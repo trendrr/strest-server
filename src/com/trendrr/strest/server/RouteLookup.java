@@ -61,7 +61,7 @@ public class RouteLookup {
 		if (cls == null)
 			return null;
 		try {
-			StrestController controller = Reflection.defaultInstance(cls);
+			StrestController controller = (StrestController)Reflection.defaultInstance(cls);
 			controller.params.putAll(route.getParams());
 			return controller;
 		} catch (Exception e) {
