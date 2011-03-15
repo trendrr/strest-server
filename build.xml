@@ -36,24 +36,6 @@
 		</copy>
 		<mkdir dir="build/jar/META-INF" />
 		
-		<copy todir="build/jar/META-INF">
-			<fileset dir="conf/META-INF">
-				<include name="**/*" />
-			</fileset>
-		</copy>
-		<copy todir="build/jar/conf">
-			<fileset dir="conf">
-				<exclude name="META-INF" />
-				<include name="*" />
-			</fileset>
-		</copy>
-		
-		
-		<copy todir="build/jar/conf">
-			<fileset dir="conf">
-				<include name="default.properties" />
-			</fileset>
-		</copy>
 		<copy todir="build/jar/conf">
 			<fileset dir="">
 				<include name="build.num" />
