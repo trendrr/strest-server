@@ -1,0 +1,26 @@
+# Example YAML config file
+# Maximum number of worker threads.  0 or remove for unlimited
+max_threads : 40
+
+# Packages to search for controllers in.
+# packages are searched recursively
+controller_packages:
+   - com.trendrr.api.controllers
+
+# Any filters to be executed on every invocation.
+# these must implement the StrestControllerFilter class
+filters:
+   - com.trendrr.api.filters.Authentication
+
+# This section configures the ssl listener.
+# remove if you do not want ssl
+ssl:
+   port: 8001
+   keystore: /home/dustin/keystore.jks
+   keystore_password: strest
+   certificate_password: strest
+
+# Configuration of the default listener (i.e. regular http/strest)
+default:
+   port: 8000
+
