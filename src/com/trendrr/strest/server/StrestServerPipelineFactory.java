@@ -72,7 +72,7 @@ public class StrestServerPipelineFactory implements ChannelPipelineFactory {
         //pipeline.addLast("aggregator", new HttpChunkAggregator(1048576));
         pipeline.addLast("encoder", new HttpResponseEncoder());
         // Remove the following line if you don't want automatic content compression.
-        pipeline.addLast("deflater", new StrestContentEncoder());
+        pipeline.addLast("deflater", new StrestResponseEncoder());
         pipeline.addLast("handler", new StrestRequestHandler(router));
         return pipeline;
     }

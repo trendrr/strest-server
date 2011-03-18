@@ -5,6 +5,7 @@ package com.trendrr.strest.server;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ConcurrentSkipListSet;
 
 import org.apache.commons.logging.Log;
@@ -29,7 +30,7 @@ public class StrestConnection {
 	Channel channel;
 	private ConcurrentHashMap<String, ConcurrentHashMap<String,Object>> transactionStorage = new ConcurrentHashMap<String,ConcurrentHashMap<String,Object>>();
 	private ConcurrentHashMap<String,Object> connectionStorage = new ConcurrentHashMap<String,Object>();
-	private ConcurrentSkipListSet<DisconnectCallback> disconnectCallbacks = new ConcurrentSkipListSet<DisconnectCallback>();
+	private ConcurrentLinkedQueue<DisconnectCallback> disconnectCallbacks = new ConcurrentLinkedQueue<DisconnectCallback>();
 	
 	/**
 	 * registers a callback for when the connection is disconnected..
@@ -62,7 +63,7 @@ public class StrestConnection {
 		return this.channel != null;
 	}
 	
-	synchronized void finished() {
+	synchronized void finished() {		
 		for (DisconnectCallback cb : this.disconnectCallbacks) {
 			cb.disconnected(this);
 		}

@@ -47,7 +47,16 @@ public class StrestResponseEncoder extends SimpleChannelHandler {
 			 ctx.sendDownstream(e);
 		 } else  if (msg instanceof HttpMessage) {
 			 HttpMessage m = (HttpMessage) msg;
+			 //make sure content length is set.
+			 if (!m.containsHeader(HttpHeaders.Names.CONTENT_LENGTH)) {
+				 if (m.getContent() != null && m.getContent().readableBytes() > 0) {
+					 m.setHeader(HttpHeaders.Names.CONTENT_LENGTH, m.getContent().readableBytes());
+				 } else {
+					 m.setHeader(HttpHeaders.Names.CONTENT_LENGTH, 0);
+				 } 
+			 }
 		 }
+		 ctx.sendDownstream(e);
 	 }
 	
 	/**

@@ -5,8 +5,10 @@ package com.trendrr.strest.server;
 
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -37,9 +39,27 @@ public abstract class StrestController {
 	protected Log log = LogFactory.getLog(StrestController.class);
 	
 	protected HttpRequest request;
-	protected HttpResponse response;
+	protected HttpResponse response = null;
 	protected DynMap params = new DynMap();
+	protected boolean sendResponse = true;
 	
+	/**
+	 * If false then the this.response item will not automatically be sent to the client
+	 * @return
+	 */
+	public boolean isSendResponse() {
+		return sendResponse;
+	}
+
+	/**
+	 * set to false if you would like to send responses outside the normal request response
+	 * 
+	 * @param sendResponse
+	 */
+	public void setSendResponse(boolean sendResponse) {
+		this.sendResponse = sendResponse;
+	}
+
 	/**
 	 * these are the params, either parsed from the get string, or from a form encoded post.
 	 * will also include any named params from the url string.
@@ -162,6 +182,13 @@ public abstract class StrestController {
 	public Class[] filters() {
 		if (this.getClass().isAnnotationPresent(Strest.class)) {
 			return this.getClass().getAnnotation(Strest.class).filters();
+		}
+		return null;
+	}
+	
+	public String[] requiredParams() {
+		if (this.getClass().isAnnotationPresent(Strest.class)) {	
+			return this.getClass().getAnnotation(Strest.class).requiredParams();
 		}
 		return null;
 	}

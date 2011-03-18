@@ -65,8 +65,7 @@ public class RouteLookup {
 			controller.params.putAll(route.getParams());
 			return controller;
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			log.error("Caught" ,e);
 		}
 		return null;
 	}

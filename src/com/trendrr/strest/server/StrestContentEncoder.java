@@ -29,7 +29,12 @@ import org.jboss.netty.util.internal.LinkedTransferQueue;
  * @author Dustin Norlander
  * @created Feb 2, 2011
  * 
+ * Dont use this, just keeping around for reference for the time being.
+ * 
+ * The acceptEncodingQueue is wrong for STREST, as it assumes 1to1 request response pairs.
+ * 
  */
+@Deprecated
 public class StrestContentEncoder extends HttpContentCompressor {
 
 	protected Log log = LogFactory.getLog(StrestContentEncoder.class);
@@ -58,7 +63,7 @@ public class StrestContentEncoder extends HttpContentCompressor {
 
         ctx.sendUpstream(e);
     }
-
+    
     @Override
     public void writeRequested(ChannelHandlerContext ctx, MessageEvent e)
             throws Exception {
@@ -102,7 +107,6 @@ public class StrestContentEncoder extends HttpContentCompressor {
 //                                HttpHeaders.Names.CONTENT_LENGTH,
 //                                Integer.toString(content.readableBytes()));
 //                    }
-                    System.out.println("BLAHRG StrestContentEncoder");
                 }
             }
             //ALWAYS SET THE Content_LEngth
@@ -142,8 +146,6 @@ public class StrestContentEncoder extends HttpContentCompressor {
         } else {
             ctx.sendDownstream(e);
         }
-        
-        System.out.println(msg);
     }
     
     private ChannelBuffer encode(ChannelBuffer buf) {

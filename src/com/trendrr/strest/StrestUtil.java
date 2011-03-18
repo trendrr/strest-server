@@ -7,6 +7,7 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.jboss.netty.handler.codec.http.HttpMessage;
 import org.jboss.netty.handler.codec.http.HttpRequest;
 import org.jboss.netty.handler.codec.http.HttpVersion;
 
@@ -52,5 +53,9 @@ public class StrestUtil {
 			return false;
 		}
 		return true;
+	}
+	
+	public static String txnId(HttpMessage message) {
+		return 	message.getHeader(StrestUtil.HEADERS.TXN_ID);
 	}
 }

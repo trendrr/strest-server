@@ -192,11 +192,18 @@ public class StrestRouter {
 	            }
 				
 				response.setResponse(controller.getResponse());
+				if (!controller.isSendResponse()) {
+					log.info("controller requested we not send a response.");
+					return;
+				}
+				
+				
 	        } catch (StrestHttpException e) {
 	        	throw e;
 	        } catch (Exception x) {
 	        	StrestHttpException e = StrestHttpException.INTERNAL_SERVER_ERROR();
 	        	e.setCause(x);
+	        	log.error("Caught", x);
 	        	throw e;
 	        }
 		} catch (StrestHttpException e) {
@@ -226,9 +233,9 @@ public class StrestRouter {
 		
 		
         // Write the response.
-		System.out.println(response.getResponse());
-		System.out.println("*****");
-		System.out.println(response.getResponse().getContent().toString());
+//		System.out.println(response.getResponse());
+//		System.out.println("*****");
+//		System.out.println(response.getResponse().getContent().toString());
 		
         ChannelFuture future = con.sendMessage(response.getResponse());
 

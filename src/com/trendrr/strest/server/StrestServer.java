@@ -50,22 +50,34 @@ public class StrestServer {
 		
 	}
 	
+	/**
+	 * creates a server based on a config file.  Config file is assumed to be either 
+	 * json or yaml.  See example_config.yaml for more.
+	 * @param filename
+	 * @return
+	 * @throws Exception
+	 */
 	public static StrestServer instanceFromFile(String filename) throws Exception {
+		StrestServer server = new StrestServer();
+		initFromFile(server, filename);
+		return server;
+	}
+	
+	public static void initFromFile(StrestServer server, String filename) throws Exception {
 		if (filename.endsWith("yaml")) {
 			Yaml yaml = new Yaml();
 		    String document = FileHelper.loadString("example_config.yaml");
 		    Map map = (Map) yaml.load(document);
-		    return instance(DynMapFactory.instance(map));
+		    initialize(server, DynMapFactory.instance(map));
 		    
 		} else if (filename.endsWith("xml")) {
 			//TODO (or not..)
 			
 		} else {
 			//assume json
-			return instance(DynMapFactory.instanceFromFile(filename));
+			initialize(server, DynMapFactory.instanceFromFile(filename));
 			
 		}
-		throw new Exception("Unable to load file: " + filename);
 	}
 	
 	/*
@@ -98,6 +110,24 @@ public class StrestServer {
 			throw new Exception("Config is null! unable to create server ");
 		}
 		StrestServer server = new StrestServer();
+		initialize(server, config);
+		return server;
+	}
+	
+	/**
+	 * initializes the passed in server.  Use this if you need to override the 
+	 * StrestServer or set a new Router, ect.  
+	 * 
+	 * In other cases you should use the the StrestServer.instance methods
+	 * 
+	 * @param server
+	 * @param config
+	 * @throws Exception
+	 */
+	public static void initialize(StrestServer server, DynMap config) throws Exception {
+		if (config == null) {
+			throw new Exception("Config is null! unable to initialize server ");
+		}
 		server.setPort(config.get(Integer.class, "default.port"));
 		server.setMaxWorkerThreads(config.get(Integer.class, "max_threads"));
 		List<String> controllerPackages = config.getList(String.class, "controller_packages");
@@ -122,8 +152,6 @@ public class StrestServer {
 			server.setSSLContext(builder.toSSLContext());
 			server.setSslPort(ssl.get(Integer.class, "port", server.getSslPort()));
 		}
-		
-		return server;
 	}
 	
 	public StrestRouter getRouter() {

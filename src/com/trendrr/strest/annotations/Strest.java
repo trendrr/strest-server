@@ -19,8 +19,9 @@ public @interface Strest {
 	String[] route() default "";
 	Class[] filters() default Strest.class; //use Strest as a dummy, since we need a default.
 	
-//	boolean authenticate() default true;
-//	String[] access() default "";
-//	String[] requiredParams() default "";
-//	String[] returnTypes() default {"json","xml"};
+	/**
+	 * these params are required.
+	 * @return
+	 */
+	String[] requiredParams() default "";
 }
