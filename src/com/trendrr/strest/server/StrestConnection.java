@@ -40,6 +40,10 @@ public class StrestConnection {
 		this.disconnectCallbacks.add(callback);
 	}
 	
+	public Channel getChannel() {
+		return this.channel;
+	}
+	
 	/**
 	 * gets the transaction storage, or null
 	 * @param txnId

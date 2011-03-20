@@ -58,6 +58,8 @@ public class StrestServerPipelineFactory implements ChannelPipelineFactory {
 	}
 	
     public ChannelPipeline getPipeline() throws Exception {
+    	
+    	System.out.println("PIPELINE!");
         // Create a default pipeline implementation.
         ChannelPipeline pipeline = pipeline();
 

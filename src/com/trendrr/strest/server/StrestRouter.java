@@ -20,11 +20,13 @@ import org.jboss.netty.channel.Channel;
 import org.jboss.netty.channel.ChannelFuture;
 import org.jboss.netty.channel.ChannelFutureListener;
 import org.jboss.netty.handler.codec.http.DefaultHttpResponse;
+import org.jboss.netty.handler.codec.http.HttpHeaders;
 import org.jboss.netty.handler.codec.http.HttpMethod;
 import org.jboss.netty.handler.codec.http.HttpRequest;
 import org.jboss.netty.handler.codec.http.HttpResponse;
 import org.jboss.netty.handler.codec.http.HttpResponseStatus;
 import org.jboss.netty.handler.codec.http.HttpVersion;
+import org.jboss.netty.handler.codec.http.websocket.WebSocketFrameEncoder;
 import org.jboss.netty.util.CharsetUtil;
 
 import com.trendrr.oss.DynMap;
@@ -32,6 +34,7 @@ import com.trendrr.oss.DynMapFactory;
 import com.trendrr.oss.Reflection;
 import com.trendrr.strest.StrestHttpException;
 import com.trendrr.strest.StrestUtil;
+import com.trendrr.strest.server.websocket.WebsocketEncoder;
 
 
 /**
@@ -118,8 +121,8 @@ public class StrestRouter {
 	
 	public void incoming(Channel channel, HttpRequest request) {
 		
-		System.out.println("NEW CONNECTION!");
-		System.out.println("TOTAL CONNECTIONS: " + this.connections.size());
+//		System.out.println("NEW CONNECTION!");
+//		System.out.println("TOTAL CONNECTIONS: " + this.connections.size());
 		boolean isStrest = "STREST".equalsIgnoreCase(request.getProtocolVersion().getProtocolName());
 		// Build the response object.
         ResponseBuilder response = new ResponseBuilder(request);
@@ -241,6 +244,7 @@ public class StrestRouter {
 
         // Close the non-keep-alive connection after the write operation is done.
         if (!isStrest) {
+//        	log.info("CLOSING NON STREST CONNECTION");
             future.addListener(ChannelFutureListener.CLOSE);
             this.removeChannel(channel);
         }

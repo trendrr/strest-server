@@ -41,6 +41,7 @@ public class StrestResponseEncoder extends SimpleChannelHandler {
 	
 	 @Override
 	 public void writeRequested(ChannelHandlerContext ctx, MessageEvent e) throws Exception {
+		 System.out.println("response encoder " + e);
 		 Object msg = e.getMessage();
 		 if (msg instanceof HttpResponse && ((HttpResponse) msg).getStatus().getCode() == 100) {
 			 // 100-continue response must be passed through.
