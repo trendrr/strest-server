@@ -1,7 +1,7 @@
 /**
  * 
  */
-package com.trendrr.strest.server;
+package com.trendrr.strest.server.connections;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -19,6 +19,8 @@ import org.jboss.netty.handler.codec.http.HttpRequest;
 import org.jboss.netty.handler.codec.http.HttpResponse;
 
 import com.trendrr.strest.StrestUtil;
+import com.trendrr.strest.server.StrestResponseEncoder;
+import com.trendrr.strest.server.callbacks.DisconnectCallback;
 
 
 /**
@@ -37,13 +39,13 @@ public class StrestConnectionGroup implements DisconnectCallback{
 	protected Log log = LogFactory.getLog(StrestConnectionGroup.class);
 
 	//map of connection to list of transactions.
-	ConcurrentHashMap<StrestConnection, ConcurrentSkipListSet<SCon>> connections = new ConcurrentHashMap<StrestConnection, ConcurrentSkipListSet<SCon>>();
+	ConcurrentHashMap<StrestConnectionChannel, ConcurrentSkipListSet<SCon>> connections = new ConcurrentHashMap<StrestConnectionChannel, ConcurrentSkipListSet<SCon>>();
 	
 
 	protected class SCon implements Comparable<SCon>{
-		StrestConnection connection;
+		StrestConnectionChannel connection;
 		HttpRequest requestCopy;
-		public SCon(StrestConnection con, HttpRequest request) {
+		public SCon(StrestConnectionChannel con, HttpRequest request) {
 			//just copy the headers into a new request
 			requestCopy = new DefaultHttpRequest(request.getProtocolVersion(), request.getMethod(), request.getUri());
 			for (String h : request.getHeaderNames()) {
@@ -62,7 +64,7 @@ public class StrestConnectionGroup implements DisconnectCallback{
 	 * @param connection
 	 * @param txnId
 	 */
-	public synchronized void addConnection(StrestConnection connection, HttpRequest request) {
+	public synchronized void addConnection(StrestConnectionChannel connection, HttpRequest request) {
 		connections.putIfAbsent(connection, new ConcurrentSkipListSet<SCon>());
 		connections.get(connection).add(new SCon(connection,request));
 		connection.onDisconnect(this);
@@ -75,7 +77,7 @@ public class StrestConnectionGroup implements DisconnectCallback{
 	 * was not in the group
 	 * @param connection
 	 */
-	public synchronized Set<HttpRequest> removeConnection(StrestConnection connection) {
+	public synchronized Set<HttpRequest> removeConnection(StrestConnectionChannel connection) {
 		
 		Set<SCon> vals = connections.remove(connection);
 		if (vals == null || vals.isEmpty()) {
@@ -97,7 +99,7 @@ public class StrestConnectionGroup implements DisconnectCallback{
 	 * @param connection
 	 * @param txnId
 	 */
-	public synchronized void removeTxn(StrestConnection connection, String txnId) {
+	public synchronized void removeTxn(StrestConnectionChannel connection, String txnId) {
 		if (!this.connections.containsKey(connection)) {
 			return;
 		}
@@ -118,7 +120,7 @@ public class StrestConnectionGroup implements DisconnectCallback{
 	 */
 	public Collection<ChannelFuture> sendMessage(HttpResponse response) {
 		Collection<ChannelFuture> futures = new ArrayList<ChannelFuture>();
-		for (StrestConnection con : this.connections.keySet()) {
+		for (StrestConnectionChannel con : this.connections.keySet()) {
 			Set<SCon> scons = this.connections.get(con);
 			if (scons == null || scons.isEmpty()) 
 				continue;
@@ -142,7 +144,7 @@ public class StrestConnectionGroup implements DisconnectCallback{
 		return this.connections.isEmpty();
 	}
 	
-	public boolean contains(StrestConnection connection) {
+	public boolean contains(StrestConnectionChannel connection) {
 		return this.connections.containsKey(connection);
 	}
 	
@@ -150,7 +152,7 @@ public class StrestConnectionGroup implements DisconnectCallback{
 	 * @see com.trendrr.strest.server.DisconnectCallback#disconnected(com.trendrr.strest.server.StrestConnection)
 	 */
 	@Override
-	public void disconnected(StrestConnection connection) {
+	public void disconnected(StrestConnectionChannel connection) {
 		this.removeConnection(connection);
 	}
 }

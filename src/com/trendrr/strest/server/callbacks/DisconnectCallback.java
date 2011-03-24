@@ -1,10 +1,13 @@
 /**
  * 
  */
-package com.trendrr.strest.server;
+package com.trendrr.strest.server.callbacks;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
+import com.trendrr.strest.server.connections.StrestConnectionChannel;
+
 
 
 /**
@@ -18,5 +21,5 @@ import org.apache.commons.logging.LogFactory;
  */
 public interface DisconnectCallback {
 
-	public void disconnected(StrestConnection connection);
+	public void disconnected(StrestConnectionChannel connection);
 }

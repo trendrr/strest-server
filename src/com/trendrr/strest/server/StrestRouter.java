@@ -34,6 +34,7 @@ import com.trendrr.oss.DynMapFactory;
 import com.trendrr.oss.Reflection;
 import com.trendrr.strest.StrestHttpException;
 import com.trendrr.strest.StrestUtil;
+import com.trendrr.strest.server.connections.StrestConnectionChannel;
 import com.trendrr.strest.server.websocket.WebsocketEncoder;
 
 
@@ -53,7 +54,7 @@ public class StrestRouter {
 	
 	protected RouteLookup routeLookup = new RouteLookup();
 
-	protected ConcurrentHashMap<Channel, StrestConnection> connections = new ConcurrentHashMap<Channel, StrestConnection>();
+	protected ConcurrentHashMap<Channel, StrestConnectionChannel> connections = new ConcurrentHashMap<Channel, StrestConnectionChannel>();
 	
 	protected List<StrestControllerFilter> defaultFilters = new ArrayList<StrestControllerFilter> ();
 	
@@ -113,10 +114,10 @@ public class StrestRouter {
 	 * @param channel
 	 */
 	public void removeChannel(Channel channel) {
-		StrestConnection con = this.connections.remove(channel);
+		StrestConnectionChannel con = this.connections.remove(channel);
 		if (con == null)
 			return;
-		con.finished();
+		con.cleanup();
 	}
 	
 	public void incoming(Channel channel, HttpRequest request) {
@@ -127,13 +128,13 @@ public class StrestRouter {
 		// Build the response object.
         ResponseBuilder response = new ResponseBuilder(request);
         
-        this.connections.putIfAbsent(channel, new StrestConnection());
-        StrestConnection con = this.connections.get(channel);
-        con.channel = channel;
+        this.connections.putIfAbsent(channel, new StrestConnectionChannel(channel));
+        StrestConnectionChannel con = this.connections.get(channel);
+      
         
         String txnId = request.getHeader(StrestUtil.HEADERS.TXN_ID);
-        con.transactionStarted(txnId);
-        
+        con.incoming(request);
+
         try {
         	try {
 	        	log.info("Looking up:" + request.getUri());
@@ -164,7 +165,7 @@ public class StrestRouter {
 	            
 	            controller.setRequest(request);
 	            controller.setResponse(response.getResponse());
-	            controller.setConnection(con);
+	            controller.setChannelConnection(con);
 	            
 	            //before filters
 	            for (StrestControllerFilter f : controller.getFilters()) {
@@ -224,11 +225,6 @@ public class StrestRouter {
 			txnStatus = StrestUtil.HEADERS.TXN_STATUS_VALUES.COMPLETE;
 		}
 		
-		
-		if (txnStatus.equalsIgnoreCase(StrestUtil.HEADERS.TXN_STATUS_VALUES.COMPLETE)) {
-			//remove any transaction cache.
-			con.transactionComplete(txnId);
-		}
 		//now set the status
 		response.txnStatus(txnStatus);
         
@@ -240,7 +236,7 @@ public class StrestRouter {
 //		System.out.println("*****");
 //		System.out.println(response.getResponse().getContent().toString());
 		
-        ChannelFuture future = con.sendMessage(response.getResponse());
+        ChannelFuture future = con.sendMessage(response);
 
         // Close the non-keep-alive connection after the write operation is done.
         if (!isStrest) {

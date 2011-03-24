@@ -22,6 +22,8 @@ import org.jboss.netty.util.CharsetUtil;
 import com.trendrr.oss.DynMap;
 import com.trendrr.oss.Reflection;
 import com.trendrr.strest.annotations.Strest;
+import com.trendrr.strest.server.connections.StrestConnectionChannel;
+import com.trendrr.strest.server.connections.StrestConnectionTxn;
 
 
 /**
@@ -76,7 +78,7 @@ public abstract class StrestController {
 
 	protected boolean strest = false;
 	protected String strestTxnId = null;
-	protected StrestConnection connection = null;
+	protected StrestConnectionChannel connection = null;
 	
 	/**
 	 * default constructor is manditory.  Other constructors will not be used.
@@ -86,16 +88,20 @@ public abstract class StrestController {
 		
 	}
 	
-	public StrestConnection getConnection() {
+	public StrestConnectionChannel getChannelConnection() {
 		return this.connection;
 	}
 
-	public void setConnection(StrestConnection connection) {
+	public void setChannelConnection(StrestConnectionChannel connection) {
 		this.connection = connection;
+	}
+	
+	public StrestConnectionTxn getTxnConnection() {
+		return this.connection.getTxnConnection(this.strestTxnId);
 	}
 
 	public Map<String,Object> getTransactionStorage() {
-		return this.connection.getTransactionStorage(this.strestTxnId);
+		return this.connection.getTxnConnection(this.strestTxnId).getStorage();
 	}
 	
 	

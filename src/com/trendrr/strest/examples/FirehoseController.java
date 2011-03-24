@@ -18,9 +18,10 @@ import com.trendrr.strest.StrestHttpException;
 import com.trendrr.strest.StrestUtil;
 import com.trendrr.strest.annotations.Strest;
 import com.trendrr.strest.server.ResponseBuilder;
-import com.trendrr.strest.server.StrestConnection;
-import com.trendrr.strest.server.StrestConnectionGroup;
 import com.trendrr.strest.server.StrestController;
+import com.trendrr.strest.server.connections.StrestConnectionChannel;
+import com.trendrr.strest.server.connections.StrestConnectionGroup;
+import com.trendrr.strest.server.connections.StrestConnectionGroup2;
 
 
 /**
@@ -47,7 +48,7 @@ public class FirehoseController extends StrestController implements Runnable{
 	 * This is a special lock that only opens the first time
 	 */
 	static LazyInit lock = new LazyInit();
-	static StrestConnectionGroup connections = new StrestConnectionGroup();
+	static StrestConnectionGroup2 connections = new StrestConnectionGroup2();
 	
 	/* (non-Javadoc)
 	 * @see com.trendrr.strest.server.StrestController#action(com.trendrr.oss.DynMap)
@@ -68,7 +69,7 @@ public class FirehoseController extends StrestController implements Runnable{
 		if (!StrestUtil.isTxnMulti(this.request)) {
 			throw new StrestHttpException(400, "Strest-Txn-Accept must be multi for this action!");
 		}		
-		connections.addConnection(this.getConnection(), this.getRequest());
+		connections.addConnection(this.getTxnConnection());
 		this.setSendResponse(false); //make sure to not send a default response.
 	}
 

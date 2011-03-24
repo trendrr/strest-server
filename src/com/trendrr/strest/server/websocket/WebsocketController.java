@@ -113,18 +113,15 @@ public class WebsocketController extends StrestController {
         }
 
         // Upgrade the connection and send the handshake response.
-        ChannelPipeline p = this.getConnection().getChannel().getPipeline();
+        ChannelPipeline p = this.getChannelConnection().getChannel().getPipeline();
         p.addFirst("wsstrestdecoder", new WebsocketDecoder());
         p.addFirst("wsdecoder", new WebSocketFrameDecoder());  
-        this.getConnection().sendMessage(res);
+        this.getChannelConnection().sendMessage(res);
         this.setSendResponse(false);
         
         //Downstream handlers execute in reverse order.
         p.addFirst("wsstrestencoder", new WebsocketEncoder());
         p.addFirst("wsencoder", new WebSocketFrameEncoder());
-        
-        
-        
 	}
 
 	 private String getWebSocketLocation(HttpRequest req) {

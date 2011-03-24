@@ -8,7 +8,8 @@ max_threads : 40
 # packages are searched recursively
 controller_packages:
    - com.trendrr.strest.examples
-
+   - com.trendrr.strest.server.websocket
+   
 # Any filters to be executed on every invocation.
 # these must implement the StrestControllerFilter class
 filters:

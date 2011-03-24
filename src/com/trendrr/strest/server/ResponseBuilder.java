@@ -3,6 +3,7 @@
  */
 package com.trendrr.strest.server;
 
+import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
@@ -65,6 +66,24 @@ public class ResponseBuilder {
 		return this;
 	}
 	
+	/**
+	 * sets the txn status to complete
+	 * @return
+	 */
+	public ResponseBuilder txnStatusComplete() {
+		response.setHeader(StrestUtil.HEADERS.TXN_STATUS, StrestUtil.HEADERS.TXN_STATUS_VALUES.COMPLETE);
+		return this;
+	}
+	
+	/**
+	 * sets txn status to continue
+	 * @return
+	 */
+	public ResponseBuilder txnStatusContinue() {
+		response.setHeader(StrestUtil.HEADERS.TXN_STATUS, StrestUtil.HEADERS.TXN_STATUS_VALUES.CONTINUE);
+		return this;
+	}
+	
 	public ResponseBuilder status(HttpResponseStatus status) {
 		this.response.setStatus(status);
 		return this;
@@ -97,6 +116,34 @@ public class ResponseBuilder {
 		response.setHeader("Content-Type", mimeType);
 //		response.setHeader(HttpHeaders.Names.CONTENT_LENGTH, bytes.length);
 		return this;
+	}
+	
+	/**
+	 * encodes the text as utf8 and swallows and logs a warning for any character encodeing exceptions
+	 * @param mimeType
+	 * @param content
+	 * @return
+	 */
+	public ResponseBuilder contentUTF8(String mimeType, String content) {
+		try {
+			this.content(mimeType, content.getBytes("utf8"));
+		} catch (UnsupportedEncodingException e) {
+			log.warn("Swallowed", e);
+		}
+		return this;
+	}
+	/**
+	 * same as above but sets mimetype to text/plain
+	 * @param content
+	 * @return
+	 */
+	public ResponseBuilder contentUTF8(String content) {
+		this.contentUTF8("text/plain", content);
+		return this;
+	}
+	
+	public ResponseBuilder contentJSON(DynMap mp) {
+		return this.contentUTF8("text/json", mp.toJSONString());
 	}
 	
 	public HttpResponse getResponse() {
