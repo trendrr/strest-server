@@ -5,8 +5,6 @@ package com.trendrr.strest.examples;
 
 
 import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
-import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -19,7 +17,6 @@ import com.trendrr.strest.StrestUtil;
 import com.trendrr.strest.annotations.Strest;
 import com.trendrr.strest.server.ResponseBuilder;
 import com.trendrr.strest.server.StrestController;
-import com.trendrr.strest.server.connections.StrestConnectionChannel;
 import com.trendrr.strest.server.connections.StrestConnectionGroup;
 
 
@@ -82,14 +79,9 @@ public class FirehoseController extends StrestController implements Runnable{
 		while (true) {
 			//build the response.
 			ResponseBuilder res = new ResponseBuilder();
-			try {
-				res.txnStatus(StrestUtil.HEADERS.TXN_STATUS_VALUES.CONTINUE); //lets the client know to expect more messages.
-				
-				//set the content message.
-				res.content("text", ("this is message number: " + num++ + "\r\nThere are " + connections.size() + " concurrent connections").getBytes("utf-8"));
-			} catch (UnsupportedEncodingException e) {
-				//will never happen :)
-			}
+			res.txnStatusContinue();//lets the client know to expect more messages.			
+			//set the content message.
+			res.contentUTF8("this is message number: " + num++ + "\r\nThere are " + connections.size() + " concurrent connections");
 			//send it to all connections
 			connections.sendMessage(res.getResponse());
 			Sleep.millis(500);
