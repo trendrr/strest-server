@@ -21,7 +21,6 @@ import com.trendrr.strest.server.ResponseBuilder;
 import com.trendrr.strest.server.StrestController;
 import com.trendrr.strest.server.connections.StrestConnectionChannel;
 import com.trendrr.strest.server.connections.StrestConnectionGroup;
-import com.trendrr.strest.server.connections.StrestConnectionGroup2;
 
 
 /**
@@ -48,7 +47,7 @@ public class FirehoseController extends StrestController implements Runnable{
 	 * This is a special lock that only opens the first time
 	 */
 	static LazyInit lock = new LazyInit();
-	static StrestConnectionGroup2 connections = new StrestConnectionGroup2();
+	static StrestConnectionGroup connections = new StrestConnectionGroup();
 	
 	/* (non-Javadoc)
 	 * @see com.trendrr.strest.server.StrestController#action(com.trendrr.oss.DynMap)

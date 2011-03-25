@@ -7,18 +7,14 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.jboss.netty.handler.codec.http.HttpRequest;
 
 import com.trendrr.oss.DynMap;
 import com.trendrr.strest.StrestException;
 import com.trendrr.strest.StrestHttpException;
 import com.trendrr.strest.StrestUtil;
 import com.trendrr.strest.server.ResponseBuilder;
-import com.trendrr.strest.server.callbacks.DisconnectCallback;
 import com.trendrr.strest.server.callbacks.TxnCompleteCallback;
-import com.trendrr.strest.server.connections.StrestConnectionChannel;
 import com.trendrr.strest.server.connections.StrestConnectionGroup;
-import com.trendrr.strest.server.connections.StrestConnectionGroup2;
 import com.trendrr.strest.server.connections.StrestConnectionTxn;
 
 
@@ -44,10 +40,10 @@ public class Users implements TxnCompleteCallback {
 	protected ConcurrentHashMap<String, StrestConnectionTxn> notifyMessage = new ConcurrentHashMap<String, StrestConnectionTxn>();
 	
 	//all the connections wanting disconnect notices.
-	protected StrestConnectionGroup2 notifyDisconnect = new StrestConnectionGroup2();
+	protected StrestConnectionGroup notifyDisconnect = new StrestConnectionGroup();
 	
 	//All the connections wanting connect notices
-	protected StrestConnectionGroup2 notifyConnect = new StrestConnectionGroup2();
+	protected StrestConnectionGroup notifyConnect = new StrestConnectionGroup();
 	
 	
 	
