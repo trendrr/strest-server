@@ -192,13 +192,6 @@ public abstract class StrestController {
 		return null;
 	}
 	
-	public String[] requiredParams() {
-		if (this.getClass().isAnnotationPresent(Strest.class)) {	
-			return this.getClass().getAnnotation(Strest.class).requiredParams();
-		}
-		return null;
-	}
-	
 	/**
 	 * gets any filters associated with this controller.
 	 * 
