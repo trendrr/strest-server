@@ -12,9 +12,14 @@ import org.apache.commons.logging.LogFactory;
  */
 public class StrestException extends Exception {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 3720409055017281521L;
+
 	protected Log log = LogFactory.getLog(StrestException.class);
 	
-protected String message = null;
+	protected String message = null;
 	
 	protected Exception cause = null;
 	
