@@ -65,6 +65,8 @@ public class RouteMatcher {
 	 * returns null if no match is found.
 	 * 
 	 * if multiple matches are found, first one is returned (no guarentee on ordering).
+	 * 
+	 * if uri ends with .extension then that is trimmed and put as return_type into the params
 	 * @param uri
 	 * @return
 	 */
@@ -72,9 +74,23 @@ public class RouteMatcher {
 		List<UriMapping> found = new ArrayList<UriMapping>();
 		
 		List<String> words = new ArrayList<String>();
+		
+		String word = null;
 		for (String w : StringHelper.trim(uri, "/").split("\\/")) {
-			words.add(w);
+			if (word != null)
+				words.add(word);
+			word = w;
 		}
+		
+//		get the extension if it exists
+		String extension = null;
+		int index = word.indexOf('.');
+		if (index != -1) {
+			extension = word.substring(index+1);
+			word = word.substring(0, index);
+		}
+		words.add(word);
+		
 		
 		tree.find(found, words);
 		
@@ -89,6 +105,10 @@ public class RouteMatcher {
 		MatchedRoute m = new MatchedRoute();
 		m.setMapping(found.get(0));
 		m.setParams(m.getMapping().getWildCardMatches(words));
+		if (extension != null) {
+			m.getParams().put("return_type", extension);
+		}
+		
 		return m;
 	}
 	
