@@ -66,7 +66,7 @@ public class StrestServer {
 	public static void initFromFile(StrestServer server, String filename) throws Exception {
 		if (filename.endsWith("yaml")) {
 			Yaml yaml = new Yaml();
-		    String document = FileHelper.loadString("example_config.yaml");
+		    String document = FileHelper.loadString(filename);
 		    Map map = (Map) yaml.load(document);
 		    initialize(server, DynMapFactory.instance(map));
 		    

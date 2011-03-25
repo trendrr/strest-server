@@ -69,9 +69,6 @@ public class FirehoseController extends StrestController implements Runnable{
 		this.setSendResponse(false); //make sure to not send a default response.
 	}
 
-	/* (non-Javadoc)
-	 * @see java.lang.Runnable#run()
-	 */
 	@Override
 	public void run() {
 		//Send the firehose messages to all registered connections.	
