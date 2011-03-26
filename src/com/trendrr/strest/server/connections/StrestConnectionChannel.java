@@ -106,8 +106,6 @@ public class StrestConnectionChannel implements Comparable<StrestConnectionChann
 			//remove the txn
 			this.txnComplete(response.getHeader(StrestUtil.HEADERS.TXN_ID));
 		}
-		
-		System.out.println("SENDING: " + response);
         return channel.write(response);
 	}
 	

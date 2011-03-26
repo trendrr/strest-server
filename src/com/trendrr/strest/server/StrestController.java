@@ -21,6 +21,7 @@ import org.jboss.netty.util.CharsetUtil;
 
 import com.trendrr.oss.DynMap;
 import com.trendrr.oss.Reflection;
+import com.trendrr.strest.StrestHttpException;
 import com.trendrr.strest.annotations.Strest;
 import com.trendrr.strest.server.connections.StrestConnectionChannel;
 import com.trendrr.strest.server.connections.StrestConnectionTxn;
@@ -106,11 +107,11 @@ public abstract class StrestController {
 	
 	
 	public void handleGET(DynMap params) throws Exception {
-		log.info("default GET handler");
+		throw StrestHttpException.METHOD_NOT_ALLOWED();
 	}
 	
 	public void handlePOST(DynMap params) throws Exception {
-		log.info("default POST handler");
+		throw StrestHttpException.METHOD_NOT_ALLOWED();
 	}
 	
 	/**
@@ -119,7 +120,7 @@ public abstract class StrestController {
 	 * @throws Exception
 	 */
 	public void handlePUT(DynMap params) throws Exception {
-		log.info("default PUT handler");
+		throw StrestHttpException.METHOD_NOT_ALLOWED();
 	}
 	
 	/**
@@ -128,7 +129,7 @@ public abstract class StrestController {
 	 * @throws Exception
 	 */
 	public void handleDELETE(DynMap params) throws Exception {
-		log.info("default DELETE handler");
+		throw StrestHttpException.METHOD_NOT_ALLOWED();
 	}
 	
 	public HttpRequest getRequest() {
@@ -164,7 +165,7 @@ public abstract class StrestController {
 	}
 	
 	public void setResponseBytes(byte[] bytes, String mimeType) {
-		this.response.setContent(ChannelBuffers.copiedBuffer(bytes));
+		this.response.setContent(ChannelBuffers.wrappedBuffer(bytes));
 		this.response.setHeader("Content-Type", mimeType);
 		response.setHeader(HttpHeaders.Names.CONTENT_LENGTH, bytes.length);
 	}

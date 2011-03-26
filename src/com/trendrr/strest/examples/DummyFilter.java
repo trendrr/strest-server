@@ -25,7 +25,7 @@ public class DummyFilter implements StrestControllerFilter {
 	 */
 	@Override
 	public void before(StrestController controller) throws StrestException {
-		log.info("Dummy Filter does something before the controller executes");
+//		log.info("Dummy Filter does something before the controller executes");
 	}
 
 	/* (non-Javadoc)
@@ -33,6 +33,6 @@ public class DummyFilter implements StrestControllerFilter {
 	 */
 	@Override
 	public void after(StrestController controller) throws StrestException {
-		log.info("Dummy Filter does nothing after the controller executes");
+//		log.info("Dummy Filter does nothing after the controller executes");
 	}
 }

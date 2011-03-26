@@ -121,9 +121,6 @@ public class StrestRouter {
 	}
 	
 	public void incoming(Channel channel, HttpRequest request) {
-		
-//		System.out.println("NEW CONNECTION!");
-//		System.out.println("TOTAL CONNECTIONS: " + this.connections.size());
 		boolean isStrest = "STREST".equalsIgnoreCase(request.getProtocolVersion().getProtocolName());
 		// Build the response object.
         ResponseBuilder response = new ResponseBuilder(request);
@@ -137,8 +134,6 @@ public class StrestRouter {
 
         try {
         	try {
-	        	log.info("Looking up:" + request.getUri());
-
 	            StrestController controller = this.getRouteLookup().find(request.getUri());
 	            if (controller == null) {
 	            	throw StrestHttpException.NOT_FOUND();
@@ -185,7 +180,7 @@ public class StrestRouter {
 	            } else if (request.getMethod() == HttpMethod.DELETE) {
 	            	controller.handleDELETE(controller.getParams());	
 	            } else {
-	            	log.warn("UNSUPPORTED METHOD: " + request.getMethod());
+	            	throw StrestHttpException.METHOD_NOT_ALLOWED();
 	            }
 	            
 	            for (StrestControllerFilter f : controller.getFilters()) {

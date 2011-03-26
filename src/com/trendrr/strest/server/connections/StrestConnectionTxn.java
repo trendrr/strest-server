@@ -141,7 +141,6 @@ public class StrestConnectionTxn implements Comparable<StrestConnectionTxn>{
 	 * called when the txn is over or disconnected.
 	 */
 	public void cleanup() {
-		System.out.println("TXN COMPLETE: " + this.request);
 		for (TxnCompleteCallback cb : this.txnCompleteCallbacks) {
 			cb.txnComplete(this);
 		}
