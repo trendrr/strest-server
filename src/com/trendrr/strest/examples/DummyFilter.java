@@ -5,6 +5,7 @@ package com.trendrr.strest.examples;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.jboss.netty.handler.codec.http.HttpResponse;
 
 import com.trendrr.strest.StrestException;
 import com.trendrr.strest.server.StrestController;
@@ -34,5 +35,15 @@ public class DummyFilter implements StrestControllerFilter {
 	@Override
 	public void after(StrestController controller) throws StrestException {
 //		log.info("Dummy Filter does nothing after the controller executes");
+	}
+
+	/* (non-Javadoc)
+	 * @see com.trendrr.strest.server.StrestControllerFilter#error(com.trendrr.strest.server.StrestController, org.jboss.netty.handler.codec.http.HttpResponse, java.lang.Exception)
+	 */
+	@Override
+	public void error(StrestController controller, HttpResponse response,
+			Exception exception) {
+		// TODO Auto-generated method stub
+		
 	}
 }
