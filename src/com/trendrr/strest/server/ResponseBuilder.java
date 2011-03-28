@@ -114,7 +114,7 @@ public class ResponseBuilder {
 	public ResponseBuilder content(String mimeType, byte[] bytes) {
 		response.setContent(ChannelBuffers.copiedBuffer(bytes));
 		response.setHeader("Content-Type", mimeType);
-//		response.setHeader(HttpHeaders.Names.CONTENT_LENGTH, bytes.length);
+		response.setHeader(HttpHeaders.Names.CONTENT_LENGTH, bytes.length);
 		return this;
 	}
 	
