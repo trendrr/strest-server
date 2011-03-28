@@ -131,10 +131,10 @@ public class StrestRouter {
         
         String txnId = request.getHeader(StrestUtil.HEADERS.TXN_ID);
         con.incoming(request);
-
+        StrestController controller = null;
         try {
         	try {
-	            StrestController controller = this.getRouteLookup().find(request.getUri());
+	            controller = this.getRouteLookup().find(request.getUri());
 	            if (controller == null) {
 	            	throw StrestHttpException.NOT_FOUND();
 	            }
@@ -208,6 +208,15 @@ public class StrestRouter {
 		} catch (StrestHttpException e) {
 			response.status(e.getCode(), e.getMessage());
 			response.txnStatus(StrestUtil.HEADERS.TXN_STATUS_VALUES.COMPLETE);
+			//run the error filters
+			for (StrestControllerFilter f : controller.getFilters()) {
+            	f.error(controller, response.getResponse(), e);
+            }
+			if (controller != null) {
+				for (StrestControllerFilter f : this.defaultFilters) {
+					f.error(controller, response.getResponse(), e);
+	            }
+			}
 		}
 		
         String txnStatus = response.getTxnStatus();

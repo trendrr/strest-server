@@ -3,6 +3,8 @@
  */
 package com.trendrr.strest.server;
 
+import org.jboss.netty.handler.codec.http.HttpResponse;
+
 import com.trendrr.strest.StrestException;
 
 
@@ -38,4 +40,14 @@ public interface StrestControllerFilter {
 	 * @throws StrestException
 	 */
 	public void after(StrestController controller) throws StrestException;
+	
+	/**
+	 * this runs if the controller throws an exception.
+	 * 
+	 * 
+	 * @param controller The controller that issued the exception.  This might be null
+	 * @param response The response packet to send to the end user.  Mutable
+	 * @param exception The exception
+	 */
+	public void error(StrestController controller, HttpResponse response, Exception exception);
 }

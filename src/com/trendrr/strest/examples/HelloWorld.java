@@ -29,7 +29,7 @@ public class HelloWorld extends StrestController {
 	 */
 	@Override
 	public void handleGET(DynMap params) throws Exception {
-		log.info("Hello1");
+//		log.info("Hello1");
 		this.setResponseBytes(
 				("Hello " + params.get(String.class, "param", "World").toUpperCase() + "!").getBytes("utf8"), 
 				"text/plain");
