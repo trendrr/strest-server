@@ -209,14 +209,15 @@ public class StrestRouter {
 			response.status(e.getCode(), e.getMessage());
 			response.txnStatus(StrestUtil.HEADERS.TXN_STATUS_VALUES.COMPLETE);
 			//run the error filters
-			for (StrestControllerFilter f : controller.getFilters()) {
-            	f.error(controller, response.getResponse(), e);
-            }
 			if (controller != null) {
-				for (StrestControllerFilter f : this.defaultFilters) {
-					f.error(controller, response.getResponse(), e);
+				for (StrestControllerFilter f : controller.getFilters()) {
+	            	f.error(controller, response.getResponse(), e);
 	            }
 			}
+			for (StrestControllerFilter f : this.defaultFilters) {
+				f.error(controller, response.getResponse(), e);
+            }
+
 		}
 		
         String txnStatus = response.getTxnStatus();
