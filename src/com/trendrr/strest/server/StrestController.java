@@ -17,6 +17,7 @@ import org.jboss.netty.handler.codec.http.HttpHeaders;
 import org.jboss.netty.handler.codec.http.HttpMethod;
 import org.jboss.netty.handler.codec.http.HttpRequest;
 import org.jboss.netty.handler.codec.http.HttpResponse;
+import org.jboss.netty.handler.codec.http.HttpResponseStatus;
 import org.jboss.netty.util.CharsetUtil;
 
 import com.trendrr.oss.DynMap;
@@ -62,7 +63,7 @@ public abstract class StrestController {
 	public void setSendResponse(boolean sendResponse) {
 		this.sendResponse = sendResponse;
 	}
-
+	
 	/**
 	 * these are the params, either parsed from the get string, or from a form encoded post.
 	 * will also include any named params from the url string.
@@ -151,7 +152,15 @@ public abstract class StrestController {
 	public boolean isStrest() {
 		return strest;
 	}
-
+	
+	public void setResponseStatus(HttpResponseStatus status_code){
+		this.response.setStatus(status_code);
+	}
+	
+	public void setResponseStatus(int code, String message){
+		this.response.setStatus(new HttpResponseStatus(code,message));
+	}
+	
 	public void setStrest(boolean strest) {
 		this.strest = strest;
 	}
