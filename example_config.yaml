@@ -8,13 +8,18 @@ max_threads : 40
 # packages are searched recursively
 controller_packages:
    - com.trendrr.strest.examples
+   
+   # this controller adds websocket support.  remove to not allow websocket connections.
    - com.trendrr.strest.server.websocket
    
 # Any filters to be executed on every invocation.
 # these must implement the StrestControllerFilter class
 filters:
-   - com.trendrr.strest.examples.DummyFilter
-
+   # Leave this filter if you wish to use the "requiredParams" part of the annotation.
+   - com.trendrr.strest.server.filters.RequiredParamsFilter 
+   
+   
+   
 # This section configures the ssl listener.
 # ssl:
 #    port: 8001

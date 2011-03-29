@@ -96,7 +96,7 @@ public class StrestConnectionGroup implements TxnCompleteCallback {
 	}
 	
 	public int size() {
-		return this.size();
+		return size;
 	}
 	
 	public boolean isEmpty() {

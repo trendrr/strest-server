@@ -18,7 +18,8 @@ import com.trendrr.strest.server.StrestController;
  * 
  */
 @Strest(
-		route = "/hello/:param"
+		route = {"",
+				"/hello/:param"}
 )
 public class HelloWorld extends StrestController {
 

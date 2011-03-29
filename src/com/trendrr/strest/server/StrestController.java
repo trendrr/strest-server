@@ -5,20 +5,16 @@ package com.trendrr.strest.server;
 
 import java.nio.charset.Charset;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.jboss.netty.buffer.ChannelBuffers;
 import org.jboss.netty.handler.codec.http.HttpHeaders;
-import org.jboss.netty.handler.codec.http.HttpMethod;
 import org.jboss.netty.handler.codec.http.HttpRequest;
 import org.jboss.netty.handler.codec.http.HttpResponse;
 import org.jboss.netty.handler.codec.http.HttpResponseStatus;
-import org.jboss.netty.util.CharsetUtil;
 
 import com.trendrr.oss.DynMap;
 import com.trendrr.oss.Reflection;
@@ -102,10 +98,25 @@ public abstract class StrestController {
 		return this.connection.getTxnConnection(this.strestTxnId);
 	}
 
-	public Map<String,Object> getTransactionStorage() {
+	/**
+	 * Txn storage is a way to keep state associated with a specific transaction.
+	 * The underlying map is threadsafe.  All data will be deleted as soon the txn is complete.
+	 * 
+	 * @return
+	 */
+	public Map<String,Object> getTxnStorage() {
 		return this.connection.getTxnConnection(this.strestTxnId).getStorage();
 	}
 	
+	/**
+	 * Connection storage is a way to keep any state associated to the connection.
+	 * 
+	 * The underlying map is threadsafe.  All data will be deleted as soon the connection is complete.
+	 * @return
+	 */
+	public Map<String,Object> getConnectionStorage() {
+		return this.connection.getTxnConnection(this.strestTxnId).getStorage();
+	}
 	
 	public void handleGET(DynMap params) throws Exception {
 		throw StrestHttpException.METHOD_NOT_ALLOWED();
@@ -202,6 +213,13 @@ public abstract class StrestController {
 		return null;
 	}
 	
+	public String[] requiredParams() {	
+		if (this.getClass().isAnnotationPresent(Strest.class)) {	
+			return this.getClass().getAnnotation(Strest.class).requiredParams();
+		}
+		return null;
+	}
+
 	/**
 	 * gets any filters associated with this controller.
 	 * 
@@ -209,18 +227,11 @@ public abstract class StrestController {
 	 */
 	public List<StrestControllerFilter> getFilters() {
 		Class[] filterClss = this.filters();
-
-		
 		List<StrestControllerFilter> filters = new ArrayList<StrestControllerFilter>();
         if (filterClss == null || filterClss.length < 1) {
         	return filters;
         }
-    	for (Class f : filterClss) {    
-    		if (f.equals(Strest.class)) {
-    			//Cheap hack..  this is the default...
-    			continue;
-    		}
-    		
+    	for (Class f : filterClss) {   		
     		Object filter;
 			try {
 				filter = Reflection.defaultInstance(f);

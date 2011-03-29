@@ -17,5 +17,6 @@ import java.lang.annotation.Target;
 @Target(ElementType.TYPE)
 public @interface Strest {
 	String[] route() default "";
-	Class[] filters() default Strest.class; //use Strest as a dummy, since we need a default.
+	Class[] filters() default {};
+	String[] requiredParams() default {};
 }
