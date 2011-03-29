@@ -67,8 +67,12 @@ public class StrestRouter {
 	public void addControllerPackage(String packageName) {
 		List<StrestController> controllers = Reflection.instances(StrestController.class, packageName, true);
 		for (StrestController c : controllers) {
-			for (String route : c.routes()) {
-				this.addRoute(route, c.getClass());
+			try{
+				for (String route : c.routes()) {
+					this.addRoute(route, c.getClass());
+				}
+			}catch(Exception e){
+				this.log.info("Skipping controller with no routes");
 			}
 		}
 	}
