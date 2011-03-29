@@ -67,6 +67,11 @@ public class StrestRouter {
 	public void addControllerPackage(String packageName) {
 		List<StrestController> controllers = Reflection.instances(StrestController.class, packageName, true);
 		for (StrestController c : controllers) {
+			String[] routes = c.routes();
+			if (routes == null) {
+				this.log.warn("Controller: " + c.getClass().getCanonicalName() + " has no routes.  Skipping");
+				continue;
+			}
 			for (String route : c.routes()) {
 				this.addRoute(route, c.getClass());
 			}
@@ -217,7 +222,6 @@ public class StrestRouter {
 			for (StrestControllerFilter f : this.defaultFilters) {
 				f.error(controller, response.getResponse(), e);
             }
-
 		}
 		
         String txnStatus = response.getTxnStatus();
