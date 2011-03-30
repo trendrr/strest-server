@@ -227,14 +227,8 @@ public abstract class StrestController {
 		return null;
 	}
 	
-	/**
-	 * gets any filters associated with this controller.
-	 * 
-	 * @return filters or empty list, never null
-	 */
-	public List<StrestControllerFilter> getFilters() {
-		//TODO: this needs to be faster..
-		
+
+	private List<StrestControllerFilter> _getFilters() {
 		Class[] filterClss = this.filters();
 		List<StrestControllerFilter> filters = new ArrayList<StrestControllerFilter>();
         if (filterClss == null || filterClss.length < 1) {
@@ -255,5 +249,17 @@ public abstract class StrestController {
 			}
     	}
     	return filters;
+		
+	}
+	private List<StrestControllerFilter> _filters = null;
+	/**
+	 * gets any filters associated with this controller.
+	 * 
+	 * @return filters or empty list, never null
+	 */
+	public List<StrestControllerFilter> getFilters() {
+		if (_filters == null)
+			this._filters = this._getFilters();
+		return this._filters;
 	}
 }
