@@ -7,6 +7,7 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -18,6 +19,7 @@ import org.jboss.netty.handler.codec.http.HttpResponseStatus;
 
 import com.trendrr.oss.DynMap;
 import com.trendrr.oss.Reflection;
+import com.trendrr.oss.concurrent.LazyInit;
 import com.trendrr.strest.StrestHttpException;
 import com.trendrr.strest.annotations.Strest;
 import com.trendrr.strest.server.connections.StrestConnectionChannel;
@@ -102,9 +104,14 @@ public abstract class StrestController {
 	 * Txn storage is a way to keep state associated with a specific transaction.
 	 * The underlying map is threadsafe.  All data will be deleted as soon the txn is complete.
 	 * 
+	 * 
 	 * @return
 	 */
+	private ConcurrentHashMap<String,Object> nonstrestTxnStorage = new ConcurrentHashMap<String,Object>();
 	public Map<String,Object> getTxnStorage() {
+		if (!this.isStrest())
+			return this.nonstrestTxnStorage;
+		
 		return this.connection.getTxnConnection(this.strestTxnId).getStorage();
 	}
 	
@@ -115,7 +122,7 @@ public abstract class StrestController {
 	 * @return
 	 */
 	public Map<String,Object> getConnectionStorage() {
-		return this.connection.getTxnConnection(this.strestTxnId).getStorage();
+		return this.connection.getStorage();
 	}
 	
 	public void handleGET(DynMap params) throws Exception {
@@ -219,13 +226,15 @@ public abstract class StrestController {
 		}
 		return null;
 	}
-
+	
 	/**
 	 * gets any filters associated with this controller.
 	 * 
 	 * @return filters or empty list, never null
 	 */
 	public List<StrestControllerFilter> getFilters() {
+		//TODO: this needs to be faster..
+		
 		Class[] filterClss = this.filters();
 		List<StrestControllerFilter> filters = new ArrayList<StrestControllerFilter>();
         if (filterClss == null || filterClss.length < 1) {
@@ -234,6 +243,7 @@ public abstract class StrestController {
     	for (Class f : filterClss) {   		
     		Object filter;
 			try {
+				System.out.println(f);
 				filter = Reflection.defaultInstance(f);
 				if (!(filter instanceof StrestControllerFilter)) {
 	    			log.warn("Filters must implement the StrestControllerFilter interface (" + filter + "  does not)");
