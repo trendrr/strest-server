@@ -2,11 +2,13 @@ com.trendrr.strest
 com.trendrr.strest.annotations
 com.trendrr.strest.client
 com.trendrr.strest.doc
+com.trendrr.strest.doc.renderer
 com.trendrr.strest.doc.tags
 com.trendrr.strest.examples
 com.trendrr.strest.examples.chat
 com.trendrr.strest.server
 com.trendrr.strest.server.callbacks
 com.trendrr.strest.server.connections
+com.trendrr.strest.server.filters
 com.trendrr.strest.server.routing
 com.trendrr.strest.server.websocket
