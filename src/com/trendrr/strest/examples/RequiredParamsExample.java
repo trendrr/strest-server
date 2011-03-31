@@ -16,16 +16,20 @@ import com.trendrr.strest.server.StrestController;
  * @created Mar 29, 2011
  * 
  */
+
+/*//
+ * 
+ * @description This example demonstrates use of the requiredParams annotation.  
+ * the 'what' param is required so if the request does not contain 'what' an error is returned. 
+ * 
+ */
 @Strest(
 		route ="/require",
 		requiredParams = {"what"}
 )
 public class RequiredParamsExample extends StrestController {
 
-	protected Log log = LogFactory.getLog(RequiredParamsExample.class);
-
 	public void handleGET(DynMap params) throws Exception {
 		this.setResponseBytes(("WHAT! " + params.getString("what")).getBytes("utf8"), "text/plain");
 	}
-
 }

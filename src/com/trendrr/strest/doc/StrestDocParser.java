@@ -135,6 +135,24 @@ public class StrestDocParser {
 			}
 			index.get(List.class, category).add(mp);
 		}
+		//now sort the lists.
+		for (String cat : index.keySet()) {
+			List<DynMap> list = index.getList(DynMap.class, cat);
+			if (list == null || list.isEmpty()) 
+				continue;
+			Collections.sort(list, new Comparator<DynMap>(){
+				@Override
+				public int compare(DynMap o1, DynMap o2) {
+					String r1 = o1.getString("route", "");
+					String r2 = o2.getString("route", "");
+					return r1.compareToIgnoreCase(r2);
+				}
+			});
+			
+			index.put(cat, list);
+		}
+		
+		
 		return index;
 		
 		

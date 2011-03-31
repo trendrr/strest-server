@@ -46,8 +46,8 @@ public class ParamTag extends AbstractDocTag {
 			value = this.removeTag("default", value);
 		}
 		
-		mp.put("manditory", this.containsTag("manditory", value));
-		value = this.removeTag("manditory", value);
+		mp.put("required", this.containsTag("required", value));
+		value = this.removeTag("required", value);
 		
 		mp.put("description", value);
 		return mp;
