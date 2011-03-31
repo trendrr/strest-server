@@ -4,10 +4,13 @@
 package com.trendrr.strest.doc;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -18,6 +21,7 @@ import com.trendrr.oss.FileHelper;
 import com.trendrr.oss.Reflection;
 import com.trendrr.oss.Regex;
 import com.trendrr.oss.StringHelper;
+import com.trendrr.strest.doc.renderer.JSONRenderer;
 
 
 /**
@@ -29,12 +33,17 @@ public class StrestDocParser {
 
 	protected Log log = LogFactory.getLog(StrestDocParser.class);
 	
-	HashMap<String, AbstractDocTag> tags = new HashMap<String, AbstractDocTag>();
+	protected HashMap<String, AbstractDocTag> tags = new HashMap<String, AbstractDocTag>();
 	
-	private int abstractLength = 256;
+	protected Set<TemplateRenderer> renderers = new HashSet<TemplateRenderer>();
+	
+	protected int abstractLength = 256;
+	
+	protected String annotationName = "Strest";
 	
 	public StrestDocParser() {
 		this.addTags("com.trendrr.strest.doc.tags", true);
+		this.addTemplateRenderer(new JSONRenderer());
 	}
 	
 	public static void main(String ...strings) {
@@ -57,22 +66,32 @@ public class StrestDocParser {
 		DynMap index = this.createIndex(routes);
 		//save the index.
 		try {
-			FileHelper.saveString(saveDirectory + "/strestdoc_index.json", index.toJSONString());
+			String filename = saveDirectory + "/strestdoc_index";
+			for (TemplateRenderer rend : this.renderers) {
+				FileHelper.saveBytes(filename + rend.getFileExtension(), rend.renderIndex(index));
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		
 		for (DynMap route : routes) {
 			try {
-				String filename = saveDirectory + route.get(String.class, "route");
+				String r = route.get(String.class, "route");
+				if (r.isEmpty())
+					r = "/index";
+				String filename = saveDirectory + r;
+				
+				//TODO: this doesn't look right.  also think it would screw with the 
+				//listing pages.
 				if (route.containsKey("method")) {
 					for (String m : route.getList(String.class, "method")) {
 						filename += "_" + m;
 					}
 				}
-				filename = filename + ".json";
 				System.out.println("SAVING: " + filename);
-				FileHelper.saveString(filename, route.toJSONString());
+				for (TemplateRenderer rend : this.renderers) {					
+					FileHelper.saveBytes(filename + rend.getFileExtension(), rend.renderPage(route));
+				}
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -156,6 +175,23 @@ public class StrestDocParser {
 		return null;
 	}
 	
+	/**
+	 * adds a new template renderer
+	 * @param renderer
+	 */
+	public void addTemplateRenderer(TemplateRenderer renderer) {
+		this.renderers.add(renderer);
+	}
+	
+	/**
+	 * sets the list of template renderers
+	 * @param renderers
+	 */
+	public void setTemplateRenderers(Collection<TemplateRenderer> renderers) {
+		this.renderers.clear();
+		this.renderers.addAll(renderers);
+	}
+	
 	public void addTag(AbstractDocTag tag) {
 		tags.put(tag.tagName(), tag);
 	}
@@ -220,12 +256,12 @@ public class StrestDocParser {
 		 * This is all ugly as hell, and pretty slow, but it works :)
 		 */
 		
-		String ann = Regex.matchFirst(java, "\\@Strest\\s*\\([^\\)]+\\)", false);
+		String ann = Regex.matchFirst(java, "\\@" + this.annotationName + "\\s*\\([^\\)]+\\)", false);
 		DynMap mp = new DynMap();
 		if (ann == null) {
 			return mp;
 		}
-		ann = ann.replaceFirst("\\@Strest\\s*\\(", "");
+		ann = ann.replaceFirst("\\@" + this.annotationName + "\\s*\\(", "");
 		ann = ann.replaceAll("\\)$", "");
 		
 		
