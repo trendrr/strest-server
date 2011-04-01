@@ -25,7 +25,7 @@ public class TreeNode {
 	UriMapping mapping = null;
 	HashMap<String, TreeNode> children = new HashMap<String,TreeNode>();
 	List<TreeNode> wildcards = new ArrayList<TreeNode>();
-
+	TreeNode dirWildCard = null;
 	
 	void addChildNode(UriMapping mapping, List<String> tokens) {
 		String word = tokens.get(0);
@@ -35,7 +35,12 @@ public class TreeNode {
 			node = children.get(word);
 		}
 		
-		if (word.startsWith(":")) {
+		if (word.startsWith("*")) {
+			this.dirWildCard = node;
+			//we don't parse any more of the words as this wildcard will auto match.
+			node.setMapping(mapping);
+			return; 
+		} else if (word.startsWith(":")) {
 			this.wildcards.add(node);
 		} else {
 			this.children.put(word, node);
@@ -75,9 +80,13 @@ public class TreeNode {
 			}
 			return;
 		}
-			
+		if (this.dirWildCard != null) {
+			found.add(this.dirWildCard.getMapping());
+			return;
+		}
 	
 		List<String> wordList = words.subList(1, words.size());
+		
 		if (children.containsKey(word)) {
 			children.get(word).find(found, wordList);
 		}

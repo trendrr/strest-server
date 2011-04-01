@@ -28,6 +28,7 @@ public class UriMapping {
 	final List<String> tokens;
 	
 	private HashMap<Integer, String> wildcards = new HashMap<Integer, String>();
+
 	
 	public UriMapping(String route, Class cls) {
 		this.route = StringHelper.trim(route, "/");
@@ -36,10 +37,9 @@ public class UriMapping {
 		
 		int index = 0;
 		for (String t : this.route.split("\\/")) {
-			if (t.startsWith(":")) {
-				wildcards.put(index, t.substring(1));
+			if (t.startsWith(":") || t.startsWith("*")) {
+				wildcards.put(index, t);
 			}
-			
 			this.tokens.add(t);
 			index++;
 		}
@@ -76,7 +76,16 @@ public class UriMapping {
 			return mp;
 		}
 		for (Integer ind : this.wildcards.keySet()) {
-			mp.put(this.wildcards.get(ind), tokens.get(ind));
+			String var = this.wildcards.get(ind);
+			if (var.startsWith(":")) {
+				mp.put(var.substring(1), tokens.get(ind));
+			} else if (var.startsWith("*")) {
+				if (var.length() > 1) {
+					String dir = StringHelper.join(tokens.subList(ind, tokens.size()), "/");
+					mp.put(var.substring(1), dir);
+				}
+				return mp;
+			}
 		}
 		return mp;
 	}
