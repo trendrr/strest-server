@@ -73,9 +73,12 @@
 	
 	
 	<target name="javadoc" description="Create Javadocs for the Strest Server">
-        <mkdir dir="/work/html/strest-server/javadoc/"/>
+        <mkdir dir="/html/strest-server/javadoc/"/>
         <javadoc 
-            destdir="/work/html/strest-server/javadoc/">
+            destdir="/html/strest-server/javadoc/"
+        	classpathref="build.classpath"
+        	access="public"
+        	>
             <fileset dir="src" includes="**/*.java" />
         </javadoc>
     </target>
