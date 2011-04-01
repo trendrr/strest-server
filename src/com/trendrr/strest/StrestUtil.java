@@ -58,4 +58,8 @@ public class StrestUtil {
 	public static String txnId(HttpMessage message) {
 		return 	message.getHeader(StrestUtil.HEADERS.TXN_ID);
 	}
+	
+	public static boolean isStrest(HttpRequest request) {
+		return "STREST".equalsIgnoreCase(request.getProtocolVersion().getProtocolName());
+	}
 }

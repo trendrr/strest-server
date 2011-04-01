@@ -145,7 +145,7 @@ public class StrestRouter {
 	}
 	
 	public void incoming(Channel channel, HttpRequest request) {
-		boolean isStrest = "STREST".equalsIgnoreCase(request.getProtocolVersion().getProtocolName());
+		boolean isStrest = StrestUtil.isStrest(request);
 		// Build the response object.
         ResponseBuilder response = new ResponseBuilder(request);
         
