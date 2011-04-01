@@ -34,8 +34,6 @@ public class WebsocketEncoder extends org.jboss.netty.handler.codec.oneone.OneTo
 			WebSocketFrame frame = new DefaultWebSocketFrame(cbuf.toString(Charset.forName("utf8")));
 			return frame;
 		}
-
-		System.out.println(m.getClass());
 		return m;
 	}
 }

@@ -32,8 +32,7 @@ public class WebsocketDecoder extends OneToOneDecoder {
 			Object m) throws Exception {
 		if (!(m instanceof DefaultWebSocketFrame)) {
             return m;
-        }
-//        
+        }     
         DefaultWebSocketFrame wsf = (DefaultWebSocketFrame)m;
         
         if (wsf.isBinary()) {
@@ -44,47 +43,4 @@ public class WebsocketDecoder extends OneToOneDecoder {
         
 		return m;
 	}
-	
-//	@Override
-//    protected Object encode(ChannelHandlerContext ctx, Channel channel, Object msg) throws Exception {
-//		
-//		
-//	}
-//	 @Override
-//	    public void messageReceived(ChannelHandlerContext ctx, MessageEvent e)
-//	            throws Exception {
-//		 
-//	        Object m = e.getMessage();
-//	        if (!(m instanceof DefaultWebSocketFrame)) {
-//	            ctx.sendUpstream(e);
-//	            return;
-//	        }
-//	        
-//	        DefaultWebSocketFrame wsf = (DefaultWebSocketFrame)m;
-//	        if (!(e instanceof UpstreamMessageEvent)) {
-//	        	ctx.sendUpstream(e);
-//	        	return;
-//	        }
-//	        
-//	        UpstreamMessageEvent ume = (UpstreamMessageEvent)e;
-//	        ume.
-//	        System.out.println(e.getClass());
-//	        
-//	        
-////	        if (wsf.isBinary()) {
-////	        	ctx.sendUpstream(arg0)
-////	        	ctx.sendUpstream(wsf.getBinaryData());
-////	        }
-////	        wsf.getBinaryData()
-////	        wsf.
-////	        ChannelBuffer input = (ChannelBuffer) m;
-////	        if (!input.readable()) {
-////	            return;
-////	        }
-////
-////	        ChannelBuffer cumulation = cumulation(ctx);
-////	        cumulation.discardReadBytes();
-////	        cumulation.writeBytes(input);
-////	        callDecode(ctx, e.getChannel(), cumulation, e.getRemoteAddress());
-//	    }
 }
