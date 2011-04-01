@@ -60,12 +60,31 @@ public class StrestRouter {
 	
 	/**
 	 * will search this package (and all subpackages) for controllers.
+	 * will also work for fully qualified classnames
 	 * 
 	 * 
 	 * @param packageName
 	 */
 	public void addControllerPackage(String packageName) {
-		List<StrestController> controllers = Reflection.instances(StrestController.class, packageName, true);
+		List<StrestController> controllers = new ArrayList<StrestController>();
+		if (!packageName.toLowerCase().equals(packageName)) {
+			//see if this is a classname
+			StrestController controller;
+			try {
+				controller = Reflection.defaultInstance(StrestController.class, packageName);
+				if (controller != null)
+					controllers.add(controller);
+			} catch (Exception e) {
+				//do nothing.
+			}
+		}
+		
+		controllers.addAll(Reflection.instances(StrestController.class, packageName, true));
+		
+		if (controllers.isEmpty()) {
+			log.warn("No controllers found in package: " + packageName);
+			return;
+		}
 		for (StrestController c : controllers) {
 			String[] routes = c.routes();
 			if (routes == null) {
