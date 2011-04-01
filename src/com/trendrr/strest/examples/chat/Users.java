@@ -78,12 +78,7 @@ public class Users implements TxnCompleteCallback {
 			throw new StrestHttpException(501, "That username is registered for messages!");
 		}
 		
-		//We don't make the user public until they have registered for message notification
-		//now send the username to all who want connect notifications.
-		ResponseBuilder response = new ResponseBuilder();
-		response.txnStatus(StrestUtil.HEADERS.TXN_STATUS_VALUES.CONTINUE);
-		response.contentUTF8(username);
-		notifyConnect.sendMessage(response.getResponse());
+
 	}
 	
 	public void send(String to, String from, String message) throws StrestException {
@@ -115,15 +110,24 @@ public class Users implements TxnCompleteCallback {
 	 * @param request
 	 */
 	public void notifyConnect(StrestConnectionTxn con) {
-		this.notifyConnect.addConnection(con);
 
 		String self = (String)con.getChannelStorage().get("username");
+		
+		//Now that I am registered to recieve connect message, then I
+		//tell everyone else that I am online.
+		ResponseBuilder response = new ResponseBuilder();
+		response.txnStatus(StrestUtil.HEADERS.TXN_STATUS_VALUES.CONTINUE);
+		response.contentUTF8(self);
+		notifyConnect.sendMessage(response.getResponse());
+		
+		
+		this.notifyConnect.addConnection(con);
 		//now we send the user the list of all currently connected users
 		for (String username : this.onlineNow.keySet()) {
 			if (username.equals(self)) {
 				continue; //don't need to notify about self
 			}
-			ResponseBuilder response = new ResponseBuilder();
+			response = new ResponseBuilder();
 			response.txnStatus(StrestUtil.HEADERS.TXN_STATUS_VALUES.CONTINUE);
 			response.contentUTF8(username);
 			con.sendMessage(response);
