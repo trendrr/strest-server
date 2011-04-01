@@ -57,7 +57,7 @@
 		<!-- build the manifest -->
 		<manifest file="build/jar/META-INF/MANIFEST.MF">
 			<attribute name="Built-By" value="Dustin Norlander"/>
-			<attribute name="Main-Class" value="Main"/>  
+			<attribute name="Main-Class" value="com.trendrr.strest.examples.Main"/>  
 			<attribute name="Built-Date" value="${TODAY}"/> 
 			<attribute name="Class-Path" value="${classpath}"/>
 		</manifest>
