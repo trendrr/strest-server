@@ -3,13 +3,9 @@
  */
 package com.trendrr.strest.server;
 
-import java.util.concurrent.ConcurrentHashMap;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.trendrr.oss.DynMap;
-import com.trendrr.oss.DynMapFactory;
 import com.trendrr.oss.Reflection;
 import com.trendrr.strest.server.routing.MatchedRoute;
 import com.trendrr.strest.server.routing.RouteMatcher;
