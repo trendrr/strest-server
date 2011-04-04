@@ -43,6 +43,41 @@ public abstract class StrestController {
 	protected HttpRequest request;
 	protected HttpResponse response = null;
 	protected DynMap params = new DynMap();
+	protected DynMap paramsGET = new DynMap();
+	protected DynMap paramsPOST = new DynMap();
+	
+	/**
+	 * These params appear in the URI. I.E regular GET string params.
+	 * 
+	 * These params also appear in the params that are passed to the controller method, so unless you 
+	 * need to know that specific params are GET vs POST then use the regular params.
+	 * 
+	 * @return the GET params
+	 */
+	public DynMap getParamsGET() {
+		return paramsGET;
+	}
+
+	public void setParamsGET(DynMap paramsGET) {
+		this.paramsGET = paramsGET;
+	}
+
+	/**
+	 * The params from a url encoded POST.
+	 * 
+	 * These params also appear in the params that are passed to the controller method, so unless you 
+	 * need to know that specific params are GET vs POST then use the regular params.
+	 * 	 
+	 * @return the POST params
+	 */
+	public DynMap getParamsPOST() {
+		return paramsPOST;
+	}
+
+	public void setParamsPOST(DynMap paramsPOST) {
+		this.paramsPOST = paramsPOST;
+	}
+
 	protected boolean sendResponse = true;
 	
 	/**

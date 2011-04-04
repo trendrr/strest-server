@@ -169,18 +169,19 @@ public class StrestRouter {
 	            }
 	            
 	            //parse the get string params
-	            DynMap params = DynMapFactory.instanceFromURL(request.getUri());
+	            controller.setParamsGET(DynMapFactory.instanceFromURL(request.getUri()));
 	            
 	            //parse any post params
 	            String contentType = request.getHeader(CONTENT_TYPE);
 	            if (contentType != null && contentType.contains("form-urlencoded")) {
 	            	String pms = request.getContent().toString(Charset.forName("utf8"));
 	            	if (pms != null) {
-	            		controller.getParams().putAll(DynMapFactory.instanceFromURL(pms));
+	            		controller.setParamsPOST(DynMapFactory.instanceFromURL(pms));
 	            	}
 	            }
 	            
-	            controller.getParams().putAll(params);
+	            controller.getParams().putAll(controller.getParamsGET());
+	            controller.getParams().putAll(controller.getParamsPOST());
 	            
 	            controller.setRequest(request);
 	            controller.setResponse(response.getResponse());
