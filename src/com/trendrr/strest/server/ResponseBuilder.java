@@ -106,7 +106,7 @@ public class ResponseBuilder {
 	}
 	
 	/**
-	 * changes the response to a MOVED PERMANENTLY redirect.
+	 * Sets the status to 302, and the Location to the url.  This is a standard (sort of) redirect. 
 	 * 
 	 * This could be problematic for STREST clients, it is up to them to implement
 	 * redirects (or not). 
@@ -115,7 +115,7 @@ public class ResponseBuilder {
 	 * @return
 	 */
 	public ResponseBuilder redirect(String url) {
-		this.response.setStatus(HttpResponseStatus.MOVED_PERMANENTLY);
+		this.response.setStatus(HttpResponseStatus.FOUND);
 		this.response.setHeader("Location", url);
 		return this;
 	}
