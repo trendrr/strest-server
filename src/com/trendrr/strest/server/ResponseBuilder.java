@@ -40,6 +40,18 @@ public class ResponseBuilder {
 		ResponseBuilder b = new ResponseBuilder();
 	}
 	
+	public static ResponseBuilder instance() {
+		return new ResponseBuilder();
+	}
+	
+	public static ResponseBuilder instance(HttpRequest request) {
+		return new ResponseBuilder(request);
+	}
+	
+	public static ResponseBuilder instance(HttpResponse response) {
+		return new ResponseBuilder(response);
+	}
+	
 	/**
 	 * Creates a response builder 
 	 * txn-status is complete by default
@@ -50,6 +62,11 @@ public class ResponseBuilder {
 		this.txnStatus(StrestUtil.HEADERS.TXN_STATUS_VALUES.COMPLETE);
 	}
 	
+	
+	/**
+	 * creates a new response builder based on the txn id of the request.
+	 * @param request
+	 */
 	public ResponseBuilder(HttpRequest request) {
 		response = new DefaultHttpResponse(
 				request.getProtocolVersion(), HttpResponseStatus.OK);
@@ -57,6 +74,10 @@ public class ResponseBuilder {
 		
 	}
 	
+	/**
+	 * creates a new response builder that acts on the given response.
+	 * @param response
+	 */
 	public ResponseBuilder(HttpResponse response) {
 		this.response = response;
 	}
@@ -84,18 +105,45 @@ public class ResponseBuilder {
 		return this;
 	}
 	
+	/**
+	 * changes the response to a MOVED PERMANENTLY redirect.
+	 * 
+	 * This could be problematic for STREST clients, it is up to them to implement
+	 * redirects (or not). 
+	 * 
+	 * @param url
+	 * @return
+	 */
+	public ResponseBuilder redirect(String url) {
+		this.response.setStatus(HttpResponseStatus.MOVED_PERMANENTLY);
+		this.response.setHeader("Location", url);
+		return this;
+	}
+	
+	/**
+	 * Sets the status of the header.
+	 * 
+	 * @param status
+	 * @return
+	 */
 	public ResponseBuilder status(HttpResponseStatus status) {
 		this.response.setStatus(status);
 		return this;
 	}
 	
+	/**
+	 * Sets the status of the header.
+	 * 
+	 * @param status
+	 * @return
+	 */
 	public ResponseBuilder status(int code, String message) {
 		this.response.setStatus(new HttpResponseStatus(code, message));
 		return this;
 	}
 	
 	/**
-	 *
+	 * Set the Strest-Txn-Id header.
 	 * @param id
 	 * @return
 	 */
@@ -119,7 +167,7 @@ public class ResponseBuilder {
 	}
 	
 	/**
-	 * encodes the text as utf8 and swallows and logs a warning for any character encodeing exceptions
+	 * encodes the text as utf8 and swallows and logs a warning for any character encoding exceptions
 	 * @param mimeType
 	 * @param content
 	 * @return
