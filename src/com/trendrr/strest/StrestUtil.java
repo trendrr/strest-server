@@ -19,7 +19,7 @@ import org.jboss.netty.handler.codec.http.HttpVersion;
  */
 public class StrestUtil {
 
-	protected Log log = LogFactory.getLog(StrestUtil.class);
+	protected static Log log = LogFactory.getLog(StrestUtil.class);
 	
 	private static AtomicLong txn = new AtomicLong(0l);
 	public static String generateTxnId() {
