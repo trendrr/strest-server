@@ -18,6 +18,19 @@ import com.trendrr.strest.annotations.Strest;
 import com.trendrr.strest.server.StrestController;
 
 
+/*//
+ * 
+ * @description static files. typically cached
+ * 
+ * @json(example) 
+ * {
+ *    "var" : "poop"
+ * }
+ * 
+ * 
+ * 
+ */
+
 /**
  * 
  * Controller for serving static files.
@@ -44,9 +57,19 @@ public class StaticFileController extends StrestController {
 	private static ConcurrentHashMap<String, ReinitObject<byte[]>> cache = new ConcurrentHashMap<String, ReinitObject<byte[]>> ();
 	
 	
+	protected ConcurrentHashMap<String, ReinitObject<byte[]>> getCache() {
+		return cache;
+	}
+	protected String getBaseDir() {
+		return baseDir;
+	}
+	protected long getCacheTimeout() {
+		return cacheTimeout;
+	}
+	
 	@Override
 	public void handleGET(DynMap params) throws Exception {
-		String filename = baseDir + params.getString("filename");
+		String filename = this.getBaseDir() + params.getString("filename");
 		if (filename.contains("/.")) {
 			throw StrestHttpException.BAD_REQUEST("Bad bad bad");
 		}
