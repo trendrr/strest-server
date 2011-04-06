@@ -175,8 +175,9 @@ public class StrestRouter {
 	            String contentType = request.getHeader(CONTENT_TYPE);
 	            if (contentType != null && contentType.contains("form-urlencoded")) {
 	            	String pms = request.getContent().toString(Charset.forName("utf8"));
+	            	
 	            	if (pms != null) {
-	            		controller.setParamsPOST(DynMapFactory.instanceFromURL(pms));
+	            		controller.setParamsPOST(DynMapFactory.instanceFromURLEncoded(pms));
 	            	}
 	            }
 	            
