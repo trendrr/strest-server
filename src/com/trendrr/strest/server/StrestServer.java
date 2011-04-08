@@ -45,6 +45,12 @@ public class StrestServer {
 	private List<ServerBootstrap> bootstraps = new ArrayList<ServerBootstrap>();
 	private SSLContext sslContext = null;
 	
+	
+	/**
+	 * Public config.  This holds the LAST initialized server config. 
+	 */
+	public static DynMap config = new DynMap();
+	
 	public StrestServer() {
 		
 		
@@ -152,6 +158,8 @@ public class StrestServer {
 			server.setSSLContext(builder.toSSLContext());
 			server.setSslPort(ssl.get(Integer.class, "port", server.getSslPort()));
 		}
+		System.out.println(config);
+		StrestServer.config = config;
 	}
 	
 	public StrestRouter getRouter() {
