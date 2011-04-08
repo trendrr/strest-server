@@ -110,6 +110,7 @@ public class StrestDocParser {
 	 * 	 "admin" : [ ... ] 
 	 * }
 	 * 
+	 * individual entries are created by the createIndexEntry method.
 	 * 
 	 * @param routes
 	 * @return
@@ -119,27 +120,18 @@ public class StrestDocParser {
 		for (DynMap route : routes) {
 			String category = route.get(String.class, "category", "default");
 			index.putIfAbsent(category, new ArrayList<DynMap>());
-			
-			DynMap mp = new DynMap();
-			mp.put("route", route.get("route"));
-			String abs = route.get(String.class, "abstract");
-			if (abs == null) {
-				abs = route.get(String.class, "description", "");
-				System.out.println(abs);
-				abs = abs.substring(0, Math.min(this.abstractLength, abs.length()));
-			}
-			mp.put("abstract", abs);
-			
-			if (route.containsKey("method")) {
-				mp.put("method", route.get("method"));
-			}
+			DynMap mp = this.createIndexEntry(route);
+			if (mp == null)
+				continue;
 			index.get(List.class, category).add(mp);
 		}
 		//now sort the lists.
 		for (String cat : index.keySet()) {
 			List<DynMap> list = index.getList(DynMap.class, cat);
-			if (list == null || list.isEmpty()) 
+			if (list == null || list.isEmpty()) {
+				index.remove(cat);
 				continue;
+			}
 			Collections.sort(list, new Comparator<DynMap>(){
 				@Override
 				public int compare(DynMap o1, DynMap o2) {
@@ -151,11 +143,31 @@ public class StrestDocParser {
 			
 			index.put(cat, list);
 		}
-		
-		
 		return index;
+	}
+	
+	/**
+	 * creates the entry for the index page based on the map from the route.
+	 * 
+	 * return null to skip this entry in the index.
+	 * @param route
+	 * @return
+	 */
+	public DynMap createIndexEntry(DynMap route) {
+		DynMap mp = new DynMap();
+		mp.put("route", route.get("route"));
+		String abs = route.get(String.class, "abstract");
+		if (abs == null) {
+			abs = route.get(String.class, "description", "");
+			System.out.println(abs);
+			abs = abs.substring(0, Math.min(this.abstractLength, abs.length()));
+		}
+		mp.put("abstract", abs);
 		
-		
+		if (route.containsKey("method")) {
+			mp.put("method", route.get("method"));
+		}
+		return mp;
 	}
 	
 	/**
@@ -334,7 +346,6 @@ public class StrestDocParser {
 			doc = doc.replaceAll("(?m)^\\s*\\*", "");
 			doc = doc.replaceAll("\\/$", "");
 			doc = doc.trim();
-			
 			DynMap mp = new DynMap();
 			//now split into key values
 			for (String tmp : doc.split("[\\r\\n]\\s*\\@")) {
