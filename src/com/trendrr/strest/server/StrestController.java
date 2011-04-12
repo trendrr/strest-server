@@ -20,6 +20,7 @@ import org.jboss.netty.handler.codec.http.HttpResponseStatus;
 import com.trendrr.oss.DynMap;
 import com.trendrr.oss.Reflection;
 import com.trendrr.oss.concurrent.LazyInit;
+import com.trendrr.strest.ContentTypes;
 import com.trendrr.strest.StrestHttpException;
 import com.trendrr.strest.annotations.Strest;
 import com.trendrr.strest.server.connections.StrestConnectionChannel;
@@ -226,18 +227,20 @@ public abstract class StrestController {
 		this.strestTxnId = strestTxnId;
 	}
 	
-	public void setResponseBytes(byte[] bytes, String mimeType) {
-		this.response.setContent(ChannelBuffers.wrappedBuffer(bytes));
-		this.response.setHeader("Content-Type", mimeType);
-		response.setHeader(HttpHeaders.Names.CONTENT_LENGTH, bytes.length);
+	public void setResponseBytes(String mimeType, byte[] bytes) {
+		ResponseBuilder.instance(this.response).content(mimeType, bytes);
 	}
 	
-	public void setResponseJson(String json) {
-		this.setResponseBytes(json.getBytes(Charset.forName("utf8")), "json");
+	public void setResponseUTF8(String mimeType, String val) {
+		ResponseBuilder.instance(this.response).contentUTF8(mimeType, val);
 	}
 	
-	public void setResponseJson(DynMap json) {
-		this.setResponseJson(json.toJSONString());			
+	public void setResponseJSON(String json) {
+		ResponseBuilder.instance(this.response).contentUTF8(ContentTypes.JSON, json);
+	}
+	
+	public void setResponseJSON(DynMap json) {
+		ResponseBuilder.instance(this.response).contentJSON(json);
 	}
 	
 	

@@ -22,6 +22,7 @@ import org.jboss.netty.handler.codec.http.HttpResponseStatus;
 import org.jboss.netty.handler.codec.http.HttpVersion;
 
 import com.trendrr.oss.DynMap;
+import com.trendrr.strest.ContentTypes;
 import com.trendrr.strest.StrestUtil;
 
 
@@ -186,12 +187,12 @@ public class ResponseBuilder {
 	 * @return
 	 */
 	public ResponseBuilder contentUTF8(String content) {
-		this.contentUTF8("text/plain", content);
+		this.contentUTF8(ContentTypes.TEXT, content);
 		return this;
 	}
 	
 	public ResponseBuilder contentJSON(DynMap mp) {
-		return this.contentUTF8("text/json", mp.toJSONString());
+		return this.contentUTF8(ContentTypes.JSON, mp.toJSONString());
 	}
 	
 	public HttpResponse getResponse() {
