@@ -99,7 +99,7 @@ public class StaticFileController extends StrestController {
 		if (bytes == null) {
 			throw StrestHttpException.NOT_FOUND();
 		}
-		this.setResponseBytes(bytes, ContentTypes.fromFileExtension(returnType));
+		this.setResponseBytes(ContentTypes.fromFileExtension(returnType), bytes);
 	}
 
 }

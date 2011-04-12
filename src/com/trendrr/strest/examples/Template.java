@@ -7,12 +7,16 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import com.trendrr.oss.DynMap;
+import com.trendrr.strest.ContentTypes;
 import com.trendrr.strest.annotations.Strest;
 import com.trendrr.strest.contrib.templating.TemplateRenderer;
 import com.trendrr.strest.server.StrestController;
 
 
 /**
+ * Example showing the use of the Templating Contrib
+ * 
+ * 
  * @author Dustin Norlander
  * @created Apr 7, 2011
  * 
@@ -27,6 +31,6 @@ public class Template extends StrestController{
 
 	public void handleGET(DynMap params) throws Exception {
 		String html = TemplateRenderer.render("/test.html", params);
-		this.setResponseBytes(html.getBytes("utf8"), "text/html");
+		this.setResponseUTF8(ContentTypes.HTML, html);
 	}
 }

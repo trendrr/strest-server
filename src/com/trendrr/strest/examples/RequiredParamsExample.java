@@ -7,6 +7,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import com.trendrr.oss.DynMap;
+import com.trendrr.strest.ContentTypes;
 import com.trendrr.strest.annotations.Strest;
 import com.trendrr.strest.server.StrestController;
 
@@ -30,6 +31,6 @@ import com.trendrr.strest.server.StrestController;
 public class RequiredParamsExample extends StrestController {
 
 	public void handleGET(DynMap params) throws Exception {
-		this.setResponseBytes(("WHAT! " + params.getString("what")).getBytes("utf8"), "text/plain");
+		this.setResponseUTF8(ContentTypes.TEXT, "WHAT! " + params.getString("what"));
 	}
 }

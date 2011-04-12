@@ -8,6 +8,7 @@ import org.apache.commons.logging.LogFactory;
 import org.jboss.netty.handler.codec.http.HttpMethod;
 
 import com.trendrr.oss.DynMap;
+import com.trendrr.strest.ContentTypes;
 import com.trendrr.strest.annotations.Strest;
 import com.trendrr.strest.server.StrestController;
 
@@ -30,9 +31,8 @@ public class HelloWorld extends StrestController {
 	 */
 	@Override
 	public void handleGET(DynMap params) throws Exception {
-//		log.info("Hello1");
-		this.setResponseBytes(
-				("Hello " + params.get(String.class, "param", "World").toUpperCase() + "!").getBytes("utf8"), 
-				"text/plain");
+		String val = params.getString("param", "world");
+		this.setResponseUTF8(ContentTypes.TEXT, 
+				"Hello " + val.toUpperCase() + "!");
 	}
 }
