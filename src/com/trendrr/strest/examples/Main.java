@@ -16,10 +16,12 @@ import com.trendrr.strest.server.StrestServer;
  */
 public class Main {
 
-	protected Log log = LogFactory.getLog(Main.class);
+	protected static Log log = LogFactory.getLog(Main.class);
 	
 	public static void main(String[] args) throws Exception {
 		StrestServer server = StrestServer.instanceFromFile("example_config.yaml");
+		System.out.println("!!! WELCOME TO STREST !!!");
+		System.out.println("Strest-Server examples started");
 		server.start();
     }
 }
