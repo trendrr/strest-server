@@ -12,11 +12,24 @@ cd strest-server
 java -jar strest.jar
 </pre>
 
+Then point your browser at:
+
+<pre>
+http://localhost:8000/hello/world
+</pre>
+
+Then check out one of the drivers then try out the 
+<pre>
+/firehose
+</pre>
+example.    
+
 
 To learn more, please check out:
 
-JavaDocs -- http://trendrr.github.com/strest-server/javadoc/
-STREST Protocol Spec -- https://github.com/trendrr/strest-server/wiki/STREST-Protocol-Spec
-Strest Server introduction -- https://github.com/trendrr/strest-server/wiki/Strest-Server-introduction
-Serverside Examples -- https://github.com/trendrr/strest-server/tree/master/src/com/trendrr/strest/examples
-Websocket Example -- https://github.com/trendrr/strest-server/wiki/Websocket-Example
+* JavaDocs -- http://trendrr.github.com/strest-server/javadoc/
+* STREST Protocol Spec -- https://github.com/trendrr/strest-server/wiki/STREST-Protocol-Spec
+* Strest Server introduction -- https://github.com/trendrr/strest-server/wiki/Strest-Server-introduction
+* Serverside Examples -- https://github.com/trendrr/strest-server/tree/master/src/com/trendrr/strest/examples
+* Websocket Example -- https://github.com/trendrr/strest-server/wiki/Websocket-Example
+* Client Drivers -- https://github.com/trendrr/strest-server/wiki/Strest-Drivers
