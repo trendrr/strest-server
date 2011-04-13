@@ -352,6 +352,8 @@ public class StrestDocParser {
 				
 				tmp = StringHelper.trim(tmp, "@");
 				int ind = tmp.indexOf(' ');
+				if (ind < 0)
+					continue;
 				String key = tmp.substring(0, ind).trim();
 				String value = tmp.substring(ind).trim();
 				if (value.isEmpty()) {
