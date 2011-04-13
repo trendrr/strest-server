@@ -158,7 +158,6 @@ public class StrestServer {
 			server.setSSLContext(builder.toSSLContext());
 			server.setSslPort(ssl.get(Integer.class, "port", server.getSslPort()));
 		}
-		System.out.println(config);
 		StrestServer.config = config;
 	}
 	
@@ -232,6 +231,7 @@ public class StrestServer {
 	public void start() {
 		 // Configure the server(s).
 		if (this.port != null) {
+			
 			ServerBootstrap  bootstrap = new ServerBootstrap(
 	                new NioServerSocketChannelFactory(
 	                        this.bossExecutor,
@@ -240,9 +240,10 @@ public class StrestServer {
 	        bootstrap.setPipelineFactory(new StrestServerPipelineFactory(router, null));
 			bootstrap.bind(new InetSocketAddress(this.port));
 			this.bootstraps.add(bootstrap);
+			System.out.println("Listening on port: " + this.port);
 		}
 		if (this.sslPort != null && this.sslContext != null) {
-			System.out.println("STARTING SSL on port: " + this.sslPort);
+			
 			ServerBootstrap  bootstrap = new ServerBootstrap(
 	                new NioServerSocketChannelFactory(
 	                        this.bossExecutor,
@@ -251,6 +252,7 @@ public class StrestServer {
 	        bootstrap.setPipelineFactory(new StrestServerPipelineFactory(router, sslContext));
 			bootstrap.bind(new InetSocketAddress(this.sslPort));
 			this.bootstraps.add(bootstrap);
+			System.out.println("SSL listening on port: " + this.sslPort);
 		}
 		//TODO: Add websocket server here
       }
