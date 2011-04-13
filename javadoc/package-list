@@ -9,6 +9,7 @@ com.trendrr.strest.examples.chat
 com.trendrr.strest.server
 com.trendrr.strest.server.callbacks
 com.trendrr.strest.server.connections
+com.trendrr.strest.server.controllers
 com.trendrr.strest.server.filters
 com.trendrr.strest.server.routing
 com.trendrr.strest.server.websocket
