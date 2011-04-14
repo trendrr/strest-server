@@ -3,6 +3,15 @@ Strest-Server is a highly scalable STREST and HTTP server, specifically designed
 
 Take a look at the wiki and javadocs for more info.
 
+### Main Features
+
+* wicked fast
+* easy to create data streams (ex firehoses)
+* asynchronous 
+* controllers automatically work with both HTTP and (faster)STREST
+* websockets integration out of the box
+
+
 ### Getting started:
 
 The best way to get started is to clone the repo and try out the examples.
