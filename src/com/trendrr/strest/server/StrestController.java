@@ -47,6 +47,23 @@ public abstract class StrestController {
 	protected DynMap paramsGET = new DynMap();
 	protected DynMap paramsPOST = new DynMap();
 	
+	protected StrestRouter router = null;
+	
+	/**
+	 * This is the StrestRouter instance that initialized the controller.
+	 * 
+	 * This is only useful in rare instances. 
+	 * 
+	 * @return
+	 */
+	public StrestRouter getRouter() {
+		return router;
+	}
+
+	public void setRouter(StrestRouter router) {
+		this.router = router;
+	}
+
 	/**
 	 * These params appear in the URI. I.E regular GET string params.
 	 * 

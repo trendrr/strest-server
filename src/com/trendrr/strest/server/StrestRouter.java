@@ -162,7 +162,7 @@ public class StrestRouter {
 	            if (controller == null) {
 	            	throw StrestHttpException.NOT_FOUND();
 	            }
-	            
+	            controller.setRouter(this);
 	            controller.setStrest(isStrest);
 	            if (isStrest) {
 	            	controller.setStrestTxnId(txnId);	
