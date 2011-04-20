@@ -28,6 +28,7 @@ public class ContentTypes {
 	public static final String CSV = "text/csv";
 	public static final String CSS = "text/css";
 	public static final String XML = "text/xml";
+	public static final String FLASH = "application/x-shockwave-flash";
 	
 	
 	private static HashMap<String,String> mappings = new HashMap<String,String>();
@@ -36,6 +37,8 @@ public class ContentTypes {
 		mappings.put("json", JSON);
 		mappings.put("js", JAVASCRIPT);
 		mappings.put("html", HTML);
+		mappings.put("htm", HTML);
+		mappings.put("swf", FLASH);
 		mappings.put("csv", CSV);
 		mappings.put("css", CSS);
 		mappings.put("xml", XML);
@@ -48,13 +51,16 @@ public class ContentTypes {
 	 * csv would return "text/csv"
 	 * 
 	 * @param ext the extension to search
-	 * @return the mime type or null
+	 * @return the mime type or empty string
 	 */
 	public static String fromFileExtension(String ext) {
 		if (ext == null)
-			return null;
+			return "";
 		String e = StringHelper.trim(ext.toLowerCase(), ".");
-		return mappings.get(e);
+		String type = mappings.get(e);
+		if (type == null)
+			return "";
+		return type;
 	}
 	
 }
