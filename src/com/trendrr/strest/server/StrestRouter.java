@@ -3,11 +3,8 @@
  */
 package com.trendrr.strest.server;
 
-import static org.jboss.netty.handler.codec.http.HttpHeaders.Names.CONTENT_LENGTH;
 import static org.jboss.netty.handler.codec.http.HttpHeaders.Names.CONTENT_TYPE;
-import static org.jboss.netty.handler.codec.http.HttpResponseStatus.OK;
 
-import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
@@ -15,27 +12,18 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.jboss.netty.buffer.ChannelBuffers;
 import org.jboss.netty.channel.Channel;
 import org.jboss.netty.channel.ChannelFuture;
 import org.jboss.netty.channel.ChannelFutureListener;
-import org.jboss.netty.handler.codec.http.DefaultHttpResponse;
-import org.jboss.netty.handler.codec.http.HttpHeaders;
 import org.jboss.netty.handler.codec.http.HttpMethod;
 import org.jboss.netty.handler.codec.http.HttpRequest;
-import org.jboss.netty.handler.codec.http.HttpResponse;
-import org.jboss.netty.handler.codec.http.HttpResponseStatus;
-import org.jboss.netty.handler.codec.http.HttpVersion;
-import org.jboss.netty.handler.codec.http.websocket.WebSocketFrameEncoder;
-import org.jboss.netty.util.CharsetUtil;
 
-import com.trendrr.oss.DynMap;
+
 import com.trendrr.oss.DynMapFactory;
 import com.trendrr.oss.Reflection;
 import com.trendrr.strest.StrestHttpException;
 import com.trendrr.strest.StrestUtil;
 import com.trendrr.strest.server.connections.StrestConnectionChannel;
-import com.trendrr.strest.server.websocket.WebsocketEncoder;
 
 
 /**
@@ -218,7 +206,6 @@ public class StrestRouter {
 				
 				response.setResponse(controller.getResponse());
 				if (!controller.isSendResponse()) {
-					log.info("controller requested we not send a response.");
 					return;
 				}
 				
