@@ -43,15 +43,19 @@ public class FlashSocketPolicyServer {
 		FlashSocketPolicyServer.instance(new DynMap());
 		
 	}
-	ServerBootstrap bootstrap;
+	private ServerBootstrap bootstrap;
 	
-	protected void init(DynMap config) {
+	public ServerBootstrap getBootstrap() {
+		return this.bootstrap;
+	}
+	
+	protected void init(DynMap config, Executor bossExecutor, Executor workerExecutor) {
 		 // Configure HTTP Ping server.
-		Executor ex = Executors.newCachedThreadPool();
+		
         this.bootstrap = new ServerBootstrap(
                 new NioServerSocketChannelFactory(
-                        ex,
-                        ex));
+                		bossExecutor,
+                		workerExecutor));
 
         final DynMap cfg = config;
         // Set up the event pipeline factory.
@@ -70,9 +74,20 @@ public class FlashSocketPolicyServer {
 
         // Bind and start to accept incoming connections.
         int port = config.getInteger("flashsocketpolicy.port", 843);
-        
-        bootstrap.bind(new InetSocketAddress(port));
-		
+        try {
+        	bootstrap.bind(new InetSocketAddress(port));
+        } catch (org.jboss.netty.channel.ChannelException x) {
+        	if (x.getCause() instanceof java.net.SocketException) {
+        		if (x.getCause().getMessage().equalsIgnoreCase("Permission denied")) {
+        			log.warn("!!! Unable to connect the Flash Policy server                 !!!");
+        			log.warn("*** Often ports below 1024 are only available to admins       ***");
+        			log.warn("*** trying running as sudo or enable internal port forwarding ***");
+        			log.warn("!!! Skipping Flash Policy Server                              !!!");
+        			return;
+        		}
+        	}
+        	throw x;
+        }
         System.out.println("Flash Policy Server Ready and listening on port " + port);
 		
 	}
@@ -84,9 +99,19 @@ public class FlashSocketPolicyServer {
 	 * @param config
 	 * @return
 	 */
-	public static FlashSocketPolicyServer instance(DynMap config) {
+	public static FlashSocketPolicyServer instance(DynMap config, Executor bossExecutor, Executor workerExecutor) {
 		FlashSocketPolicyServer server = new FlashSocketPolicyServer();
-		server.init(config);
+		if (bossExecutor == null ) {
+			bossExecutor = Executors.newCachedThreadPool();
+		} 
+		if (workerExecutor == null) {
+			workerExecutor = Executors.newCachedThreadPool();
+		}
+		server.init(config, bossExecutor, workerExecutor);
 		return server;
+	}
+	
+	public static FlashSocketPolicyServer instance(DynMap config) {
+		return instance(config, null, null);
 	}
 }
