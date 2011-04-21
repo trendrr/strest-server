@@ -1,0 +1,136 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"> 
+<html> 
+	<head> 
+		
+		<script type="text/javascript" src="/static/websocket/swfobject.js"></script>
+		<script type="text/javascript" src="/static/websocket/web_socket.js"></script>
+		
+		<script type="text/javascript" src="strest.js"></script> 
+		<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.min.js"></script>
+		<script type="text/javascript">
+			WEB_SOCKET_SWF_LOCATION = "/static/websocket/WebSocketMain.swf";
+			function connect() {
+				strest = new Strest(
+							$('#websocket_url').val(),
+							function(event) {
+								$('#not_connected').fadeOut();
+								$('#connected').fadeIn();
+							},
+							function(event) {
+								$('#not_connected').fadeIn();
+							}
+						);
+			}
+
+			function disconnect() {
+				strest.close();
+			}
+			
+			function send() {
+				var request = strest.sendRequest({uri : $('#uri').val()}, 
+						function(response) {
+							addText('#response', '<div class="response">' + response.toString().replace(/\n/g, '<br />') + '</div>');
+							addText('#content', '<div class="content">' + response.content.replace(/\n/g, '<br />') + '</div>');
+						}
+				);
+
+				var str = '<div class="request">' + request.toString().replace(/\n/g, '<br />') + '</div>';
+				addText('#request',str);
+			}
+
+			/* Adds some html to the requested element.  makes sure there are only max # of elements */
+			var max = 20; //max elements to show in results box
+			function addText(element, text) {
+				var count = $(element).data('count');
+				if (!count) {
+					count = 0;
+				}
+				$(element).prepend('<div id="content' + count + '">' + text + '</div>');
+				$(element).find('#content' + (count-max)).remove();
+				$(element).data('count', count+1);
+				
+			}
+		</script>
+		<style>
+		
+			#content {
+				height : 400px;
+				overflow : auto;
+			}
+			
+			#request {
+				height : 400px;
+				overflow : auto;
+			}
+		
+			#response {
+				height : 400px;
+				overflow : auto;
+			}
+			
+			.content {
+				padding : 5px;
+				margin : 10px;
+				background-color:#eeeeee;
+				border:1px dashed black;
+			}
+			.response {
+				padding : 5px;
+				margin : 10px;
+				background-color:#eeeeff;
+				border:1px dashed black;
+			}
+			.request {
+				padding : 5px;
+				margin : 10px;
+				background-color:#eeddff;
+				border:1px dashed black;
+			}
+			
+			
+			
+		</style>
+	</head>
+	<body>
+		<b>WEBSOCKET Example</b>
+		<div id="not_connected">
+			<input type="text" id="websocket_url" value="ws://localhost:8000/websocket"></input>
+			<button onclick="connect();">CONNECT</button><br />
+			
+		</div>
+		<div id="connected" style="display:none;">
+			<input type="text" id="uri" value="/firehose" /> 
+			<button onclick="send();">SEND</button>
+			<br />
+			<button onclick="disconnect();">DISCONNECT</button><br />
+			<table style="width:80%">
+				<tr>
+					<td>
+						<h1>Response Content</h1>
+						<div id="content">
+						
+						
+						</div>
+					</td>
+					<td>
+						<h1>Response Raw</h1>
+						<div id="response">
+						
+						
+						</div>
+					</td>
+					<td>
+						<h1>Request Raw</h1>
+						<div id="request">
+						
+						
+						</div>
+					</td>
+				</tr>
+			
+			</table>
+		</div>
+		
+		
+	</body>
+</html>
