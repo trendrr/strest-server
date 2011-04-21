@@ -17,7 +17,7 @@ controller_packages:
 # these must implement the StrestControllerFilter class
 filters:
    # Leave this filter if you wish to use the "requiredParams" part of the annotation.
-   - com.trendrr.strest.server.filters.RequiredParamsFilter 
+   - com.trendrr.strest.contrib.filters.RequiredParamsFilter 
    
    
    

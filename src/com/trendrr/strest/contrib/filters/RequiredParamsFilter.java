@@ -1,7 +1,7 @@
 /**
  * 
  */
-package com.trendrr.strest.server.filters;
+package com.trendrr.strest.contrib.filters;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
