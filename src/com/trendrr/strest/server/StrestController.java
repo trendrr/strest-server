@@ -23,6 +23,8 @@ import com.trendrr.oss.concurrent.LazyInit;
 import com.trendrr.strest.ContentTypes;
 import com.trendrr.strest.StrestHttpException;
 import com.trendrr.strest.annotations.Strest;
+import com.trendrr.strest.contrib.templating.TemplateLookup;
+import com.trendrr.strest.contrib.templating.TemplateRenderer;
 import com.trendrr.strest.server.connections.StrestConnectionChannel;
 import com.trendrr.strest.server.connections.StrestConnectionTxn;
 
@@ -48,6 +50,14 @@ public abstract class StrestController {
 	protected DynMap paramsPOST = new DynMap();
 	
 	protected StrestRouter router = null;
+	
+	
+	/**
+	 * returns the config params for the server.  typically this is the parsed yaml config file.
+	 */
+	public DynMap getServerConfig() {
+		return this.getRouter().getServer().getConfig();
+	}
 	
 	/**
 	 * This is the StrestRouter instance that initialized the controller.
@@ -260,6 +270,16 @@ public abstract class StrestController {
 		ResponseBuilder.instance(this.response).contentJSON(json);
 	}
 	
+	/**
+	 * Renders a template using the default TemplateRenderer.
+	 * @param filename
+	 * @param params
+	 * @return
+	 */
+	public String renderTemplate(String filename, DynMap params) {
+		TemplateRenderer renderer = TemplateLookup.getRenderer(this.getServerConfig());
+		return renderer.renderTemplateFile(filename, params);
+	}
 	
 	public String[] routes() {
 		if (this.getClass().isAnnotationPresent(Strest.class)) {

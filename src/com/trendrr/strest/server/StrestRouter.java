@@ -46,6 +46,17 @@ public class StrestRouter {
 	
 	protected List<StrestControllerFilter> defaultFilters = new ArrayList<StrestControllerFilter> ();
 	
+	//the server that this router belongs to .
+	protected StrestServer server = null; 
+	
+	public StrestServer getServer() {
+		return server;
+	}
+
+	public void setServer(StrestServer server) {
+		this.server = server;
+	}
+
 	/**
 	 * will search this package (and all subpackages) for controllers.
 	 * will also work for fully qualified classnames

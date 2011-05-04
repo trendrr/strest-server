@@ -46,13 +46,10 @@ public class StrestServer {
 	private List<ServerBootstrap> bootstraps = new ArrayList<ServerBootstrap>();
 	private SSLContext sslContext = null;
 	
-	private DynMap _config = new DynMap(); //private local config.
+	private DynMap config = new DynMap(); //private local config.
 	
-	/**
-	 * Public config.  This holds the LAST initialized server config. 
-	 */
-	public static DynMap config = new DynMap();
 	
+
 	public StrestServer() {
 		
 		
@@ -160,8 +157,8 @@ public class StrestServer {
 			server.setSSLContext(builder.toSSLContext());
 			server.setSslPort(ssl.get(Integer.class, "port", server.getSslPort()));
 		}
-		server._config = config;
-		StrestServer.config = config;
+		server.config = config;
+		server.getRouter().setServer(server);
 	}
 	
 	public StrestRouter getRouter() {
@@ -186,6 +183,7 @@ public class StrestServer {
 
 	public void setRouter(StrestRouter router) {
 		this.router = router;
+		this.router.setServer(this);
 	}
 
 
@@ -259,13 +257,20 @@ public class StrestServer {
 		}
 		
 		//add the flashsocket policy server, if needed
-		if (this._config.containsKey("flashsocketpolicy")) {
-			FlashSocketPolicyServer f = FlashSocketPolicyServer.instance(_config, bossExecutor, workerExecutor);
+		if (this.config.containsKey("flashsocketpolicy")) {
+			FlashSocketPolicyServer f = FlashSocketPolicyServer.instance(config, bossExecutor, workerExecutor);
 			this.bootstraps.add(f.getBootstrap());
 		}
 		
-      }
+    }
 	
+	/**
+	 * The original config file.  Is typically parsed from a yaml file.
+	 * @return
+	 */
+	public DynMap getConfig() {
+		return config;
+	}
 	public void shutdown() {
 		for (ServerBootstrap bootstrap: this.bootstraps) {
 			bootstrap.releaseExternalResources();
