@@ -81,14 +81,6 @@ public class StrestDocParser {
 					r = "/index";
 				String filename = saveDirectory + r;
 				
-				//TODO: this doesn't look right.  also think it would screw with the 
-				//listing pages.
-				if (route.containsKey("method")) {
-					for (String m : route.getList(String.class, "method")) {
-						filename += "_" + m;
-					}
-				}
-				System.out.println("SAVING: " + filename);
 				for (TemplateRenderer rend : this.renderers) {					
 					FileHelper.saveBytes(filename + rend.getFileExtension(), rend.renderPage(route));
 				}
@@ -268,12 +260,68 @@ public class StrestDocParser {
 				DynMap v1 = new DynMap();
 				v1.putAll(m);
 				v1.put("route", route);
-				System.out.println(v1.toJSONString());
+				v1 = this.cleanUpRoute(v1);
 				vals.add(v1);
 			}
 		}
 		return vals;
 		
+	}
+	
+	/**
+	 * does final processing on a route map (the data associated with a single route)
+	 * 
+	 * 
+	 * 
+	 * @param route
+	 * @return
+	 */
+	protected DynMap cleanUpRoute(DynMap route) {
+		List<DynMap> params = route.getList(DynMap.class, "param");
+		if (params == null) 
+			return route;
+
+		//Make unify the requiredParams annotation with the markup.
+		List<String> requiredParams = route.getList(String.class, "requiredParams");
+		if (requiredParams != null) {
+			HashMap<String, DynMap> pmsMap = new HashMap<String,DynMap>();		
+			for (DynMap p : params) {
+				pmsMap.put(p.getString("param"), p);
+			}
+			
+			for (String rp : requiredParams) {
+				if (pmsMap.containsKey(rp)) {
+					pmsMap.get(rp).put("required", true);
+				} else {
+					DynMap p = new DynMap();
+					p.put("param", rp);
+					p.put("required", true);
+					p.put("description", "");
+					params.add(p);
+				}
+			}
+		}
+		Collections.sort(params, new Comparator<DynMap>(){
+			@Override
+			public int compare(DynMap o1, DynMap o2) {
+				
+				if (o1.getBoolean("required", false) != o2.getBoolean("required", false)) {
+					if (o1.getBoolean("required", false)) {
+						return -1;
+					} else {
+						return 1;
+					}
+				}
+				return o1.getString("param").compareTo(o1.getString("param"));
+			}
+		});
+		
+		
+		
+		System.out.println(params);
+		route.put("params", params);
+		route.removeAll("requiredParams", "param");
+		return route;
 	}
 	
 	/**

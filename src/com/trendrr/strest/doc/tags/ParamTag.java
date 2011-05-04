@@ -29,15 +29,7 @@ public class ParamTag extends AbstractDocTag {
 	public Object process(StrestDocParser parser, String value) {
 		DynMap mp = new DynMap();
 		
-		int ind = value.indexOf(' ');
-		if (ind == -1) {
-			//only the param in this one.
-			mp.put("param", value);
-			return mp;
-		}
-		String param = value.substring(0, ind).trim();
-		mp.put("param", param);
-		value = value.substring(ind).trim();
+		
 		
 		//look for @default
 		String defval = this.tagValue("default", value);
@@ -48,6 +40,18 @@ public class ParamTag extends AbstractDocTag {
 		
 		mp.put("required", this.containsTag("required", value));
 		value = this.removeTag("required", value);
+		
+		int ind = value.indexOf(' ');
+		if (ind == -1) {
+			//only the param in this one.
+			mp.put("param", value);
+			return mp;
+		}
+		String param = value.substring(0, ind).trim();
+		mp.put("param", param);
+		value = value.substring(ind).trim();
+		
+
 		
 		mp.put("description", value);
 		return mp;
