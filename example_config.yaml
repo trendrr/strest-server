@@ -33,9 +33,10 @@ default:
    port: 8000
 
 # Configuration for the optional Templating available from TemplateRenderer
-templates:
+templating:
+   renderer : com.trendrr.strest.contrib.templating.STTemplateRenderer
    base_dir : templates
-   cache_timeout : 10000 #10 seconds
+   cache_timeout : 5000 #5 seconds
 
    
 # Configuration for the Flash Socket Policy server.  this will serve the
