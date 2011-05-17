@@ -29,7 +29,6 @@ public class TimingFilter implements StrestControllerFilter {
 	@Override
 	public void before(StrestController controller) throws StrestException {
 		controller.getTxnStorage().put("timing_filter_start", new Date());
-		System.out.println("timing start");
 	}
 
 	/* (non-Javadoc)
@@ -37,7 +36,6 @@ public class TimingFilter implements StrestControllerFilter {
 	 */
 	@Override
 	public void after(StrestController controller) throws StrestException {
-		System.out.println("timing start");
 		Date start = (Date)controller.getTxnStorage().remove("timing_filter_start");
 		if (start == null)
 			return;
@@ -53,8 +51,6 @@ public class TimingFilter implements StrestControllerFilter {
 	 * @param millis
 	 */
 	public void timingResult(StrestController controller, long millis) {
-		System.out.println(millis);
-		
 		StringBuilder str = new StringBuilder();
 		str.append("*************** Action COMPLETE ****\n");
 		str.append("Route : " );
@@ -75,7 +71,11 @@ public class TimingFilter implements StrestControllerFilter {
 	@Override
 	public void error(StrestController controller, HttpResponse response,
 			Exception exception) {
-		// TODO Auto-generated method stub
-
+		if (controller == null)
+			return;
+		Date start = (Date)controller.getTxnStorage().remove("timing_filter_start");
+		if (start == null)
+			return;
+		this.timingResult(controller, new Date().getTime()-start.getTime());
 	}
 }
