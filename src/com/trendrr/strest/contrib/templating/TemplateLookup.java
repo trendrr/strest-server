@@ -54,7 +54,7 @@ public class TemplateLookup {
 		TemplateRenderer rend = new STTemplateRenderer();
 		if (cls != null) {
 			try {
-				rend = Reflection.defaultInstance(cls);
+				rend = (TemplateRenderer)Reflection.defaultInstance(cls);
 			} catch (Exception e) {
 				log.warn("Caught", e);
 			}
