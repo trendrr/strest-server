@@ -8,6 +8,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -45,7 +46,7 @@ public class StrestConnectionGroup implements TxnCompleteCallback {
 	private int size = 0; //we keep our own copy of size as the connections.size is slow
 	private ConcurrentSkipListSet<StrestConnectionTxn> connections = new ConcurrentSkipListSet<StrestConnectionTxn>();
 
-	private ConcurrentSkipListSet<ConnectionGroupEmptyCallback> emptyCallbacks = new ConcurrentSkipListSet<ConnectionGroupEmptyCallback>();
+	private ConcurrentLinkedQueue<ConnectionGroupEmptyCallback> emptyCallbacks = new ConcurrentLinkedQueue<ConnectionGroupEmptyCallback>();
 	
 	private AtomicBoolean closed = new AtomicBoolean(false);
 	
@@ -83,10 +84,10 @@ public class StrestConnectionGroup implements TxnCompleteCallback {
 	
 	private void onEmptyCallback() {
 		if (this.isEmpty()) {
-			ConnectionGroupEmptyCallback cb = emptyCallbacks.pollFirst();
+			ConnectionGroupEmptyCallback cb = emptyCallbacks.poll();
 			while(cb != null) {
 				cb.connectionGroupEmpty(this);
-				cb = emptyCallbacks.pollFirst();
+				cb = emptyCallbacks.poll();
 			}
 		}
 	}
