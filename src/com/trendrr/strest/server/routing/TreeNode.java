@@ -82,7 +82,6 @@ public class TreeNode {
 		}
 		if (this.dirWildCard != null) {
 			found.add(this.dirWildCard.getMapping());
-			return;
 		}
 	
 		List<String> wordList = words.subList(1, words.size());

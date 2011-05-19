@@ -97,13 +97,19 @@ public class RouteMatcher {
 		if (found.isEmpty()) {
 			return null;
 		}
+		UriMapping route = found.get(0);
 		
 		if (found.size() > 1) {
-			log.warn("More then one route matched: " + found);
+//			log.warn("More then one route matched: " + found);
+			for (UriMapping mp : found) {
+				if (!mp.isWildCard()) {
+					route = mp;
+				}
+			}
 		}
 		
 		MatchedRoute m = new MatchedRoute();
-		m.setMapping(found.get(0));
+		m.setMapping(route);
 		m.setParams(m.getMapping().getWildCardMatches(words));
 		if (extension != null) {
 			m.getParams().put("return_type", extension);

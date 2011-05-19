@@ -8,7 +8,9 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ConcurrentSkipListSet;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -19,7 +21,9 @@ import org.jboss.netty.handler.codec.http.HttpRequest;
 import org.jboss.netty.handler.codec.http.HttpResponse;
 
 import com.trendrr.strest.StrestUtil;
+import com.trendrr.strest.server.ResponseBuilder;
 import com.trendrr.strest.server.StrestResponseEncoder;
+import com.trendrr.strest.server.callbacks.ConnectionGroupEmptyCallback;
 import com.trendrr.strest.server.callbacks.DisconnectCallback;
 import com.trendrr.strest.server.callbacks.TxnCompleteCallback;
 
@@ -42,12 +46,22 @@ public class StrestConnectionGroup implements TxnCompleteCallback {
 	private int size = 0; //we keep our own copy of size as the connections.size is slow
 	private ConcurrentSkipListSet<StrestConnectionTxn> connections = new ConcurrentSkipListSet<StrestConnectionTxn>();
 
+	private ConcurrentLinkedQueue<ConnectionGroupEmptyCallback> emptyCallbacks = new ConcurrentLinkedQueue<ConnectionGroupEmptyCallback>();
+	
+	private AtomicBoolean closed = new AtomicBoolean(false);
+	
 	/**
 	 * Adds a new connection to the group.
 	 * @param connection
 	 * @param txnId
 	 */
 	public synchronized void addConnection(StrestConnectionTxn connection) {
+		if (closed.get()) {
+			//TODO: probably should throw an exception
+			log.warn("This connection group is closed! ");
+			return;
+		}
+		
 		if (!connections.add(connection)) {
 			log.warn("Connection already present in the group!: " + connection);
 			return;
@@ -57,14 +71,37 @@ public class StrestConnectionGroup implements TxnCompleteCallback {
 	}
 	
 	public boolean removeConnection(StrestConnectionTxn connection) {
-		if (connections.remove(connection)){
-			size--;
-			return true;
+		try {
+			if (connections.remove(connection)){
+				size--;
+				return true;
+			}
+		} finally {
+			this.onEmptyCallback();
 		}
 		return false;
 	}
 	
+	private void onEmptyCallback() {
+		if (this.isEmpty()) {
+			ConnectionGroupEmptyCallback cb = emptyCallbacks.poll();
+			while(cb != null) {
+				cb.connectionGroupEmpty(this);
+				cb = emptyCallbacks.poll();
+			}
+		}
+	}
 	
+	/**
+	 * register a callback for when this connection group is empty. 
+	 * 
+	 * Note this will never be called if this group never has any members.
+	 * 
+	 * @param callback
+	 */
+	public void onEmpty(ConnectionGroupEmptyCallback callback) {
+		this.emptyCallbacks.add(callback);
+	}
 	
 	
 	/* (non-Javadoc)
@@ -95,6 +132,10 @@ public class StrestConnectionGroup implements TxnCompleteCallback {
 		return futures;
 	}
 	
+	public Collection<ChannelFuture> sendMessage(ResponseBuilder response) {
+		return this.sendMessage(response.getResponse());
+	}
+	
 	public int size() {
 		return size;
 	}
@@ -105,5 +146,17 @@ public class StrestConnectionGroup implements TxnCompleteCallback {
 	
 	public boolean contains(StrestConnectionChannel connection) {
 		return this.connections.contains(connection);
+	}
+	
+	/**
+	 * closes this connection group and ends the transaction for *all* participants
+	 */
+	public void close() {
+		this.closed.set(true);
+		StrestConnectionTxn con = this.connections.pollFirst();
+		while (con != null) {
+			con.close();
+			con = this.connections.pollFirst();
+		}
 	}
 }

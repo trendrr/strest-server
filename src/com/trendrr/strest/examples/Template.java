@@ -30,7 +30,7 @@ public class Template extends StrestController{
 
 
 	public void handleGET(DynMap params) throws Exception {
-		String html = TemplateRenderer.render("/test.html", params);
+		String html = this.renderTemplate("/template.html", params);
 		this.setResponseUTF8(ContentTypes.HTML, html);
 	}
 }

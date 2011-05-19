@@ -27,11 +27,10 @@ Then point your browser at:
 http://localhost:8000/hello/world
 </pre>
 
-Then check out one of the drivers then try out the 
+Then to see the streaming / websocket demo point your browser at:
 <pre>
-/firehose
-</pre>
-example.    
+http://localhost:8000/static/examples/example.html
+</pre>  
 
 
 To learn more, please check out:

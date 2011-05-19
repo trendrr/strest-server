@@ -61,6 +61,9 @@ public class UriMapping {
 		return route + " => " + cls;
 	}
 	
+	public boolean isWildCard() {
+		return !this.wildcards.isEmpty();
+	}
 	/**
 	 * returns the named wildcard mappings.
 	 * 

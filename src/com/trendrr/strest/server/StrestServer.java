@@ -22,6 +22,7 @@ import com.trendrr.oss.DynMap;
 import com.trendrr.oss.DynMapFactory;
 import com.trendrr.oss.FileHelper;
 import com.trendrr.oss.SSLContextBuilder;
+import com.trendrr.strest.flash.FlashSocketPolicyServer;
 
 
 /**
@@ -45,12 +46,10 @@ public class StrestServer {
 	private List<ServerBootstrap> bootstraps = new ArrayList<ServerBootstrap>();
 	private SSLContext sslContext = null;
 	
+	private DynMap config = new DynMap(); //private local config.
 	
-	/**
-	 * Public config.  This holds the LAST initialized server config. 
-	 */
-	public static DynMap config = new DynMap();
 	
+
 	public StrestServer() {
 		
 		
@@ -158,7 +157,8 @@ public class StrestServer {
 			server.setSSLContext(builder.toSSLContext());
 			server.setSslPort(ssl.get(Integer.class, "port", server.getSslPort()));
 		}
-		StrestServer.config = config;
+		server.config = config;
+		server.getRouter().setServer(server);
 	}
 	
 	public StrestRouter getRouter() {
@@ -183,6 +183,7 @@ public class StrestServer {
 
 	public void setRouter(StrestRouter router) {
 		this.router = router;
+		this.router.setServer(this);
 	}
 
 
@@ -254,9 +255,22 @@ public class StrestServer {
 			this.bootstraps.add(bootstrap);
 			System.out.println("SSL listening on port: " + this.sslPort);
 		}
-		//TODO: Add websocket server here
-      }
+		
+		//add the flashsocket policy server, if needed
+		if (this.config.containsKey("flashsocketpolicy")) {
+			FlashSocketPolicyServer f = FlashSocketPolicyServer.instance(config, bossExecutor, workerExecutor);
+			this.bootstraps.add(f.getBootstrap());
+		}
+		
+    }
 	
+	/**
+	 * The original config file.  Is typically parsed from a yaml file.
+	 * @return
+	 */
+	public DynMap getConfig() {
+		return config;
+	}
 	public void shutdown() {
 		for (ServerBootstrap bootstrap: this.bootstraps) {
 			bootstrap.releaseExternalResources();
