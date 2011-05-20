@@ -1,8 +1,16 @@
 # Example YAML config file
 
 
-# Maximum number of worker threads.  0 or remove for unlimited
-max_threads : 40
+# Controlling thread pools
+threads :
+   #threads that handle the io, usually set this to the 2 * # of cores	
+   io : 8 
+   # these are the threads that handle all the controller logic.
+   # set this higher if your app uses lots of blocking calls
+   worker : 20  
+
+
+
 
 # Packages to search for controllers in.
 # packages are searched recursively
