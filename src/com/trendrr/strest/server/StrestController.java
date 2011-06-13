@@ -271,6 +271,14 @@ public abstract class StrestController {
 	}
 	
 	/**
+	 * returns the content of the request as a UTF8 encoded string
+	 * @return
+	 */
+	public String getRequestContentUTF8() {
+		return request.getContent().toString(Charset.forName("utf8"));
+	}
+	
+	/**
 	 * Renders a template using the default TemplateRenderer.
 	 * @param filename
 	 * @param params
