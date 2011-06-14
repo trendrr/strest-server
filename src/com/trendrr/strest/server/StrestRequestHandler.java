@@ -47,10 +47,15 @@ public class StrestRequestHandler extends SimpleChannelUpstreamHandler {
 		this.router = r;
 	}
 	
+	@Override
+	public void channelConnected(ChannelHandlerContext ctx, ChannelStateEvent e) throws Exception {
+		System.out.println("Connection! " + ctx);
+	}
+	
     @Override
     public void messageReceived(ChannelHandlerContext ctx, MessageEvent e) throws Exception {
     	HttpRequest request = (HttpRequest) e.getMessage();
-
+    	System.out.println("REQUEST RECIEVED: " + request);
         if (is100ContinueExpected(request)) {
             send100Continue(e);
         }
