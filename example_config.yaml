@@ -52,3 +52,8 @@ templating:
 # websocket connections for browsers that don't support websockets
 flashsocketpolicy:
    port : 843 # ONly change if you are doing some internal port routing, flash looks on port 843 by default
+   
+
+# To enable sessions.
+sessions:
+	persistence : com.trendrr.strest.contrib.sessions.DefaultSessionPersistence
