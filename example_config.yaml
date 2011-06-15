@@ -24,6 +24,8 @@ controller_packages:
 # Any filters to be executed on every invocation.
 # these must implement the StrestControllerFilter class
 filters:
+   # enable sessions
+   - com.trendrr.strest.contrib.sessions.SessionFilter
    # Leave this filter if you wish to use the "requiredParams" part of the annotation.
    - com.trendrr.strest.contrib.filters.RequiredParamsFilter 
    
@@ -54,6 +56,6 @@ flashsocketpolicy:
    port : 843 # ONly change if you are doing some internal port routing, flash looks on port 843 by default
    
 
-# To enable sessions.
+# session config.
 sessions:
-	persistence : com.trendrr.strest.contrib.sessions.DefaultSessionPersistence
+   persistence : com.trendrr.strest.contrib.sessions.DefaultSessionPersistence
