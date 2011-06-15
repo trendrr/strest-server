@@ -20,6 +20,7 @@ import org.jboss.netty.util.internal.ConcurrentHashMap;
 
 import com.trendrr.oss.IsoDateUtil;
 import com.trendrr.oss.Reflection;
+import com.trendrr.oss.TypeCast;
 import com.trendrr.strest.StrestException;
 import com.trendrr.strest.server.StrestController;
 import com.trendrr.strest.server.StrestControllerFilter;
@@ -71,6 +72,12 @@ public class SessionFilter implements StrestControllerFilter {
         if (sessionId != null) {
         	//load the session.
         	Map<String,Object> vals = this.getSessionPersistence(controller).loadSession(sessionId);
+        	
+        	Date expires = TypeCast.cast(Date.class, "expires", new Date());
+        	if (new Date().before(expires)) {
+        		log.info("Session expired!");
+        		return;
+        	}
         	if (vals != null) {
         		controller.getSessionStorage().putAll(vals);
         	}
@@ -132,7 +139,5 @@ public class SessionFilter implements StrestControllerFilter {
 	@Override
 	public void error(StrestController controller, HttpResponse response,
 			Exception exception) {
-		// TODO Auto-generated method stub
-
 	}
 }
