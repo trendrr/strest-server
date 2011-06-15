@@ -208,6 +208,13 @@ public abstract class StrestController {
 		return session;
 	}
 	
+	/**
+	 * deletes the session (if sessions are not enabled, does nothing)
+	 */
+	public void destroySession() {
+		this.getConnectionStorage().put("session_destroy", true);
+	}
+	
 	public void handleGET(DynMap params) throws Exception {
 		throw StrestHttpException.METHOD_NOT_ALLOWED();
 	}
@@ -340,7 +347,6 @@ public abstract class StrestController {
     	for (Class f : filterClss) {   		
     		Object filter;
 			try {
-				System.out.println(f);
 				filter = Reflection.defaultInstance(f);
 				if (!(filter instanceof StrestControllerFilter)) {
 	    			log.warn("Filters must implement the StrestControllerFilter interface (" + filter + "  does not)");

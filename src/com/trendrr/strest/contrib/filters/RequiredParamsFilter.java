@@ -30,7 +30,6 @@ public class RequiredParamsFilter implements StrestControllerFilter {
 		String req[] = controller.requiredParams();
 		if (req == null) 
 			return;
-		System.out.println(req);
 		for (String p : req) {
 			if (p.isEmpty())
 				continue;

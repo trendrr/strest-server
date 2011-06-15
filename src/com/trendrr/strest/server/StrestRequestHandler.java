@@ -55,7 +55,6 @@ public class StrestRequestHandler extends SimpleChannelUpstreamHandler {
     @Override
     public void messageReceived(ChannelHandlerContext ctx, MessageEvent e) throws Exception {
     	HttpRequest request = (HttpRequest) e.getMessage();
-    	System.out.println("REQUEST RECIEVED: " + request);
         if (is100ContinueExpected(request)) {
             send100Continue(e);
         }
