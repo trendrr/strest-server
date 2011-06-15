@@ -5,6 +5,7 @@ package com.trendrr.strest.server;
 
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -186,6 +187,25 @@ public abstract class StrestController {
 	 */
 	public Map<String,Object> getConnectionStorage() {
 		return this.connection.getStorage();
+	}
+	
+	
+	/**
+	 * gets the session storage.  
+	 * sessions must be enabled for http connections. otherwise this is
+	 * similar to connection storage or txn storage.
+	 * 
+	 * This is not threadsafe, and should not be used in STREST connections if avoidable.
+	 * 
+	 * @return
+	 */
+	public Map<String,Object> getSessionStorage() {
+		Map<String, Object> session = (Map<String, Object>)this.getConnectionStorage().get("session");
+		if (session == null) {
+			session = new HashMap<String,Object>();
+			this.getConnectionStorage().put("session", session);
+		}
+		return session;
 	}
 	
 	public void handleGET(DynMap params) throws Exception {

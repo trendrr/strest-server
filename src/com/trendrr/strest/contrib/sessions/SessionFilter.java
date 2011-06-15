@@ -74,7 +74,7 @@ public class SessionFilter implements StrestControllerFilter {
         	if (vals != null) {
         		controller.getSessionStorage().putAll(vals);
         	}
-        	controller.getSessionStorage().put(SESSION, sessionId);
+        	controller.getConnectionStorage().put(SESSION, sessionId);
         }
 
 	}
@@ -110,7 +110,7 @@ public class SessionFilter implements StrestControllerFilter {
 			return;
 		}
 		
-		String sessionId = (String)controller.getSessionStorage().remove(SESSION);
+		String sessionId = (String)controller.getConnectionStorage().get(SESSION);
 		if (sessionId == null && !controller.getSessionStorage().isEmpty()) {
 			CookieEncoder cookieEncoder = new CookieEncoder(true);
 			sessionId = UUID.randomUUID().toString();
@@ -120,7 +120,10 @@ public class SessionFilter implements StrestControllerFilter {
 	        controller.getResponse().setHeader(HttpHeaders.Names.COOKIE, cookieEncoder.encode());
 	        controller.getSessionStorage().put("expires", IsoDateUtil.getIsoDate(new Date(new Date().getTime()+(1000*this.maxAge))));
 		}
-		this.getSessionPersistence(controller).saveSession(sessionId, controller.getSessionStorage());
+		//save the session.
+		if (sessionId != null) {
+			this.getSessionPersistence(controller).saveSession(sessionId, controller.getSessionStorage());
+		}
 	}
 
 	/* (non-Javadoc)
