@@ -18,4 +18,5 @@ public interface SessionPersistence {
 
 	public Map<String,Object> loadSession(String sessionId);
 	public void saveSession(String sessionId, Map<String,Object> values);
+	public void deleteSession(String sessionId);
 }

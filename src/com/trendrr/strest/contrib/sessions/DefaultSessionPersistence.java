@@ -36,4 +36,13 @@ public class DefaultSessionPersistence implements SessionPersistence {
 	public void saveSession(String sessionId, Map<String, Object> values) {
 		log.info("Saving session (not really though) : " + sessionId + " " + values);
 	}
+
+	/* (non-Javadoc)
+	 * @see com.trendrr.strest.contrib.sessions.SessionPersistence#deleteSession(java.lang.String)
+	 */
+	@Override
+	public void deleteSession(String sessionId) {
+		log.info("Deleting session (not really though) : " + sessionId);
+		
+	}
 }

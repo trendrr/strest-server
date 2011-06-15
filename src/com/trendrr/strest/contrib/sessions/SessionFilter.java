@@ -68,13 +68,16 @@ public class SessionFilter implements StrestControllerFilter {
                 }
             }
         }
+        if ("deleted".equals(sessionId)) {
+        	sessionId = null;
+        }
         
         if (sessionId != null) {
         	//load the session.
         	Map<String,Object> vals = this.getSessionPersistence(controller).loadSession(sessionId);
         	
-        	Date expires = TypeCast.cast(Date.class, "expires", new Date());
-        	if (new Date().before(expires)) {
+        	Date expires = TypeCast.cast(Date.class, "expires");
+        	if (expires != null && expires.before(new Date())) {
         		log.info("Session expired!");
         		return;
         	}
@@ -118,16 +121,32 @@ public class SessionFilter implements StrestControllerFilter {
 		}
 		
 		String sessionId = (String)controller.getConnectionStorage().get(SESSION);
+		if (TypeCast.cast(Boolean.class, controller.getConnectionStorage().get("session_destroy"), false)) {
+			log.info("Destroying session!");
+			//destroy the session.
+			if (sessionId == null) {
+				return;
+			}
+			CookieEncoder cookieEncoder = new CookieEncoder(true);
+			Cookie cookie = new DefaultCookie(SESSION, "deleted");
+			cookie.setMaxAge(0);
+			cookieEncoder.addCookie(cookie);
+	        controller.getResponse().setHeader(HttpHeaders.Names.SET_COOKIE, cookieEncoder.encode());
+	        this.getSessionPersistence(controller).deleteSession(sessionId);
+			return;
+		}
+		
+		
 		if (sessionId == null && !controller.getSessionStorage().isEmpty()) {
 			CookieEncoder cookieEncoder = new CookieEncoder(true);
 			sessionId = UUID.randomUUID().toString();
 			Cookie cookie = new DefaultCookie(SESSION, sessionId);
 			cookie.setMaxAge(this.maxAge);
 			cookieEncoder.addCookie(cookie);
-	        controller.getResponse().setHeader(HttpHeaders.Names.COOKIE, cookieEncoder.encode());
-	        controller.getSessionStorage().put("expires", IsoDateUtil.getIsoDate(new Date(new Date().getTime()+(1000*this.maxAge))));
+	        controller.getResponse().setHeader(HttpHeaders.Names.SET_COOKIE, cookieEncoder.encode());
 		}
 		//save the session.
+		controller.getSessionStorage().put("expires", IsoDateUtil.getIsoDate(new Date(new Date().getTime()+(1000*this.maxAge))));
 		if (sessionId != null) {
 			this.getSessionPersistence(controller).saveSession(sessionId, controller.getSessionStorage());
 		}
