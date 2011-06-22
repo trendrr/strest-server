@@ -85,28 +85,10 @@ public class StrestServer {
 		}
 	}
 	
-	/*
+	/**
 	 * Initialize the server from a config DynMap. 
-	 
-	 	{
-		 	max_threads : 40,
-		 	controller_packages : [
-		 		'com.trendrr.api.controllers'
-		 	],
-		 	filters : [
-		 		'com.trendrr.api.filters.Authentication'
-		 	],
-		 	ssl : {
-		 		port : 8001,
-		 		keystore : '/home/dustin/keystore.jks',
-		 		keystore_password : 'strest',
-		 		certificate_password : 'strest'
-		 	},
-		 	default : {
-		 		port : 8000
-		 	}
-		 }
-	 
+	 *
+	 * See example_config.yaml for fields
 	 
 	 * 
 	 */
@@ -134,7 +116,7 @@ public class StrestServer {
 			throw new Exception("Config is null! unable to initialize server ");
 		}
 		server.setPort(config.get(Integer.class, "default.port"));
-		server.setMaxWorkerThreads(config.get(Integer.class, "max_threads"));
+		server.setMaxWorkerThreads(config.getInteger("threads.io"));
 		List<String> controllerPackages = config.getList(String.class, "controller_packages");
 		if (controllerPackages != null) {
 			for (String c : controllerPackages) {

@@ -5,6 +5,7 @@ package com.trendrr.strest.server;
 
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -188,6 +189,32 @@ public abstract class StrestController {
 		return this.connection.getStorage();
 	}
 	
+	
+	/**
+	 * gets the session storage.  
+	 * sessions must be enabled for http connections. otherwise this is
+	 * similar to connection storage or txn storage.
+	 * 
+	 * This is not threadsafe, and should not be used in STREST connections if avoidable.
+	 * 
+	 * @return
+	 */
+	public Map<String,Object> getSessionStorage() {
+		Map<String, Object> session = (Map<String, Object>)this.getConnectionStorage().get("session");
+		if (session == null) {
+			session = new HashMap<String,Object>();
+			this.getConnectionStorage().put("session", session);
+		}
+		return session;
+	}
+	
+	/**
+	 * deletes the session (if sessions are not enabled, does nothing)
+	 */
+	public void destroySession() {
+		this.getConnectionStorage().put("session_destroy", true);
+	}
+	
 	public void handleGET(DynMap params) throws Exception {
 		throw StrestHttpException.METHOD_NOT_ALLOWED();
 	}
@@ -271,6 +298,14 @@ public abstract class StrestController {
 	}
 	
 	/**
+	 * returns the content of the request as a UTF8 encoded string
+	 * @return
+	 */
+	public String getRequestContentUTF8() {
+		return request.getContent().toString(Charset.forName("utf8"));
+	}
+	
+	/**
 	 * Renders a template using the default TemplateRenderer.
 	 * @param filename
 	 * @param params
@@ -312,7 +347,6 @@ public abstract class StrestController {
     	for (Class f : filterClss) {   		
     		Object filter;
 			try {
-				System.out.println(f);
 				filter = Reflection.defaultInstance(f);
 				if (!(filter instanceof StrestControllerFilter)) {
 	    			log.warn("Filters must implement the StrestControllerFilter interface (" + filter + "  does not)");

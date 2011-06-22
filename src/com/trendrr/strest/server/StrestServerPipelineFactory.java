@@ -25,6 +25,9 @@ import org.jboss.netty.channel.ChannelPipelineFactory;
 import org.jboss.netty.handler.codec.http.HttpContentCompressor;
 import org.jboss.netty.handler.codec.http.HttpRequestDecoder;
 import org.jboss.netty.handler.codec.http.HttpResponseEncoder;
+import org.jboss.netty.handler.execution.ExecutionHandler;
+import org.jboss.netty.handler.execution.MemoryAwareThreadPoolExecutor;
+import org.jboss.netty.handler.execution.OrderedMemoryAwareThreadPoolExecutor;
 import org.jboss.netty.handler.ssl.SslHandler;
 
 /**
@@ -38,12 +41,16 @@ public class StrestServerPipelineFactory implements ChannelPipelineFactory {
 	private StrestRouter router ;
 	
 	SSLContext sslContext = null;
+	
+	ExecutionHandler handler;
+	
 	/**
 	 * creates a new pipeline factory (non-ssl)
 	 * @param router
 	 */
 	public StrestServerPipelineFactory(StrestRouter router) {
 		this(router, null);
+		
 	}
 	
 	/**
@@ -55,6 +62,10 @@ public class StrestServerPipelineFactory implements ChannelPipelineFactory {
 	public StrestServerPipelineFactory(StrestRouter router, SSLContext sslContext) {
 		this.router = router;
 		this.sslContext = sslContext;
+		this.handler = new ExecutionHandler(
+	             new MemoryAwareThreadPoolExecutor(
+	            		 router.getServer().getConfig().getInteger("threads.worker", 16), 1048576, 1048576)
+	    );
 	}
 	
     public ChannelPipeline getPipeline() throws Exception {
@@ -70,10 +81,12 @@ public class StrestServerPipelineFactory implements ChannelPipelineFactory {
         }
         pipeline.addLast("decoder", new HttpRequestDecoder());
         // Uncomment the following line if you don't want to handle HttpChunks.
-        //pipeline.addLast("aggregator", new HttpChunkAggregator(1048576));
+        pipeline.addLast("aggregator", new StrestChunkAggregator(65536));
         pipeline.addLast("encoder", new HttpResponseEncoder());
         // Remove the following line if you don't want automatic content compression.
         pipeline.addLast("deflater", new StrestResponseEncoder());
+        
+        pipeline.addLast("executionHandler", handler);
         pipeline.addLast("handler", new StrestRequestHandler(router));
         return pipeline;
     }

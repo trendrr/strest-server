@@ -1,8 +1,16 @@
 # Example YAML config file
 
 
-# Maximum number of worker threads.  0 or remove for unlimited
-max_threads : 40
+# Controlling thread pools
+threads :
+   #threads that handle the io, usually set this to the 2 * # of cores	
+   io : 8 
+   # these are the threads that handle all the controller logic.
+   # set this higher if your app uses lots of blocking calls
+   worker : 20  
+
+
+
 
 # Packages to search for controllers in.
 # packages are searched recursively
@@ -16,6 +24,8 @@ controller_packages:
 # Any filters to be executed on every invocation.
 # these must implement the StrestControllerFilter class
 filters:
+   # enable sessions
+   - com.trendrr.strest.contrib.sessions.SessionFilter
    # Leave this filter if you wish to use the "requiredParams" part of the annotation.
    - com.trendrr.strest.contrib.filters.RequiredParamsFilter 
    
@@ -44,3 +54,8 @@ templating:
 # websocket connections for browsers that don't support websockets
 flashsocketpolicy:
    port : 843 # ONly change if you are doing some internal port routing, flash looks on port 843 by default
+   
+
+# session config.
+sessions:
+   persistence : com.trendrr.strest.contrib.sessions.DefaultSessionPersistence
