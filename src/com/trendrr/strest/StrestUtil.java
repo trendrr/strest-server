@@ -9,6 +9,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.jboss.netty.handler.codec.http.HttpMessage;
 import org.jboss.netty.handler.codec.http.HttpRequest;
+import org.jboss.netty.handler.codec.http.HttpResponse;
 import org.jboss.netty.handler.codec.http.HttpVersion;
 
 
@@ -61,5 +62,27 @@ public class StrestUtil {
 	
 	public static boolean isStrest(HttpRequest request) {
 		return "STREST".equalsIgnoreCase(request.getProtocolVersion().getProtocolName());
+	}
+	
+	public static String toString(HttpResponse response) {
+		StringBuilder str = new StringBuilder();
+		str.append(response.getProtocolVersion());
+		str.append(" ");
+		str.append(response.getStatus().getCode());
+		str.append(" ");
+		str.append(response.getStatus().getReasonPhrase());
+		
+		str.append("\n");
+		for (String hdr : response.getHeaderNames()) {
+			str.append(hdr);
+			str.append(" : ");
+			str.append(response.getHeader(hdr));
+			str.append("\n");
+		}
+		
+		str.append("\n\r\n\r");
+		str.append(response.getContent().toString());
+
+		return str.toString();
 	}
 }
