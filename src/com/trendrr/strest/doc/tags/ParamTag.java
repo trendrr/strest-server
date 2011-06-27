@@ -44,11 +44,11 @@ public class ParamTag extends AbstractDocTag {
 		int ind = value.indexOf(' ');
 		if (ind == -1) {
 			//only the param in this one.
-			mp.put("param", value);
+			mp.put(this.tagName(), value);
 			return mp;
 		}
 		String param = value.substring(0, ind).trim();
-		mp.put("param", param);
+		mp.put(this.tagName(), param);
 		value = value.substring(ind).trim();
 		
 
