@@ -254,7 +254,7 @@ public abstract class StrestController {
 	}
 	
 	public ResponseBuilder getResponseAsBuilder() {
-		return ResponseBuilder.instance(this.getRequest());
+		return ResponseBuilder.instance(this.getResponse());
 	}
 
 	public void setResponse(HttpResponse response) {
