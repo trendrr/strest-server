@@ -58,10 +58,6 @@ public class RouteMatchingTests {
 		Assert.assertTrue(match(tree, "/test/idmatch/1", "test/idmatch/:id"));
 		Assert.assertTrue(match(tree, "/test/idmatch/namematch", "test/idmatch/namematch"));
 		
-//		System.out.println(tree.find("/dustin/blah"));
-//		System.out.println(tree.find("/dustin/blah/asdf"));
-//		System.out.println(tree.find("/"));
-		
 	}
 	
 	protected boolean match(RouteMatcher tree, String route, String expected) {
