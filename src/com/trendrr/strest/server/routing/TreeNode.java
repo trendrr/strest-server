@@ -86,12 +86,13 @@ public class TreeNode {
 	
 		List<String> wordList = words.subList(1, words.size());
 		
-		if (children.containsKey(word)) {
-			children.get(word).find(found, wordList);
-		}
 		for (TreeNode n : this.wildcards) {
 			n.find(found, wordList);
 		}
 		
+		//word matches next.
+		if (children.containsKey(word)) {
+			children.get(word).find(found, wordList);
+		}
 	}
 }
