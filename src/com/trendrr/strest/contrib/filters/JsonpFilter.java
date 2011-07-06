@@ -4,12 +4,15 @@
 package com.trendrr.strest.contrib.filters;
 
 import java.io.UnsupportedEncodingException;
+import java.util.Collection;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.jboss.netty.handler.codec.http.HttpHeaders;
 import org.jboss.netty.handler.codec.http.HttpResponse;
 
+import com.trendrr.oss.ListHelper;
+import com.trendrr.oss.TypeCast;
 import com.trendrr.strest.ContentTypes;
 import com.trendrr.strest.StrestException;
 import com.trendrr.strest.StrestHttpException;
@@ -31,8 +34,17 @@ import com.trendrr.strest.server.StrestControllerFilter;
 public class JsonpFilter implements StrestControllerFilter {
 
 	protected Log log = LogFactory.getLog(JsonpFilter.class);
-
-	String jsonpParam = "jsonp";
+	
+	private static Collection<String> params = ListHelper.toTypedList(String.class, "jsonp,callback", ",");
+	
+	/**
+	 * returns the possible names for the jsonp param.  
+	 * defaults to ['jsonp','callback']
+	 * @return
+	 */
+	protected Collection<String> getParamNames() {
+		return params;
+	}
 	
 	/* (non-Javadoc)
 	 * @see com.trendrr.strest.server.StrestControllerFilter#before(com.trendrr.strest.server.StrestController)
@@ -52,7 +64,12 @@ public class JsonpFilter implements StrestControllerFilter {
 		if (!ContentTypes.JSON.equals(response.getHeader(HttpHeaders.Names.CONTENT_TYPE))) {
 			return;
 		}
-		String param = controller.getParams().getString(this.jsonpParam);
+		String param = null;
+		for (String p : this.getParamNames()) {
+			param = controller.getParams().getString(p);
+			if (param != null)
+				break;
+		}
 		if (param == null)
 			return;
 		try {
