@@ -108,36 +108,58 @@ public class StrestDocParser {
 	 * @return
 	 */
 	public DynMap createIndex(List<DynMap> routes) {
-		DynMap index = new DynMap();
+		
+		
+		DynMap categories = new DynMap();
+		
 		for (DynMap route : routes) {
 			String category = route.get(String.class, "category", "default");
-			index.putIfAbsent(category, new ArrayList<DynMap>());
+			categories.putIfAbsent(category, new ArrayList<DynMap>());
 			DynMap mp = this.createIndexEntry(route);
 			if (mp == null)
 				continue;
-			index.get(List.class, category).add(mp);
+			categories.get(List.class, category).add(mp);
 		}
+
+		
+		List<DynMap> catList = new ArrayList<DynMap>();
 		//now sort the lists.
-		for (String cat : index.keySet()) {
-			List<DynMap> list = index.getList(DynMap.class, cat);
-			if (list == null || list.isEmpty()) {
-				index.remove(cat);
-				continue;
+		for (String cat : categories.keySet()) {
+			List<DynMap> rt = categories.getList(DynMap.class, cat);
+			DynMap ct = this.createIndexCategory(cat, rt);
+			if (ct != null) {
+				catList.add(ct);
 			}
-			Collections.sort(list, new Comparator<DynMap>(){
-				@Override
-				public int compare(DynMap o1, DynMap o2) {
-					String r1 = o1.getString("route", "");
-					String r2 = o2.getString("route", "");
-					return r1.compareToIgnoreCase(r2);
-				}
-			});
-			
-			index.put(cat, list);
 		}
+		
+		Collections.sort(catList, new Comparator<DynMap>() {
+			@Override
+			public int compare(DynMap o1, DynMap o2) {
+				return o1.getString("category").compareTo(o2.getString("category"));
+			}
+		});
+		DynMap index = new DynMap();
+		index.put("categories", catList);
 		return index;
 	}
 	
+	public DynMap createIndexCategory(String category, List<DynMap> routes) {
+		if (routes == null || routes.isEmpty()) {
+			return null;
+		}
+		Collections.sort(routes, new Comparator<DynMap>(){
+			@Override
+			public int compare(DynMap o1, DynMap o2) {
+				String r1 = o1.getString("route", "");
+				String r2 = o2.getString("route", "");
+				return r1.compareToIgnoreCase(r2);
+			}
+		});
+		DynMap cat = new DynMap();
+		cat.put("category", category);
+		cat.put("routes", routes);
+		return cat;
+	}
 	/**
 	 * creates the entry for the index page based on the map from the route.
 	 * 
