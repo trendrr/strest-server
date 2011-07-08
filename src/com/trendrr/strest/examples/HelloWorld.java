@@ -34,5 +34,6 @@ public class HelloWorld extends StrestController {
 		String val = params.getString("param", "world");
 		this.setResponseUTF8(ContentTypes.TEXT, 
 				"Hello " + val.toUpperCase() + "!");
+		this.getSessionStorage().put("Key", "Test");
 	}
 }
