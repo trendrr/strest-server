@@ -48,6 +48,10 @@ public class SessionFilter implements StrestControllerFilter {
 			//sessions unnecessary
 			return;
 		}
+		
+		if (controller.routes()[0].startsWith("/static")) {
+			return;
+		}
         
 		String sessionId = null;
 		 // get the session cookie.
@@ -120,6 +124,9 @@ public class SessionFilter implements StrestControllerFilter {
 			return;
 		}
 		
+		if (controller.routes()[0].startsWith("/static")) {
+			return;
+		}
 		String sessionId = (String)controller.getConnectionStorage().get(SESSION);
 		if (TypeCast.cast(Boolean.class, controller.getConnectionStorage().get("session_destroy"), false)) {
 			log.info("Destroying session!");
