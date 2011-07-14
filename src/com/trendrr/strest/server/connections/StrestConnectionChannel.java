@@ -52,18 +52,6 @@ public class StrestConnectionChannel implements Comparable<StrestConnectionChann
 	public Channel getChannel() {
 		return this.channel;
 	}
-	
-//	/**
-//	 * gets the transaction storage, or null
-//	 * @param txnId
-//	 * @return
-//	 */
-//	public Map<String, Object> getTransactionStorage(String txnId) {
-//		if (txnId == null)
-//			return null;
-//		StrestConnectionTxn txn = this.transactions.get(txnId);
-//		
-//	}
 
 	/**
 	 * gets the threadsafe connection storage, never null.
@@ -91,7 +79,6 @@ public class StrestConnectionChannel implements Comparable<StrestConnectionChann
 		}
 		this.disconnectCallbacks = null;
 		this.channel = null;
-		
 		this.connectionStorage.clear();
 		this.connectionStorage = null;
 	}
@@ -124,12 +111,6 @@ public class StrestConnectionChannel implements Comparable<StrestConnectionChann
 	public StrestConnectionTxn getTxnConnection(String txnId) {
 		return this.transactions.get(txnId);
 	}
-	
-//	void transactionStarted(String id) {
-//		if (id == null)
-//			return;
-//		this.transactionStorage.putIfAbsent(id, new ConcurrentHashMap<String,Object>());
-//	}
 	
 	public void txnComplete(String id) {
 		if (id == null)
