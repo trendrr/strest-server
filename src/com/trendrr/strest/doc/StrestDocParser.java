@@ -445,10 +445,38 @@ public class StrestDocParser {
 					mp.put(key, v);
 				}
 			}
+			if (mp.get("method") == null) {
+				mp.put("method", this.parseMethod(java));
+			} else {
+				mp.put("method", mp.getList(String.class, "method", ","));
+			}
 			results.add(mp);
 		}
 		
 		return results;
+	}
+	
+	/**
+	 * attempts to figure out if the route is GET, POST, DELETE, ect.
+	 * @param java
+	 * @return
+	 */
+	protected List<String> parseMethod(String java) {
+		List<String> methods = new ArrayList<String>();
+		if (java.contains("handleGET")) {
+			methods.add("GET");
+		}
+		if (java.contains("handlePOST")) {
+			methods.add("POST");
+		}
+		if (java.contains("handleDELETE")) {
+			methods.add("DELETE");
+		}
+		
+		if (java.contains("handlePUT")) {
+			methods.add("PUT");
+		}
+		return methods;
 	}
 	
 	/**
