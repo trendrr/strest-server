@@ -277,13 +277,15 @@ public class StrestDocParser {
 		for(DynMap v : docs) {
 			
 			DynMap m = new DynMap().extend(mp,v);
-//			System.out.println(m.toJSONString());
-			for(String route : m.getList(String.class, "route")) {
-				DynMap v1 = new DynMap();
-				v1.putAll(m);
-				v1.put("route", route);
-				v1 = this.cleanUpRoute(v1);
-				vals.add(v1);
+			List<String> routes = m.getList(String.class, "route");
+			if (routes != null) {
+				for(String route : routes) {
+					DynMap v1 = new DynMap();
+					v1.putAll(m);
+					v1.put("route", route);
+					v1 = this.cleanUpRoute(v1);
+					vals.add(v1);
+				}
 			}
 		}
 		return vals;
