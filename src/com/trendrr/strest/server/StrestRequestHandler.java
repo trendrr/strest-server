@@ -20,6 +20,8 @@ import static org.jboss.netty.handler.codec.http.HttpHeaders.Names.*;
 import static org.jboss.netty.handler.codec.http.HttpResponseStatus.*;
 import static org.jboss.netty.handler.codec.http.HttpVersion.*;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.jboss.netty.channel.ChannelHandlerContext;
 import org.jboss.netty.channel.ChannelStateEvent;
 import org.jboss.netty.channel.ExceptionEvent;
@@ -42,6 +44,7 @@ import org.jboss.netty.handler.codec.http.HttpResponse;
 public class StrestRequestHandler extends SimpleChannelUpstreamHandler {
 
 	StrestRouter router;
+	protected Log log = LogFactory.getLog(StrestRequestHandler.class);
 	
 	public StrestRequestHandler(StrestRouter r) {
 		this.router = r;
@@ -49,7 +52,7 @@ public class StrestRequestHandler extends SimpleChannelUpstreamHandler {
 	
 	@Override
 	public void channelConnected(ChannelHandlerContext ctx, ChannelStateEvent e) throws Exception {
-		System.out.println("Connection! " + ctx);
+		log.info("Connect! " + ctx);
 	}
 	
     @Override
@@ -70,6 +73,7 @@ public class StrestRequestHandler extends SimpleChannelUpstreamHandler {
 
     @Override
     public void channelDisconnected(ChannelHandlerContext ctx, ChannelStateEvent e) {
+    	log.info("Disconnect! " + ctx);
     	router.removeChannel(e.getChannel());
     }
     
@@ -82,7 +86,7 @@ public class StrestRequestHandler extends SimpleChannelUpstreamHandler {
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, ExceptionEvent e)
             throws Exception {
-        e.getCause().printStackTrace();
+    	log.warn("Caught", e.getCause());
         e.getChannel().close();
         this.router.removeChannel(e.getChannel());
     }
