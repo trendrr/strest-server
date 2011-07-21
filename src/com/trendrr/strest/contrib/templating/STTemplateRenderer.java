@@ -27,7 +27,7 @@ import com.trendrr.strest.server.StrestServer;
  * 
  * A few modifications on top of StringTemplate:
  * 
- * uses ${xxxxx} as field delimiter.
+ * uses $xxxxx$ as field delimiter.
  * 
  * to define regions:
  * <%def name="methodName()">
@@ -92,6 +92,10 @@ public class STTemplateRenderer implements TemplateRenderer{
 					
 					templateString = templateString.replaceAll("\\<\\s*\\/\\%def\\s*\\>", "\n>>\n||SPLIT||");
 					
+					
+					//deal with jquery syntax (escapes the leading $)
+					templateString = templateString.replaceAll("(\\$\\([^\\)]+\\)[^\\$])", "\\\\$1");
+					
 					String tmp[] = templateString.split("\\|\\|SPLIT\\|\\|");
 					
 					
@@ -109,9 +113,10 @@ public class STTemplateRenderer implements TemplateRenderer{
 					
 					
 					
-					System.out.println("##### TEMPLATE : " + f);
-					System.out.println(template.toString());
-					System.out.println("##### END TEMPLATE : " + f);
+					
+//					System.out.println("##### TEMPLATE : " + f);
+//					System.out.println(template.toString());
+//					System.out.println("##### END TEMPLATE : " + f);
 					STGroup group = new STGroupString("page", template.toString(), '$', '$');
 					if (parent != null)
 						group.importTemplates(parent);
