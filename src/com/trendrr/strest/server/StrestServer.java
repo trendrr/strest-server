@@ -116,7 +116,9 @@ public class StrestServer {
 			throw new Exception("Config is null! unable to initialize server ");
 		}
 		server.setPort(config.get(Integer.class, "default.port"));
+		server.setMaxWorkerThreads(config.getInteger("threads.worker"));
 		server.setMaxWorkerThreads(config.getInteger("threads.io"));
+		
 		List<String> controllerPackages = config.getList(String.class, "controller_packages");
 		if (controllerPackages != null) {
 			for (String c : controllerPackages) {
@@ -207,7 +209,24 @@ public class StrestServer {
 		if (maxThreads == null || maxThreads < 1) {
 			this.workerExecutor = Executors.newCachedThreadPool();
 		} else {
+			log.info("Setting max worker threads: " + maxThreads);
 			this.workerExecutor = Executors.newFixedThreadPool(maxThreads);
+		}
+	}
+	
+	/**
+	 * will set the bossExecutor to a fixed pool with maxThreads number of threads.
+	 * 
+	 * -1 or null will set to unlimited.
+	 * 
+	 * @param maxThreads
+	 */
+	public void setMaxIOThreads(Integer maxThreads) {
+		if (maxThreads == null || maxThreads < 1) {
+			this.bossExecutor = Executors.newCachedThreadPool();
+		} else {
+			log.info("Setting max IO threads: " + maxThreads);
+			this.bossExecutor = Executors.newFixedThreadPool(maxThreads);
 		}
 	}
 	
