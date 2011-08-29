@@ -52,7 +52,28 @@ public abstract class StrestController {
 	
 	protected StrestRouter router = null;
 	
+	protected boolean skipExecution = false;
 	
+	/**
+	 * Should we skip running the GET POST ect methods?
+	 * @return
+	 */
+	public boolean isSkipExecution() {
+		return skipExecution;
+	}
+
+	/**
+	 * This flag will indicate that the get,post,delete,put methods should NOT be executed.
+	 * 
+	 * This is useful for filters to indicate that no error has occurred but the business logic should
+	 * not be run (i.e. for caching implementations).
+	 * 
+	 * @param skipExecution
+	 */
+	public void setSkipExecution(boolean skipExecution) {
+		this.skipExecution = skipExecution;
+	}
+
 	/**
 	 * returns the config params for the server.  typically this is the parsed yaml config file.
 	 */

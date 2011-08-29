@@ -196,18 +196,19 @@ public class StrestRouter {
 	            }
 	            
 	            //now execution the appropriate action.
-	            if (request.getMethod() == HttpMethod.GET) {
-					controller.handleGET(controller.getParams());	
-	            } else if (request.getMethod() == HttpMethod.POST) {
-	            	controller.handlePOST(controller.getParams());	
-	            } else if (request.getMethod() == HttpMethod.PUT) {
-	            	controller.handlePUT(controller.getParams());	
-	            } else if (request.getMethod() == HttpMethod.DELETE) {
-	            	controller.handleDELETE(controller.getParams());	
-	            } else {
-	            	throw StrestHttpException.METHOD_NOT_ALLOWED();
+	            if (!controller.isSkipExecution()) {
+		            if (request.getMethod() == HttpMethod.GET) {
+						controller.handleGET(controller.getParams());	
+		            } else if (request.getMethod() == HttpMethod.POST) {
+		            	controller.handlePOST(controller.getParams());	
+		            } else if (request.getMethod() == HttpMethod.PUT) {
+		            	controller.handlePUT(controller.getParams());	
+		            } else if (request.getMethod() == HttpMethod.DELETE) {
+		            	controller.handleDELETE(controller.getParams());	
+		            } else {
+		            	throw StrestHttpException.METHOD_NOT_ALLOWED();
+		            }
 	            }
-	            
 	            for (StrestControllerFilter f : controller.getFilters()) {
 	            	f.after(controller);
 	            }
