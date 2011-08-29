@@ -18,12 +18,15 @@ import org.jboss.netty.handler.codec.http.HttpHeaders;
 import org.jboss.netty.handler.codec.http.HttpResponse;
 import org.jboss.netty.util.internal.ConcurrentHashMap;
 
+import com.trendrr.oss.DynMap;
 import com.trendrr.oss.IsoDateUtil;
 import com.trendrr.oss.Reflection;
 import com.trendrr.oss.TypeCast;
+import com.trendrr.oss.concurrent.LazyInit;
 import com.trendrr.strest.StrestException;
 import com.trendrr.strest.server.StrestController;
 import com.trendrr.strest.server.StrestControllerFilter;
+import com.trendrr.strest.server.StrestRouter;
 
 
 /**
@@ -37,7 +40,10 @@ public class SessionFilter implements StrestControllerFilter {
 	protected static String SESSION = "sessionId";
 	protected int maxAge = 60*30; //30 minutes
 	
-	protected ConcurrentHashMap<String, SessionPersistence> persistence = new ConcurrentHashMap<String,SessionPersistence>();
+	protected static ConcurrentHashMap<StrestRouter, LazyInit> persistenceInit = new ConcurrentHashMap<StrestRouter, LazyInit>();
+	protected static ConcurrentHashMap<StrestRouter, SessionPersistence> persistence = new ConcurrentHashMap<StrestRouter,SessionPersistence>();
+	
+	
 	
 	/* (non-Javadoc)
 	 * @see com.trendrr.strest.server.StrestControllerFilter#before(com.trendrr.strest.server.StrestController)
@@ -99,20 +105,36 @@ public class SessionFilter implements StrestControllerFilter {
 	 * @return
 	 */
 	protected SessionPersistence getSessionPersistence(StrestController controller) {
-		String cls = controller.getServerConfig().getString("sessions.persistence", "com.trendrr.strest.contrib.sessions.DefaultSessionPersistence");
-		SessionPersistence persistence = this.persistence.get(cls);
-		if (persistence == null) {
+		
+		persistenceInit.putIfAbsent(controller.getRouter(), new LazyInit());
+		LazyInit init = persistenceInit.get(controller.getRouter());
+		if (init.start()) {
+			//lazily initialize
 			try {
-				persistence = (SessionPersistence)Reflection.defaultInstance(cls);
-				this.persistence.put(cls, persistence);
-			} catch (Exception e) {
-				log.warn("Unable to load SessionPersistence class: " + cls);
+				
+				DynMap sessionConfig = controller.getServerConfig().getMap("sessions", new DynMap());
+				String cls = sessionConfig.getString("persistence", "com.trendrr.strest.contrib.sessions.DefaultSessionPersistence");
+				
+				SessionPersistence per = persistence.get(cls);
+				if (per == null) {
+					try {
+						per = (SessionPersistence)Reflection.defaultInstance(cls);
+						
+					} catch (Exception e) {
+						log.warn("Unable to load SessionPersistence class: " + cls);
+					}
+				}
+				if (per == null) {
+					log.warn("No sessions.persistence class available, using dummy provider");
+					per = new DefaultSessionPersistence();
+				}
+				per.init(sessionConfig);
+				persistence.put(controller.getRouter(), per);
+			} finally {
+				init.end();
 			}
 		}
-		if (persistence == null) {
-			return new DefaultSessionPersistence();
-		}
-		return persistence;
+		return persistence.get(controller.getRouter());
 	}
 	
 	/* (non-Javadoc)

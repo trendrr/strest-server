@@ -45,4 +45,13 @@ public class DefaultSessionPersistence implements SessionPersistence {
 		log.info("Deleting session (not really though) : " + sessionId);
 		
 	}
+
+	/* (non-Javadoc)
+	 * @see com.trendrr.strest.contrib.sessions.SessionPersistence#init(com.trendrr.oss.DynMap)
+	 */
+	@Override
+	public void init(DynMap sessionsConfig) {
+		// TODO Auto-generated method stub
+		
+	}
 }
