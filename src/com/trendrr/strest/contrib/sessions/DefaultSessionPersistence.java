@@ -3,6 +3,7 @@
  */
 package com.trendrr.strest.contrib.sessions;
 
+import java.util.Date;
 import java.util.Map;
 
 import org.apache.commons.logging.Log;
@@ -30,14 +31,6 @@ public class DefaultSessionPersistence implements SessionPersistence {
 	}
 
 	/* (non-Javadoc)
-	 * @see com.trendrr.strest.contrib.sessions.SessionPersistence#saveSession(java.lang.String, java.util.Map)
-	 */
-	@Override
-	public void saveSession(String sessionId, Map<String, Object> values) {
-		log.info("Saving session (not really though) : " + sessionId + " " + values);
-	}
-
-	/* (non-Javadoc)
 	 * @see com.trendrr.strest.contrib.sessions.SessionPersistence#deleteSession(java.lang.String)
 	 */
 	@Override
@@ -53,5 +46,14 @@ public class DefaultSessionPersistence implements SessionPersistence {
 	public void init(DynMap sessionsConfig) {
 		// TODO Auto-generated method stub
 		
+	}
+
+	/* (non-Javadoc)
+	 * @see com.trendrr.strest.contrib.sessions.SessionPersistence#saveSession(java.lang.String, java.util.Map, java.util.Date)
+	 */
+	@Override
+	public void saveSession(String sessionId, Map<String, Object> values,
+			Date expires) {
+		log.info("Saving session (not really though) : " + sessionId + " " + values);
 	}
 }

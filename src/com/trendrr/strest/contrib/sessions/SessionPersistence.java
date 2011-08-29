@@ -3,6 +3,7 @@
  */
 package com.trendrr.strest.contrib.sessions;
 
+import java.util.Date;
 import java.util.Map;
 
 import org.apache.commons.logging.Log;
@@ -29,7 +30,29 @@ public interface SessionPersistence {
 	 * @param sessionsConfig contains everything from the sessions part of the server config file.
 	 */
 	public void init(DynMap sessionsConfig);
+	/**
+	 * load a session
+	 * 
+	 * Null is treated as an empty session.
+	 * 
+	 * @param sessionId
+	 * @return
+	 */
 	public Map<String,Object> loadSession(String sessionId);
-	public void saveSession(String sessionId, Map<String,Object> values);
+	
+	/**
+	 * Saves a session.
+	 * 
+	 * By default the expires time will be rolling, i.e. each request will push back the expiration time.
+	 * @param sessionId
+	 * @param values
+	 * @param expires
+	 */
+	public void saveSession(String sessionId, Map<String,Object> values, Date expires);
+	
+	/**
+	 * deletes a session.
+	 * @param sessionId
+	 */
 	public void deleteSession(String sessionId);
 }

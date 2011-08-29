@@ -175,9 +175,10 @@ public class SessionFilter implements StrestControllerFilter {
 	        controller.getResponse().setHeader(HttpHeaders.Names.SET_COOKIE, cookieEncoder.encode());
 		}
 		//save the session.
-		controller.getSessionStorage().put("expires", IsoDateUtil.getIsoDate(new Date(new Date().getTime()+(1000*this.maxAge))));
+		Date expires = new Date(new Date().getTime()+(1000*this.maxAge));
+		controller.getSessionStorage().put("expires", IsoDateUtil.getIsoDate(expires));
 		if (sessionId != null) {
-			this.getSessionPersistence(controller).saveSession(sessionId, controller.getSessionStorage());
+			this.getSessionPersistence(controller).saveSession(sessionId, controller.getSessionStorage(), expires);
 		}
 	}
 
