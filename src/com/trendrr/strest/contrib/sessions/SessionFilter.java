@@ -43,19 +43,28 @@ public class SessionFilter implements StrestControllerFilter {
 	protected static ConcurrentHashMap<StrestRouter, LazyInit> persistenceInit = new ConcurrentHashMap<StrestRouter, LazyInit>();
 	protected static ConcurrentHashMap<StrestRouter, SessionPersistence> persistence = new ConcurrentHashMap<StrestRouter,SessionPersistence>();
 	
-	
-	
+	/**
+	 * should this filter run or be skipped?
+	 * @param controller
+	 * @return
+	 */
+	protected boolean shouldRun(StrestController controller) {
+		if (controller.isStrest()) {
+			return false;
+		}
+		
+		if (controller.routes()[0].startsWith("/static")) {
+			return false;
+		}
+		
+		return true;
+	}
 	/* (non-Javadoc)
 	 * @see com.trendrr.strest.server.StrestControllerFilter#before(com.trendrr.strest.server.StrestController)
 	 */
 	@Override
 	public void before(StrestController controller) throws StrestException {
-		if (controller.isStrest()) {
-			//sessions unnecessary
-			return;
-		}
-		
-		if (controller.routes()[0].startsWith("/static")) {
+		if (!this.shouldRun(controller)) {
 			return;
 		}
         
@@ -142,11 +151,7 @@ public class SessionFilter implements StrestControllerFilter {
 	 */
 	@Override
 	public void after(StrestController controller) throws StrestException {
-		if (controller.isStrest()) {
-			return;
-		}
-		
-		if (controller.routes()[0].startsWith("/static")) {
+		if (!this.shouldRun(controller)) {
 			return;
 		}
 		String sessionId = (String)controller.getConnectionStorage().get(SESSION);
