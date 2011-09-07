@@ -60,6 +60,7 @@ public class AccessLogFilter implements StrestControllerFilter {
 	protected DynMap toLog(StrestController controller) {
 		Date start = (Date)controller.getTxnStorage().remove("accesslog_start");
 		DynMap mp = new DynMap();
+		mp.put("timestamp", start);
 		mp.put("millis", (new Date().getTime() - start.getTime()));
 		mp.put("uri", controller.getRequest().getUri());
 		mp.put("strest", controller.isStrest());
