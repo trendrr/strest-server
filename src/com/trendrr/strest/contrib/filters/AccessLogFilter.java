@@ -73,8 +73,8 @@ public class AccessLogFilter implements StrestControllerFilter {
 	 */
 	@Override
 	public void after(StrestController controller) throws StrestException {
-		DynMap row = this.toLog(controller);
 		try {
+			DynMap row = this.toLog(controller);
 			appender.append(row.toJSONString() + "\n");
 		} catch (Exception e) {
 			log.error("Caught", e);
