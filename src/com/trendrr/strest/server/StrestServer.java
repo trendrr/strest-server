@@ -32,7 +32,7 @@ import com.trendrr.strest.flash.FlashSocketPolicyServer;
  */
 public class StrestServer {
 
-	protected Log log = LogFactory.getLog(StrestServer.class);
+	protected static Log log = LogFactory.getLog(StrestServer.class);
 	
 	
 	private StrestRouter router = new StrestRouter();
@@ -58,33 +58,57 @@ public class StrestServer {
 	/**
 	 * creates a server based on a config file.  Config file is assumed to be either 
 	 * json or yaml.  See example_config.yaml for more.
+	 * 
+	 * if more then one filename is passed, the subsequent config files will override any fields in the previous ones.
+	 * this allows you to chain config files
+	 * 
 	 * @param filename
 	 * @return
 	 * @throws Exception
 	 */
-	public static StrestServer instanceFromFile(String filename) throws Exception {
+	public static StrestServer instanceFromFile(String filename, String ...filenames) throws Exception {
 		StrestServer server = new StrestServer();
-		initFromFile(server, filename);
+		initFromFile(server, filename, filenames);
 		return server;
 	}
 	
-	public static void initFromFile(StrestServer server, String filename) throws Exception {
+	/**
+	 * initializes the server with the passed in filenames.  
+	 * if more then one filename is passed, the subsequent config files will override any fields in the previous ones.
+	 * 
+	 * this allows you to chain config files
+	 * 
+	 * 
+	 * @param server
+	 * @param filename
+	 * @param filenames
+	 * @throws Exception
+	 */
+	public static void initFromFile(StrestServer server, String filename, String ...filenames) throws Exception {
+		DynMap conf = dynMapFromFile(filename);
+		
+		for (String f : filenames) {
+			conf.extend(dynMapFromFile(f));
+		}
+		initialize(server, conf);
+	}
+	
+	private static DynMap dynMapFromFile(String filename) throws Exception {
 		if (filename.endsWith("yaml")) {
 			Yaml yaml = new Yaml();
 		    String document = FileHelper.loadString(filename);
 		    Map map = (Map) yaml.load(document);
-		    initialize(server, DynMapFactory.instance(map));
+		    return DynMapFactory.instance(map);
 		    
 		} else if (filename.endsWith("xml")) {
 			//TODO (or not..)
 			
-		} else {
-			//assume json
-			initialize(server, DynMapFactory.instanceFromFile(filename));
-			
 		}
+
+		//assume json
+		return DynMapFactory.instanceFromFile(filename);
+		
 	}
-	
 	/**
 	 * Initialize the server from a config DynMap. 
 	 *
@@ -115,6 +139,7 @@ public class StrestServer {
 		if (config == null) {
 			throw new Exception("Config is null! unable to initialize server ");
 		}
+		
 		server.setPort(config.get(Integer.class, "default.port"));
 		server.setMaxWorkerThreads(config.getInteger("threads.worker"));
 		server.setMaxWorkerThreads(config.getInteger("threads.io"));
@@ -242,7 +267,7 @@ public class StrestServer {
 	        bootstrap.setPipelineFactory(new StrestServerPipelineFactory(router, null));
 			bootstrap.bind(new InetSocketAddress(this.port));
 			this.bootstraps.add(bootstrap);
-			System.out.println("Listening on port: " + this.port);
+			log.warn("Listening on port: " + this.port);
 		}
 		if (this.sslPort != null && this.sslContext != null) {
 			
@@ -254,7 +279,7 @@ public class StrestServer {
 	        bootstrap.setPipelineFactory(new StrestServerPipelineFactory(router, sslContext));
 			bootstrap.bind(new InetSocketAddress(this.sslPort));
 			this.bootstraps.add(bootstrap);
-			System.out.println("SSL listening on port: " + this.sslPort);
+			log.warn("SSL listening on port: " + this.sslPort);
 		}
 		
 		//add the flashsocket policy server, if needed
