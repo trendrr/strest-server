@@ -86,10 +86,13 @@ public class StrestServer {
 	 */
 	public static void initFromFile(StrestServer server, String filename, String ...filenames) throws Exception {
 		DynMap conf = dynMapFromFile(filename);
-		
+		log.warn("Config with : " + conf.toJSONString());
 		for (String f : filenames) {
-			conf.extend(dynMapFromFile(f));
+			DynMap override = dynMapFromFile(f);
+			log.warn("Overriding config: " + override);
+			conf.extend(override);
 		}
+		log.warn("Initializing with config: " + conf.toJSONString());
 		initialize(server, conf);
 	}
 	
