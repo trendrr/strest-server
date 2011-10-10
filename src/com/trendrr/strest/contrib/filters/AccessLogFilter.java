@@ -11,9 +11,9 @@ import org.apache.commons.logging.LogFactory;
 import org.jboss.netty.handler.codec.http.HttpResponse;
 
 import com.trendrr.oss.DynMap;
-import com.trendrr.oss.RollingFileAppender;
 import com.trendrr.oss.Timeframe;
 import com.trendrr.oss.TypeCast;
+import com.trendrr.oss.appender.RollingFileAppender;
 import com.trendrr.oss.concurrent.LazyInit;
 import com.trendrr.strest.StrestException;
 import com.trendrr.strest.server.StrestController;
