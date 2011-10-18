@@ -13,14 +13,7 @@ import com.trendrr.oss.DynMap;
  */
 public interface TemplateRenderer {
 
-	public byte[] renderIndex(DynMap index);
+	public void renderIndex(DynMap index);
 	
-	public byte[] renderPage(DynMap page);
-	
-	/**
-	 * returns what filename extension should be used.
-	 * EX ".json" or ".html"
-	 * @return
-	 */
-	public String getFileExtension();
+	public void renderPage(String route, DynMap page);
 }

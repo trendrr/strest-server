@@ -21,7 +21,7 @@ import com.trendrr.oss.FileHelper;
 import com.trendrr.oss.Reflection;
 import com.trendrr.oss.Regex;
 import com.trendrr.oss.StringHelper;
-import com.trendrr.strest.doc.renderer.JSONRenderer;
+import com.trendrr.strest.doc.renderer.JSONFileRenderer;
 
 
 /**
@@ -43,7 +43,7 @@ public class StrestDocParser {
 	
 	public StrestDocParser() {
 		this.addTags("com.trendrr.strest.doc.tags", true);
-		this.addTemplateRenderer(new JSONRenderer());
+		this.addTemplateRenderer(new JSONFileRenderer());
 	}
 	
 	public static void main(String ...strings) {
@@ -65,27 +65,17 @@ public class StrestDocParser {
 		List<DynMap> routes = this.parseDirectory(docDirectory);
 		DynMap index = this.createIndex(routes);
 		//save the index.
-		try {
-			String filename = saveDirectory + "/strestdoc_index";
-			for (TemplateRenderer rend : this.renderers) {
-				FileHelper.saveBytes(filename + rend.getFileExtension(), rend.renderIndex(index));
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
+		for (TemplateRenderer rend : this.renderers) {
+			rend.renderIndex(index);
 		}
 		
 		for (DynMap route : routes) {
-			try {
-				String r = route.get(String.class, "route");
-				if (r.isEmpty())
-					r = "/index";
-				String filename = saveDirectory + r;
-				
-				for (TemplateRenderer rend : this.renderers) {					
-					FileHelper.saveBytes(filename + rend.getFileExtension(), rend.renderPage(route));
-				}
-			} catch (Exception e) {
-				e.printStackTrace();
+			String r = route.get(String.class, "route");
+			if (r.isEmpty())
+				r = "/index";
+
+			for (TemplateRenderer rend : this.renderers) {					
+				rend.renderPage(r, route);
 			}
 		}
 	}
