@@ -49,6 +49,10 @@ public class SessionFilter implements StrestControllerFilter {
 	 * @return
 	 */
 	protected boolean shouldRun(StrestController controller) {
+		if (controller == null) {
+			return false; //wtf?
+		}
+		
 		if (controller.isStrest()) {
 			return false;
 		}
@@ -57,6 +61,9 @@ public class SessionFilter implements StrestControllerFilter {
 			return false;
 		}
 		
+		if (controller.getConnectionStorage() == null) {
+			return false; //wtf?
+		}
 		return true;
 	}
 	/* (non-Javadoc)
