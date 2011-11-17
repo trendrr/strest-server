@@ -5,6 +5,7 @@ package com.trendrr.strest.server;
 
 import static org.jboss.netty.handler.codec.http.HttpHeaders.Names.CONTENT_TYPE;
 
+import java.nio.channels.ClosedChannelException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
@@ -268,14 +269,14 @@ public class StrestRouter {
 //		System.out.println(response.getResponse());
 //		System.out.println("*****");
 //		System.out.println(response.getResponse().getContent().toString());
-		
-        ChannelFuture future = con.sendMessage(response);
-
-        // Close the non-keep-alive connection after the write operation is done.
+		ChannelFuture future = con.sendMessage(response);
+		 // Close the non-keep-alive connection after the write operation is done.
         if (!isStrest) {
-//        	log.info("CLOSING NON STREST CONNECTION");
+//	        	log.info("CLOSING NON STREST CONNECTION");
+        	future.addListener(ChannelFutureListener.CLOSE_ON_FAILURE);
             future.addListener(ChannelFutureListener.CLOSE);
             this.removeChannel(channel);
         }
+       
 	}
 }
