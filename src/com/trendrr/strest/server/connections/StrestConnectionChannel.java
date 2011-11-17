@@ -80,7 +80,6 @@ public class StrestConnectionChannel implements Comparable<StrestConnectionChann
 		this.disconnectCallbacks = null;
 		this.channel = null;
 		this.connectionStorage.clear();
-		this.connectionStorage = null;
 	}
 	
 	public ChannelFuture sendMessage(ResponseBuilder responseBuilder) {
