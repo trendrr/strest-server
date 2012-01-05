@@ -87,12 +87,17 @@ public class StrestConnectionChannel implements Comparable<StrestConnectionChann
 	}
 	
 	public synchronized ChannelFuture sendMessage(HttpResponse response) {
-		 // Write the response.
+		if (channel == null || !channel.isOpen()) {
+			log.info("channel is closed, user has disconnected");
+			return null;
+		}
+        
+		// Write the response.
 		if (StrestUtil.HEADERS.TXN_STATUS_VALUES.COMPLETE.equalsIgnoreCase(response.getHeader(StrestUtil.HEADERS.TXN_STATUS))) {
 			//remove the txn
 			this.txnComplete(response.getHeader(StrestUtil.HEADERS.TXN_ID));
 		}
-        return channel.write(response);
+		return channel.write(response);
 	}
 	
 	public void incoming(HttpRequest request) {

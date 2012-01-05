@@ -270,6 +270,11 @@ public class StrestRouter {
 //		System.out.println("*****");
 //		System.out.println(response.getResponse().getContent().toString());
 		ChannelFuture future = con.sendMessage(response);
+		if (future == null) {
+			this.removeChannel(channel);
+			return;
+		}
+		
 		 // Close the non-keep-alive connection after the write operation is done.
         if (!isStrest) {
 //	        	log.info("CLOSING NON STREST CONNECTION");
@@ -277,6 +282,6 @@ public class StrestRouter {
             future.addListener(ChannelFutureListener.CLOSE);
             this.removeChannel(channel);
         }
-       
+       log.info(this.connections.size());
 	}
 }
