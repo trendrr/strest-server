@@ -22,8 +22,13 @@ import com.trendrr.oss.DynMap;
 import com.trendrr.oss.IsoDateUtil;
 import com.trendrr.oss.Reflection;
 import com.trendrr.oss.TypeCast;
+import com.trendrr.oss.cache.TrendrrCache;
+import com.trendrr.oss.cache.TrendrrCacheStore;
+import com.trendrr.oss.concurrent.Initializer;
 import com.trendrr.oss.concurrent.LazyInit;
 import com.trendrr.strest.StrestException;
+import com.trendrr.strest.contrib.InMemoryTrendrrCache;
+import com.trendrr.strest.contrib.TrendrrCaches;
 import com.trendrr.strest.server.StrestController;
 import com.trendrr.strest.server.StrestControllerFilter;
 import com.trendrr.strest.server.StrestRouter;
@@ -40,8 +45,8 @@ public class SessionFilter implements StrestControllerFilter {
 	protected static String SESSION = "sessionId";
 	protected int maxAge = 60*30; //30 minutes
 	
-	protected static ConcurrentHashMap<StrestRouter, LazyInit> persistenceInit = new ConcurrentHashMap<StrestRouter, LazyInit>();
-	protected static ConcurrentHashMap<StrestRouter, SessionPersistence> persistence = new ConcurrentHashMap<StrestRouter,SessionPersistence>();
+//	protected static ConcurrentHashMap<StrestRouter, LazyInit> persistenceInit = new ConcurrentHashMap<StrestRouter, LazyInit>();
+//	protected static ConcurrentHashMap<StrestRouter, TrendrrCache> persistence = new ConcurrentHashMap<StrestRouter,TrendrrCache>();
 	
 	/**
 	 * should this filter run or be skipped?
@@ -100,7 +105,7 @@ public class SessionFilter implements StrestControllerFilter {
         
         if (sessionId != null) {
         	//load the session.
-        	Map<String,Object> vals = this.getSessionPersistence(controller).loadSession(sessionId);
+        	Map<String,Object> vals = DynMap.instance(this.getSessionPersistence(controller).get(sessionId));
         	
         	Date expires = TypeCast.cast(Date.class, "expires");
         	if (expires != null && expires.before(new Date())) {
@@ -120,37 +125,36 @@ public class SessionFilter implements StrestControllerFilter {
 	 * @param controller
 	 * @return
 	 */
-	protected SessionPersistence getSessionPersistence(StrestController controller) {
+	protected TrendrrCache getSessionPersistence(final StrestController controller) {
+		return TrendrrCaches.getCacheOrDefault("sessions", controller);
 		
-		persistenceInit.putIfAbsent(controller.getRouter(), new LazyInit());
-		LazyInit init = persistenceInit.get(controller.getRouter());
-		if (init.start()) {
-			//lazily initialize
-			try {
-				
-				DynMap sessionConfig = controller.getServerConfig().getMap("sessions", new DynMap());
-				String cls = sessionConfig.getString("persistence", "com.trendrr.strest.contrib.sessions.DefaultSessionPersistence");
-				
-				SessionPersistence per = persistence.get(cls);
-				if (per == null) {
-					try {
-						per = (SessionPersistence)Reflection.defaultInstance(cls);
-						
-					} catch (Exception e) {
-						log.warn("Unable to load SessionPersistence class: " + cls);
-					}
-				}
-				if (per == null) {
-					log.warn("No sessions.persistence class available, using dummy provider");
-					per = new DefaultSessionPersistence();
-				}
-				per.init(sessionConfig);
-				persistence.put(controller.getRouter(), per);
-			} finally {
-				init.end();
-			}
-		}
-		return persistence.get(controller.getRouter());
+//		persistenceInit.putIfAbsent(controller.getRouter(), new LazyInit());
+//		LazyInit init = persistenceInit.get(controller.getRouter());
+//		if (init.start()) {
+//			//lazily initialize
+//			try {
+//				
+//				DynMap sessionConfig = controller.getServerConfig().getMap("sessions", new DynMap());
+//				String cls = sessionConfig.getString("persistence", "com.trendrr.strest.contrib.sessions.DefaultSessionPersistence");
+//				
+//				TrendrrCache per = persistence.get(cls);
+//				if (per == null) {
+//					try {
+//						per = (TrendrrCache)Reflection.instance(Class.forName(cls), sessionConfig);
+//					} catch (Exception e) {
+//						log.warn("Unable to load TrendrrCache class: " + cls);
+//					}
+//				}
+//				if (per == null) {
+//					log.warn("No sessions.persistence class available, using dummy provider");
+//					per = new InMemoryTrendrrCache(sessionConfig);
+//				}
+//				persistence.put(controller.getRouter(), per);
+//			} finally {
+//				init.end();
+//			}
+//		}
+//		return persistence.get(controller.getRouter());
 	}
 	
 	/* (non-Javadoc)
@@ -173,7 +177,7 @@ public class SessionFilter implements StrestControllerFilter {
 			cookie.setMaxAge(0);
 			cookieEncoder.addCookie(cookie);
 	        controller.getResponse().setHeader(HttpHeaders.Names.SET_COOKIE, cookieEncoder.encode());
-	        this.getSessionPersistence(controller).deleteSession(sessionId);
+	        this.getSessionPersistence(controller).delete(sessionId);
 			return;
 		}
 		
@@ -190,7 +194,7 @@ public class SessionFilter implements StrestControllerFilter {
 		Date expires = new Date(new Date().getTime()+(1000*this.maxAge));
 		controller.getSessionStorage().put("expires", IsoDateUtil.getIsoDate(expires));
 		if (sessionId != null) {
-			this.getSessionPersistence(controller).saveSession(sessionId, controller.getSessionStorage(), expires);
+			this.getSessionPersistence(controller).set(sessionId, DynMap.instance(controller.getSessionStorage()).toJSONString(), expires);
 		}
 	}
 
