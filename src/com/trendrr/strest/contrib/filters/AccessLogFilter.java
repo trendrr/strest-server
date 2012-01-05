@@ -57,6 +57,12 @@ public class AccessLogFilter implements StrestControllerFilter {
 				accessLogConfig.getString("filename", "/var/logs/strest/access.log"));
 	}
 	
+	/**
+	 * Subclasses can override this to add any additional logging fields (or take them away).
+	 * if this returns null, the message will not be logged.
+	 * @param controller
+	 * @return
+	 */
 	protected DynMap toLog(StrestController controller) {
 		Date start = (Date)controller.getTxnStorage().remove("accesslog_start");
 		DynMap mp = new DynMap();
@@ -79,6 +85,8 @@ public class AccessLogFilter implements StrestControllerFilter {
 	public void after(StrestController controller) throws StrestException {
 		try {
 			DynMap row = this.toLog(controller);
+			if (row == null)
+				return;
 			appender.append(row.toJSONString() + "\n");
 		} catch (Exception e) {
 			log.error("Caught", e);
