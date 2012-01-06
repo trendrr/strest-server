@@ -24,8 +24,6 @@ import com.trendrr.oss.concurrent.LazyInit;
 import com.trendrr.strest.ContentTypes;
 import com.trendrr.strest.StrestHttpException;
 import com.trendrr.strest.annotations.Strest;
-import com.trendrr.strest.contrib.templating.TemplateLookup;
-import com.trendrr.strest.contrib.templating.TemplateRenderer;
 import com.trendrr.strest.server.connections.StrestConnectionChannel;
 import com.trendrr.strest.server.connections.StrestConnectionTxn;
 
@@ -328,17 +326,6 @@ public abstract class StrestController {
 	 */
 	public String getRequestContentUTF8() {
 		return request.getContent().toString(Charset.forName("utf8"));
-	}
-	
-	/**
-	 * Renders a template using the default TemplateRenderer.
-	 * @param filename
-	 * @param params
-	 * @return
-	 */
-	public String renderTemplate(String filename, DynMap params) {
-		TemplateRenderer renderer = TemplateLookup.getRenderer(this.getServerConfig());
-		return renderer.renderTemplateFile(filename, params);
 	}
 	
 	public String[] routes() {
