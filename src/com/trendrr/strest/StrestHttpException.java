@@ -83,6 +83,15 @@ public class StrestHttpException extends StrestException {
 	public static final StrestHttpException CONFLICT(String message) {
 		return new StrestHttpException(409, message);
 	}
+	
+	public static final StrestHttpException RATE_LIMITED() {
+		return new StrestHttpException(420, "Rate Limited");
+	}
+	
+	public static final StrestHttpException RATE_LIMITED(String message) {
+		return new StrestHttpException(420, message);
+	}
+	
 	public static final StrestHttpException INTERNAL_SERVER_ERROR() {
 		return new StrestHttpException(500, "Internal Server Error");
 	}
