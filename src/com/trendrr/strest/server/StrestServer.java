@@ -143,9 +143,9 @@ public class StrestServer {
 			throw new Exception("Config is null! unable to initialize server ");
 		}
 		
-		server.setPort(config.get(Integer.class, "default.port"));
-		server.setMaxWorkerThreads(config.getInteger("threads.worker"));
-		server.setMaxWorkerThreads(config.getInteger("threads.io"));
+		server.setPort(config.get(Integer.class, "default.port", 8008));
+		server.setMaxWorkerThreads(config.getInteger("threads.worker", 10));
+		server.setMaxWorkerThreads(config.getInteger("threads.io",8));
 		
 		List<String> controllerPackages = config.getList(String.class, "controller_packages");
 		if (controllerPackages != null) {
