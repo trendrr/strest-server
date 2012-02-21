@@ -282,6 +282,5 @@ public class StrestRouter {
             future.addListener(ChannelFutureListener.CLOSE);
             this.removeChannel(channel);
         }
-       log.info(this.connections.size());
 	}
 }
