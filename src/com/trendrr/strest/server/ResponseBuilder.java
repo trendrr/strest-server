@@ -33,7 +33,7 @@ import com.trendrr.strest.StrestUtil;
  */
 public class ResponseBuilder {
 
-	protected Log log = LogFactory.getLog(ResponseBuilder.class);
+	protected static Log log = LogFactory.getLog(ResponseBuilder.class);
 
 	HttpResponse response;
 	

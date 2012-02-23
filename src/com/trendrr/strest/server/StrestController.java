@@ -40,7 +40,7 @@ import com.trendrr.strest.server.connections.StrestConnectionTxn;
  */
 public abstract class StrestController {
 
-	protected Log log = LogFactory.getLog(StrestController.class);
+	protected static Log log = LogFactory.getLog(StrestController.class);
 	
 	protected HttpRequest request;
 	protected HttpResponse response = null;

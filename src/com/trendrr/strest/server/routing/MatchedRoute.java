@@ -17,7 +17,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public class MatchedRoute {
 
-	protected Log log = LogFactory.getLog(MatchedRoute.class);
+	protected static Log log = LogFactory.getLog(MatchedRoute.class);
 	
 	UriMapping mapping;
 	Map<String,String> params = new HashMap<String,String>();
