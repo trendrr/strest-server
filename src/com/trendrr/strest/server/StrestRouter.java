@@ -46,6 +46,7 @@ public class StrestRouter {
 	protected ConcurrentHashMap<Channel, StrestConnectionChannel> connections = new ConcurrentHashMap<Channel, StrestConnectionChannel>();
 	
 	protected List<StrestControllerFilter> defaultFilters = new ArrayList<StrestControllerFilter> ();
+	protected ConcurrentHashMap<Class, StrestControllerFilter> filters = new ConcurrentHashMap<Class,StrestControllerFilter>();
 	
 	//the server that this router belongs to .
 	protected StrestServer server = null; 
@@ -144,6 +145,19 @@ public class StrestRouter {
 		con.cleanup();
 	}
 	
+	private StrestControllerFilter getFilter(Class cls) {
+		StrestControllerFilter f = this.filters.get(cls);
+		if (f != null)
+			return f;
+		try {
+			f = (StrestControllerFilter)Reflection.defaultInstance(cls);
+			this.filters.putIfAbsent(cls, f);
+		} catch (Exception x) {
+			log.warn("Unable to load filter: " + cls, x);
+		}
+		return f;
+	}
+	
 	public void incoming(Channel channel, HttpRequest request) {
 		boolean isStrest = StrestUtil.isStrest(request);
 		// Build the response object.
@@ -193,8 +207,8 @@ public class StrestRouter {
 	            controller.setChannelConnection(con);
 	            
 	            //before filters
-	            for (StrestControllerFilter f : controller.getFilters()) {
-	            	f.before(controller);
+	            for (Class f : controller.filters()) {
+	            	this.getFilter(f).before(controller);
 	            }
 	            for (StrestControllerFilter f : this.defaultFilters) {
 	            	f.before(controller);
@@ -214,8 +228,8 @@ public class StrestRouter {
 		            	throw StrestHttpException.METHOD_NOT_ALLOWED();
 		            }
 	            }
-	            for (StrestControllerFilter f : controller.getFilters()) {
-	            	f.after(controller);
+	            for (Class f : controller.filters()) {
+	            	this.getFilter(f).after(controller);
 	            }
 				for (StrestControllerFilter f : this.defaultFilters) {
 	            	f.after(controller);
@@ -240,8 +254,10 @@ public class StrestRouter {
 			response.txnStatus(StrestUtil.HEADERS.TXN_STATUS_VALUES.COMPLETE);
 			//run the error filters
 			if (controller != null) {
-				for (StrestControllerFilter f : controller.getFilters()) {
-	            	f.error(controller, response.getResponse(), e);
+				for (Class fcls : controller.filters()) {
+					StrestControllerFilter f = this.getFilter(fcls);
+					if (f != null)
+						f.error(controller, response.getResponse(), e);
 	            }
 			}
 			for (StrestControllerFilter f : this.defaultFilters) {

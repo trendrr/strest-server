@@ -347,41 +347,6 @@ public abstract class StrestController {
 		return null;
 	}
 	
-
-	private List<StrestControllerFilter> _getFilters() {
-		Class[] filterClss = this.filters();
-		List<StrestControllerFilter> filters = new ArrayList<StrestControllerFilter>();
-        if (filterClss == null || filterClss.length < 1) {
-        	return filters;
-        }
-    	for (Class f : filterClss) {   		
-    		Object filter;
-			try {
-				filter = Reflection.defaultInstance(f);
-				if (!(filter instanceof StrestControllerFilter)) {
-	    			log.warn("Filters must implement the StrestControllerFilter interface (" + filter + "  does not)");
-	    			continue;
-	    		}	
-				filters.add((StrestControllerFilter)filter);
-			} catch (Exception e) {
-				log.warn("Caught", e);
-			}
-    	}
-    	return filters;
-		
-	}
-	private List<StrestControllerFilter> _filters = null;
-	/**
-	 * gets any filters associated with this controller.
-	 * 
-	 * @return filters or empty list, never null
-	 */
-	public List<StrestControllerFilter> getFilters() {
-		if (_filters == null)
-			this._filters = this._getFilters();
-		return this._filters;
-	}
-	
 	/**
 	 * gets a value from the annotation
 	 * @param cls
@@ -396,7 +361,7 @@ public abstract class StrestController {
 		return Strest.class;
 	}
 	
-	private boolean isAnnotationPresent() {
+	protected boolean isAnnotationPresent() {
 		return this.getClass().isAnnotationPresent(this.getAnnotationClass());
 	}
 }
