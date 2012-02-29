@@ -12,17 +12,13 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.jboss.netty.buffer.ChannelBuffers;
-import org.jboss.netty.handler.codec.http.HttpHeaders;
 import org.jboss.netty.handler.codec.http.HttpRequest;
 import org.jboss.netty.handler.codec.http.HttpResponse;
 import org.jboss.netty.handler.codec.http.HttpResponseStatus;
-
-import com.trendrr.cheshire.CheshireApi;
 import com.trendrr.oss.DynMap;
 import com.trendrr.oss.Reflection;
 import com.trendrr.oss.TypeCast;
-import com.trendrr.oss.concurrent.LazyInit;
+
 import com.trendrr.strest.ContentTypes;
 import com.trendrr.strest.StrestHttpException;
 import com.trendrr.strest.annotations.Strest;
