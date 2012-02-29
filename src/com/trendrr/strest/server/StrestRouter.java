@@ -8,6 +8,7 @@ import static org.jboss.netty.handler.codec.http.HttpHeaders.Names.CONTENT_TYPE;
 import java.nio.channels.ClosedChannelException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -45,8 +46,8 @@ public class StrestRouter {
 
 	protected ConcurrentHashMap<Channel, StrestConnectionChannel> connections = new ConcurrentHashMap<Channel, StrestConnectionChannel>();
 	
-	protected List<StrestControllerFilter> defaultFilters = new ArrayList<StrestControllerFilter> ();
-	protected ConcurrentHashMap<Class, StrestControllerFilter> filters = new ConcurrentHashMap<Class,StrestControllerFilter>();
+	protected HashMap<String, List<StrestControllerFilter>> defaultFilters = new HashMap<String,List<StrestControllerFilter>> ();
+	protected ConcurrentHashMap<Class, StrestControllerFilter> filtersByClass = new ConcurrentHashMap<Class,StrestControllerFilter>();
 	
 	//the server that this router belongs to .
 	protected StrestServer server = null; 
@@ -107,18 +108,32 @@ public class StrestRouter {
 	 * 
 	 * @param defaultFilters
 	 */
-	public void setDefaultFilters(List<String> defaultFilters) {
- 
+	public void setFilters(String namespace, List<String> defaultFilters) {
+		if (namespace == null) {
+			namespace = "default";
+		}
 		
-		this.defaultFilters = new ArrayList<StrestControllerFilter> ();
+		List<StrestControllerFilter> filters = new ArrayList<StrestControllerFilter> ();
 		 for (String d : defaultFilters) {
 			 try {
 				StrestControllerFilter f = Reflection.defaultInstance(StrestControllerFilter.class, d);
-				this.defaultFilters.add(f);
+				filters.add(f);
 			} catch (Exception x) {
 				log.warn("Unable to load filter: " + d, x);
 			}
 		 }
+		 this.defaultFilters.put(namespace, filters);
+	}
+	/**
+	 * returns the list of filters or empty list
+	 * @param namespace
+	 * @return
+	 */
+	protected List<StrestControllerFilter> getFilters(String namespace) {
+		List<StrestControllerFilter> filters = this.defaultFilters.get(namespace);
+		if (filters == null)
+			filters = new ArrayList<StrestControllerFilter>();
+		return filters;
 	}
 	
 	public void addRoute(String route, Class cls) {
@@ -146,12 +161,12 @@ public class StrestRouter {
 	}
 	
 	private StrestControllerFilter getFilter(Class cls) {
-		StrestControllerFilter f = this.filters.get(cls);
+		StrestControllerFilter f = this.filtersByClass.get(cls);
 		if (f != null)
 			return f;
 		try {
 			f = (StrestControllerFilter)Reflection.defaultInstance(cls);
-			this.filters.putIfAbsent(cls, f);
+			this.filtersByClass.putIfAbsent(cls, f);
 		} catch (Exception x) {
 			log.warn("Unable to load filter: " + cls, x);
 		}
@@ -210,7 +225,7 @@ public class StrestRouter {
 	            for (Class f : controller.filters()) {
 	            	this.getFilter(f).before(controller);
 	            }
-	            for (StrestControllerFilter f : this.defaultFilters) {
+	            for (StrestControllerFilter f : this.getFilters(controller.getFilterNamespace())) {
 	            	f.before(controller);
 	            }
 	            
@@ -231,7 +246,7 @@ public class StrestRouter {
 	            for (Class f : controller.filters()) {
 	            	this.getFilter(f).after(controller);
 	            }
-				for (StrestControllerFilter f : this.defaultFilters) {
+				for (StrestControllerFilter f : this.getFilters(controller.getFilterNamespace())) {
 	            	f.after(controller);
 	            }
 				
@@ -259,10 +274,10 @@ public class StrestRouter {
 					if (f != null)
 						f.error(controller, response.getResponse(), e);
 	            }
+				for (StrestControllerFilter f : this.getFilters(controller.getFilterNamespace())) {
+					f.error(controller, response.getResponse(), e);
+	            }
 			}
-			for (StrestControllerFilter f : this.defaultFilters) {
-				f.error(controller, response.getResponse(), e);
-            }
 		}
 		
         String txnStatus = response.getTxnStatus();

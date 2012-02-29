@@ -156,7 +156,7 @@ public class StrestServer {
 		
 		List<String> filters = config.getList(String.class, "filters");
 		if (filters != null) {
-			server.getRouter().setDefaultFilters(filters);
+			server.getRouter().setFilters("default", filters);
 		}
 		
 		DynMap ssl = config.get(DynMap.class, "ssl");

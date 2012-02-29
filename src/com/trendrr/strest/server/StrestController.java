@@ -348,6 +348,14 @@ public abstract class StrestController {
 	}
 	
 	/**
+	 * gets the namespace for the filters in
+	 * @return
+	 */
+	public String getFilterNamespace() {
+		return "default";
+	}
+	
+	/**
 	 * gets a value from the annotation
 	 * @param cls
 	 * @param name
