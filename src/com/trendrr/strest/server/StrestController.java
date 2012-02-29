@@ -18,8 +18,10 @@ import org.jboss.netty.handler.codec.http.HttpRequest;
 import org.jboss.netty.handler.codec.http.HttpResponse;
 import org.jboss.netty.handler.codec.http.HttpResponseStatus;
 
+import com.trendrr.cheshire.CheshireApi;
 import com.trendrr.oss.DynMap;
 import com.trendrr.oss.Reflection;
+import com.trendrr.oss.TypeCast;
 import com.trendrr.oss.concurrent.LazyInit;
 import com.trendrr.strest.ContentTypes;
 import com.trendrr.strest.StrestHttpException;
@@ -329,22 +331,22 @@ public abstract class StrestController {
 	}
 	
 	public String[] routes() {
-		if (this.getClass().isAnnotationPresent(Strest.class)) {
-			return this.getClass().getAnnotation(Strest.class).route();
+		if (this.isAnnotationPresent()) {
+			return this.getAnnotationVal(String[].class, "route");
 		}
 		return null;
 	}
 
 	public Class[] filters() {
-		if (this.getClass().isAnnotationPresent(Strest.class)) {
-			return this.getClass().getAnnotation(Strest.class).filters();
+		if (this.isAnnotationPresent()) {
+			return this.getAnnotationVal(Class[].class, "filters");
 		}
 		return null;
 	}
 	
 	public String[] requiredParams() {	
-		if (this.getClass().isAnnotationPresent(Strest.class)) {	
-			return this.getClass().getAnnotation(Strest.class).requiredParams();
+		if (this.isAnnotationPresent()) {	
+			return this.getAnnotationVal(String[].class, "requiredParams");
 		}
 		return null;
 	}
@@ -382,5 +384,23 @@ public abstract class StrestController {
 		if (_filters == null)
 			this._filters = this._getFilters();
 		return this._filters;
+	}
+	
+	/**
+	 * gets a value from the annotation
+	 * @param cls
+	 * @param name
+	 * @return
+	 */
+	protected <T> T getAnnotationVal(Class<T> cls, String name) {
+		return TypeCast.cast(cls, Reflection.execute(this.getClass().getAnnotation(this.getAnnotationClass()), name));
+	}
+	
+	protected Class getAnnotationClass() {
+		return Strest.class;
+	}
+	
+	private boolean isAnnotationPresent() {
+		return this.getClass().isAnnotationPresent(this.getAnnotationClass());
 	}
 }
