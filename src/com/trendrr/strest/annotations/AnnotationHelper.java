@@ -3,10 +3,14 @@
  */
 package com.trendrr.strest.annotations;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
+import com.trendrr.oss.Reflection;
+import com.trendrr.oss.TypeCast;
 
 
 /**
@@ -34,5 +38,28 @@ public class AnnotationHelper {
 			 }
 	      }
 		 return false;
+	}
+	
+	public static <T> T getAnnotationVal(Class annotation, Object obj, Class<T> cls, String name) {
+		
+		try {
+			return TypeCast.cast(cls, obj.getClass().getAnnotation(annotation).getClass().getMethod(name).invoke(obj));
+		} catch (IllegalArgumentException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (SecurityException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IllegalAccessException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InvocationTargetException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (NoSuchMethodException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return null;
 	}
 }

@@ -21,6 +21,7 @@ import com.trendrr.oss.TypeCast;
 
 import com.trendrr.strest.ContentTypes;
 import com.trendrr.strest.StrestHttpException;
+import com.trendrr.strest.annotations.AnnotationHelper;
 import com.trendrr.strest.annotations.Strest;
 import com.trendrr.strest.server.connections.StrestConnectionChannel;
 import com.trendrr.strest.server.connections.StrestConnectionTxn;
@@ -362,7 +363,7 @@ public abstract class StrestController {
 	 * @return
 	 */
 	protected <T> T getAnnotationVal(Class<T> cls, String name) {
-		return TypeCast.cast(cls, Reflection.execute(this.getClass().getAnnotation(this.getAnnotationClass()), name));
+		return AnnotationHelper.getAnnotationVal(this.getAnnotationClass(), this, cls, name);
 	}
 	
 	protected Class getAnnotationClass() {

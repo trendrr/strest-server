@@ -25,6 +25,8 @@ import com.trendrr.oss.DynMapFactory;
 import com.trendrr.oss.Reflection;
 import com.trendrr.strest.StrestHttpException;
 import com.trendrr.strest.StrestUtil;
+import com.trendrr.strest.annotations.AnnotationHelper;
+import com.trendrr.strest.annotations.Async;
 import com.trendrr.strest.server.connections.StrestConnectionChannel;
 
 
@@ -173,6 +175,10 @@ public class StrestRouter {
 		return f;
 	}
 	
+	private boolean isAsync(StrestController controller, HttpMethod method) {
+		return AnnotationHelper.hasMethodAnnotation(Async.class, controller, "handle" + method.toString());
+	}
+	
 	public void incoming(Channel channel, HttpRequest request) {
 		boolean isStrest = StrestUtil.isStrest(request);
 		// Build the response object.
@@ -233,7 +239,6 @@ public class StrestRouter {
 	            if (!controller.isSkipExecution()) {
 		            if (request.getMethod() == HttpMethod.GET) {
 						controller.handleGET(controller.getParams());
-						
 		            } else if (request.getMethod() == HttpMethod.POST) {
 		            	controller.handlePOST(controller.getParams());	
 		            } else if (request.getMethod() == HttpMethod.PUT) {
@@ -243,6 +248,10 @@ public class StrestRouter {
 		            } else {
 		            	throw StrestHttpException.METHOD_NOT_ALLOWED();
 		            }
+		            if (this.isAsync(controller, request.getMethod())) {
+		            	//user is responsable to complete the request.
+//		            	return; 
+					}
 	            }
 	            
 //	            
