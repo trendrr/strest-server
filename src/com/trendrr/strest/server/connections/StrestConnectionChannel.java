@@ -62,7 +62,10 @@ public class StrestConnectionChannel implements Comparable<StrestConnectionChann
 	}
 
 	public synchronized boolean isConnected() {
-		return this.channel != null;
+		if (this.channel != null) {
+			return this.channel.isConnected();
+		}
+		return false;
 	}
 	
 	public synchronized void cleanup() {		
@@ -77,8 +80,8 @@ public class StrestConnectionChannel implements Comparable<StrestConnectionChann
 			DisconnectCallback cb = this.disconnectCallbacks.poll();
 			cb.disconnected(this);
 		}
-		this.disconnectCallbacks = null;
-		this.channel = null;
+		this.disconnectCallbacks.clear();
+//		this.channel = null;
 		this.connectionStorage.clear();
 	}
 	
