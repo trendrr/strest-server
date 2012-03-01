@@ -232,7 +232,8 @@ public class StrestRouter {
 	            //now execution the appropriate action.
 	            if (!controller.isSkipExecution()) {
 		            if (request.getMethod() == HttpMethod.GET) {
-						controller.handleGET(controller.getParams());	
+						controller.handleGET(controller.getParams());
+						
 		            } else if (request.getMethod() == HttpMethod.POST) {
 		            	controller.handlePOST(controller.getParams());	
 		            } else if (request.getMethod() == HttpMethod.PUT) {
@@ -243,17 +244,20 @@ public class StrestRouter {
 		            	throw StrestHttpException.METHOD_NOT_ALLOWED();
 		            }
 	            }
-	            for (Class f : controller.filters()) {
-	            	this.getFilter(f).after(controller);
-	            }
-				for (StrestControllerFilter f : this.getFilters(controller.getFilterNamespace())) {
-	            	f.after(controller);
-	            }
-				
-				response.setResponse(controller.getResponse());
-				if (!controller.isSendResponse()) {
-					return;
-				}
+	            
+//	            
+//	            
+//	            for (Class f : controller.filters()) {
+//	            	this.getFilter(f).after(controller);
+//	            }
+//				for (StrestControllerFilter f : this.getFilters(controller.getFilterNamespace())) {
+//	            	f.after(controller);
+//	            }
+//				
+//				response.setResponse(controller.getResponse());
+//				if (!controller.isSendResponse()) {
+//					return;
+//				}
 				
 				
 	        } catch (StrestHttpException e) {
@@ -278,9 +282,53 @@ public class StrestRouter {
 					f.error(controller, response.getResponse(), e);
 	            }
 			}
+			this.sendResponse(request, con, response);
+			return;
 		}
-		
-        String txnStatus = response.getTxnStatus();
+		this.finishResponse(controller, response);
+//		
+//        String txnStatus = response.getTxnStatus();
+//		if (txnStatus == null) {
+//			txnStatus = StrestUtil.HEADERS.TXN_STATUS_VALUES.COMPLETE;
+//		}
+//		
+//		//client only accepts single transactions.
+//		if (StrestUtil.HEADERS.TXN_ACCEPT_VALUES.SINGLE.equalsIgnoreCase(request.getHeader(StrestUtil.HEADERS.TXN_ACCEPT))) {
+//			txnStatus = StrestUtil.HEADERS.TXN_STATUS_VALUES.COMPLETE;
+//		}
+//		
+//		//now set the status
+//		response.txnStatus(txnStatus);
+//        
+//		
+//		
+//		
+//        // Write the response.
+////		System.out.println(response.getResponse());
+////		System.out.println("*****");
+////		System.out.println(response.getResponse().getContent().toString());
+//		ChannelFuture future = con.sendMessage(response);
+//		if (future == null) {
+//			this.removeChannel(channel);
+//			return;
+//		}
+//		
+//		 // Close the non-keep-alive connection after the write operation is done.
+//        if (!isStrest) {
+////	        	log.info("CLOSING NON STREST CONNECTION");
+//        	future.addListener(ChannelFutureListener.CLOSE_ON_FAILURE);
+//            future.addListener(ChannelFutureListener.CLOSE);
+//            this.removeChannel(channel);
+//        }
+	}
+	
+	/**
+	 * actually does the send, and handles the txn.
+	 * @param controller
+	 * @param response
+	 */
+	protected void sendResponse(HttpRequest request, StrestConnectionChannel channel, ResponseBuilder response) {
+		String txnStatus = response.getTxnStatus();
 		if (txnStatus == null) {
 			txnStatus = StrestUtil.HEADERS.TXN_STATUS_VALUES.COMPLETE;
 		}
@@ -297,21 +345,66 @@ public class StrestRouter {
 		
 		
         // Write the response.
-//		System.out.println(response.getResponse());
-//		System.out.println("*****");
-//		System.out.println(response.getResponse().getContent().toString());
-		ChannelFuture future = con.sendMessage(response);
+//			System.out.println(response.getResponse());
+//			System.out.println("*****");
+//			System.out.println(response.getResponse().getContent().toString());
+		ChannelFuture future = channel.sendMessage(response);
 		if (future == null) {
-			this.removeChannel(channel);
+			this.removeChannel(channel.getChannel());
 			return;
 		}
 		
 		 // Close the non-keep-alive connection after the write operation is done.
-        if (!isStrest) {
-//	        	log.info("CLOSING NON STREST CONNECTION");
+        if (!StrestUtil.isStrest(request)) {
+//		        	log.info("CLOSING NON STREST CONNECTION");
         	future.addListener(ChannelFutureListener.CLOSE_ON_FAILURE);
             future.addListener(ChannelFutureListener.CLOSE);
-            this.removeChannel(channel);
+            this.removeChannel(channel.getChannel());
         }
+		
+	}
+	/**
+	 * completes a response.  
+	 * @param controller
+	 * @param response
+	 */
+	public void finishResponse(StrestController controller, ResponseBuilder response) {
+		try {
+			try {
+				for (Class f : controller.filters()) {
+		        	this.getFilter(f).after(controller);
+		        }
+				for (StrestControllerFilter f : this.getFilters(controller.getFilterNamespace())) {
+		        	f.after(controller);
+		        }
+				
+				response.setResponse(controller.getResponse());
+				if (!controller.isSendResponse()) {
+					return;
+				}
+			} catch (StrestHttpException e) {
+	        	throw e;
+	        } catch (Exception x) {
+	        	StrestHttpException e = StrestHttpException.INTERNAL_SERVER_ERROR();
+	        	e.setCause(x);
+	        	log.error("Caught", x);
+	        	throw e;
+	        }
+		} catch (StrestHttpException e) {
+			response.status(e.getCode(), e.getMessage());
+			response.txnStatus(StrestUtil.HEADERS.TXN_STATUS_VALUES.COMPLETE);
+			//run the error filters
+			if (controller != null) {
+				for (Class fcls : controller.filters()) {
+					StrestControllerFilter f = this.getFilter(fcls);
+					if (f != null)
+						f.error(controller, response.getResponse(), e);
+	            }
+				for (StrestControllerFilter f : this.getFilters(controller.getFilterNamespace())) {
+					f.error(controller, response.getResponse(), e);
+	            }
+			}
+		}
+        this.sendResponse(controller.getRequest(), controller.getChannelConnection(), response);
 	}
 }
