@@ -20,7 +20,7 @@ import com.trendrr.oss.TypeCast;
  */
 public class AnnotationHelper {
 
-	protected Log log = LogFactory.getLog(AnnotationHelper.class);
+	protected static Log log = LogFactory.getLog(AnnotationHelper.class);
 	
 	/**
 	 * check the requested method for the requested annotation.
@@ -43,23 +43,11 @@ public class AnnotationHelper {
 	public static <T> T getAnnotationVal(Class annotation, Object obj, Class<T> cls, String name) {
 		
 		try {
-			return TypeCast.cast(cls, obj.getClass().getAnnotation(annotation).getClass().getMethod(name).invoke(obj));
-		} catch (IllegalArgumentException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (SecurityException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IllegalAccessException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (InvocationTargetException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (NoSuchMethodException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+			Object annotationObj = obj.getClass().getAnnotation(annotation);
+			return TypeCast.cast(cls, annotationObj.getClass().getMethod(name).invoke(annotationObj));
+		} catch (Exception e) {
+			log.error("Caught", e);
+		} 
 		return null;
 	}
 }
