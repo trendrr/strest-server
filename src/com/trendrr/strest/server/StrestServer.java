@@ -55,78 +55,78 @@ public class StrestServer {
 		
 	}
 	
-	/**
-	 * creates a server based on a config file.  Config file is assumed to be either 
-	 * json or yaml.  See example_config.yaml for more.
-	 * 
-	 * if more then one filename is passed, the subsequent config files will override any fields in the previous ones.
-	 * this allows you to chain config files
-	 * 
-	 * @param filename
-	 * @return
-	 * @throws Exception
-	 */
-	public static StrestServer instanceFromFile(String filename, String ...filenames) throws Exception {
-		StrestServer server = new StrestServer();
-		initFromFile(server, filename, filenames);
-		return server;
-	}
-	
-	/**
-	 * initializes the server with the passed in filenames.  
-	 * if more then one filename is passed, the subsequent config files will override any fields in the previous ones.
-	 * 
-	 * this allows you to chain config files
-	 * 
-	 * 
-	 * @param server
-	 * @param filename
-	 * @param filenames
-	 * @throws Exception
-	 */
-	public static void initFromFile(StrestServer server, String filename, String ...filenames) throws Exception {
-		DynMap conf = dynMapFromFile(filename);
-		log.warn("Config with : " + conf.toJSONString());
-		for (String f : filenames) {
-			DynMap override = dynMapFromFile(f);
-			log.warn("Overriding config: " + override);
-			conf.extend(override);
-		}
-		log.warn("Initializing with config: " + conf.toJSONString());
-		initialize(server, conf);
-	}
-	
-	private static DynMap dynMapFromFile(String filename) throws Exception {
-		if (filename.endsWith("yaml")) {
-			Yaml yaml = new Yaml();
-		    String document = FileHelper.loadString(filename);
-		    Map map = (Map) yaml.load(document);
-		    return DynMapFactory.instance(map);
-		    
-		} else if (filename.endsWith("xml")) {
-			//TODO (or not..)
-			
-		}
-
-		//assume json
-		return DynMapFactory.instanceFromFile(filename);
-		
-	}
-	/**
-	 * Initialize the server from a config DynMap. 
-	 *
-	 * See example_config.yaml for fields
-	 
-	 * 
-	 */
-	public static StrestServer instance(DynMap config) throws Exception {
-		if (config == null) {
-			throw new Exception("Config is null! unable to create server ");
-		}
-		StrestServer server = new StrestServer();
-		initialize(server, config);
-		return server;
-	}
+//	/**
+//	 * creates a server based on a config file.  Config file is assumed to be either 
+//	 * json or yaml.  See example_config.yaml for more.
+//	 * 
+//	 * if more then one filename is passed, the subsequent config files will override any fields in the previous ones.
+//	 * this allows you to chain config files
+//	 * 
+//	 * @param filename
+//	 * @return
+//	 * @throws Exception
+//	 */
+//	public static StrestServer instanceFromFile(String filename, String ...filenames) throws Exception {
+//		StrestServer server = new StrestServer();
+//		initFromFile(server, filename, filenames);
+//		return server;
+//	}
+//	
+//	/**
+//	 * initializes the server with the passed in filenames.  
+//	 * if more then one filename is passed, the subsequent config files will override any fields in the previous ones.
+//	 * 
+//	 * this allows you to chain config files
+//	 * 
+//	 * 
+//	 * @param server
+//	 * @param filename
+//	 * @param filenames
+//	 * @throws Exception
+//	 */
+//	public static void initFromFile(StrestServer server, String filename, String ...filenames) throws Exception {
+//		DynMap conf = dynMapFromFile(filename);
+//		log.warn("Config with : " + conf.toJSONString());
+//		for (String f : filenames) {
+//			DynMap override = dynMapFromFile(f);
+//			log.warn("Overriding config: " + override);
+//			conf.extend(override);
+//		}
+//		log.warn("Initializing with config: " + conf.toJSONString());
+//		initialize(server, conf);
+//	}
+//	
+//	private static DynMap dynMapFromFile(String filename) throws Exception {
+//		if (filename.endsWith("yaml")) {
+//			Yaml yaml = new Yaml();
+//		    String document = FileHelper.loadString(filename);
+//		    Map map = (Map) yaml.load(document);
+//		    return DynMapFactory.instance(map);
+//		    
+//		} else if (filename.endsWith("xml")) {
+//			//TODO (or not..)
+//			
+//		}
+//
+//		//assume json
+//		return DynMapFactory.instanceFromFile(filename);
+//		
+//	}
+//	/**
+//	 * Initialize the server from a config DynMap. 
+//	 *
+//	 * See example_config.yaml for fields
+//	 
+//	 * 
+//	 */
+//	public static StrestServer instance(DynMap config) throws Exception {
+//		if (config == null) {
+//			throw new Exception("Config is null! unable to create server ");
+//		}
+//		StrestServer server = new StrestServer();
+//		initialize(server, config);
+//		return server;
+//	}
 	
 	/**
 	 * initializes the passed in server.  Use this if you need to override the 
