@@ -45,6 +45,12 @@ public class StrestServerBuilder {
 	
 	/**
 	 * adds a config file.  will merge with any previous config files added
+	 * 
+	 * Config file is assumed to be either 
+     * json or yaml.  See example_config.yaml for more.
+	 * 
+	 * if more then one filename is passed, the subsequent config files will override any fields in the previous ones.
+	 * this allows you to chain config files
 	 * @param filename
 	 * @return
 	 * @throws Exception
@@ -77,7 +83,7 @@ public class StrestServerBuilder {
 	 * @return
 	 */
 	public StrestServerBuilder addFilters(String namespace, String ...filters) {
-		this.config.addToListWithDot(namespace + ".filters", filters);
+		this.config.addToListWithDot(namespace + ".filters", (java.lang.Object[])filters);
 		this.filterNamespaces.add(namespace);
 		return this;
 	}
@@ -87,7 +93,7 @@ public class StrestServerBuilder {
 	 * @return
 	 */
 	public StrestServerBuilder addFilter(String ...filters) {
-		this.config.addToListWithDot("filters", filters);
+		this.config.addToListWithDot("filters", (java.lang.Object[])filters);
 		return this;
 	}
 	
@@ -97,7 +103,7 @@ public class StrestServerBuilder {
 	 * @return
 	 */
 	public StrestServerBuilder addControllerPackage(String ...packages) {
-		this.config.addToListWithDot("controller_packages", packages);
+		this.config.addToListWithDot("controller_packages", (java.lang.Object[])packages);
 		return this;
 	}
 	
