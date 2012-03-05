@@ -66,8 +66,16 @@ public class StrestDocParser {
 		this.annotationNames.add(ann);
 	}
 	
-	public void parseAndSave(String docDirectory, String saveDirectory) {
-		List<DynMap> routes = this.parseDirectory(docDirectory);
+	/**
+	 * parses the given src directories and saves the resulting files in the save directory.
+	 * @param srcDirectories
+	 * @param saveDirectory
+	 */
+	public void parseAndSave(List<String> srcDirectories, String saveDirectory) {
+		List<DynMap> routes = new ArrayList<DynMap>();
+		for (String dir : srcDirectories) {
+			routes.addAll(this.parseDirectory(dir));
+		}
 		DynMap index = this.createIndex(routes);
 		//save the index.
 		for (TemplateRenderer rend : this.renderers) {
@@ -83,6 +91,17 @@ public class StrestDocParser {
 				rend.renderPage(r, route);
 			}
 		}
+	}
+	
+	/**
+	 * parses the given src directory and saves the resulting files in the save directory.
+	 * @param docDirectory
+	 * @param saveDirectory
+	 */
+	public void parseAndSave(String srcDirectory, String saveDirectory) {
+		List<String> dirs = new ArrayList<String>();
+		dirs.add(srcDirectory);
+		this.parseAndSave(dirs, saveDirectory);
 	}
 	
 	
