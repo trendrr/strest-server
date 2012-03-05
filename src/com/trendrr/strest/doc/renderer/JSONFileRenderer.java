@@ -18,27 +18,16 @@ import com.trendrr.strest.doc.TemplateRenderer;
  * @created Mar 31, 2011
  * 
  */
-public class JSONFileRenderer implements TemplateRenderer {
+public class JSONFileRenderer extends FileRenderer {
 
 	protected Log log = LogFactory.getLog(JSONFileRenderer.class);
-	
-	protected String docDirectory="strestdoc";
-	
-	
+
 	/* (non-Javadoc)
 	 * @see com.trendrr.strest.doc.TemplateRenderer#renderIndex(com.trendrr.oss.DynMap)
 	 */
 	@Override
 	public void renderIndex(DynMap index) {
-		//save the index.
-		try {
-			String filename = docDirectory + "/strestdoc_index.json";
-			byte[] json = index.toJSONString().getBytes("utf8");
-			
-			FileHelper.saveBytes(FileHelper.toWindowsFilename(filename), json);
-		} catch (Exception e) {
-			log.error("Caught", e);
-		}
+		this.save("strestdoc_index.json", index.toJSONString());
 	}
 
 	/* (non-Javadoc)
@@ -46,15 +35,6 @@ public class JSONFileRenderer implements TemplateRenderer {
 	 */
 	@Override
 	public void renderPage(String route, DynMap page) {
-		try {
-			String filename = docDirectory + route + ".json";
-			byte[] json = page.toJSONString().getBytes("utf8");
-			
-			FileHelper.saveBytes(FileHelper.toWindowsFilename(filename), json);
-		} catch (Exception e) {
-			log.error("Caught", e);
-		}
+		this.save(route + ".json", page.toJSONString());
 	}
-
-	
 }
