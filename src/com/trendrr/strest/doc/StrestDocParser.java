@@ -39,10 +39,11 @@ public class StrestDocParser {
 	
 	protected int abstractLength = 256;
 	
-	protected String annotationName = "Strest";
+	protected Set<String> annotationNames = new HashSet<String>();
 	
 	public StrestDocParser() {
 		this.addTags("com.trendrr.strest.doc.tags", true);
+		this.annotationNames.add("Strest");
 		this.addTemplateRenderer(new JSONFileRenderer());
 	}
 	
@@ -59,6 +60,10 @@ public class StrestDocParser {
 //		
 		parser.parseAndSave("src", "strestdoc");
 		
+	}
+	
+	public void addAnnotationName(String ann) {
+		this.annotationNames.add(ann);
 	}
 	
 	public void parseAndSave(String docDirectory, String saveDirectory) {
@@ -348,49 +353,51 @@ public class StrestDocParser {
 		 * This is all ugly as hell, and pretty slow, but it works :)
 		 */
 		
-		String ann = Regex.matchFirst(java, "\\@" + this.annotationName + "\\s*\\([^\\)]+\\)", false);
 		DynMap mp = new DynMap();
-		if (ann == null) {
-			return mp;
-		}
-		ann = ann.replaceFirst("\\@" + this.annotationName + "\\s*\\(", "");
-		ann = ann.replaceAll("\\)$", "");
-		
-		
-		String[] tokens = ann.split("\\s*\\=\\s*");
-		String key = null;
-		String value = null;
-		for (String t : tokens) {
-			if (key == null) {
-				key = t;
+		for (String annotationName : this.annotationNames) {
+			String ann = Regex.matchFirst(java, "\\@" + annotationName + "\\s*\\([^\\)]+\\)", false);
+			
+			if (ann == null) {
 				continue;
 			}
-			//else parse the value.
-			String nextKey = Regex.matchFirst(t, "[\\n\\r]+\\s*[^\\s]+\\s*$", false);
-			value = t.replaceFirst("[\\n\\r]+\\s*[^\\s]+\\s*$", "").trim();
-			boolean isList = value.startsWith("{");
+			ann = ann.replaceFirst("\\@" + annotationName + "\\s*\\(", "");
+			ann = ann.replaceAll("\\)$", "");
 			
 			
-			value = StringHelper.trim(value, ",");
-			value = StringHelper.trim(value, "{");
-			value = StringHelper.trim(value, "}");
-			value = StringHelper.trim(value.trim(), "\"");
-			if (isList) {
-				List<String> values = new ArrayList<String>();
-				for (String v : value.split(",")) {
-					values.add(StringHelper.trim(v.trim(), "\""));
+			String[] tokens = ann.split("\\s*\\=\\s*");
+			String key = null;
+			String value = null;
+			for (String t : tokens) {
+				if (key == null) {
+					key = t;
+					continue;
 				}
-				mp.put(key.trim(), values);
-			} else {
-				mp.put(key.trim(), value);
+				//else parse the value.
+				String nextKey = Regex.matchFirst(t, "[\\n\\r]+\\s*[^\\s]+\\s*$", false);
+				value = t.replaceFirst("[\\n\\r]+\\s*[^\\s]+\\s*$", "").trim();
+				boolean isList = value.startsWith("{");
+				
+				
+				value = StringHelper.trim(value, ",");
+				value = StringHelper.trim(value, "{");
+				value = StringHelper.trim(value, "}");
+				value = StringHelper.trim(value.trim(), "\"");
+				if (isList) {
+					List<String> values = new ArrayList<String>();
+					for (String v : value.split(",")) {
+						values.add(StringHelper.trim(v.trim(), "\""));
+					}
+					mp.put(key.trim(), values);
+				} else {
+					mp.put(key.trim(), value);
+				}
+				
+				if (nextKey != null) {
+					key = nextKey;
+				}
 			}
-			
-			if (nextKey != null) {
-				key = nextKey;
-			}
+		
 		}
-		
-		
 		
 		System.out.println(mp.toJSONString());
 		
