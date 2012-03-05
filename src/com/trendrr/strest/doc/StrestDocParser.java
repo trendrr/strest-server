@@ -21,6 +21,7 @@ import com.trendrr.oss.FileHelper;
 import com.trendrr.oss.Reflection;
 import com.trendrr.oss.Regex;
 import com.trendrr.oss.StringHelper;
+import com.trendrr.strest.doc.renderer.FileRenderer;
 import com.trendrr.strest.doc.renderer.JSONFileRenderer;
 
 
@@ -87,7 +88,10 @@ public class StrestDocParser {
 			if (r.isEmpty())
 				r = "/index";
 
-			for (TemplateRenderer rend : this.renderers) {					
+			for (TemplateRenderer rend : this.renderers) {	
+				if (rend instanceof FileRenderer) {
+					((FileRenderer)rend).setSaveDirectory(saveDirectory);
+				}
 				rend.renderPage(r, route);
 			}
 		}
