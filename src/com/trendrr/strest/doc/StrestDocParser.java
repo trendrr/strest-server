@@ -80,6 +80,9 @@ public class StrestDocParser {
 		DynMap index = this.createIndex(routes);
 		//save the index.
 		for (TemplateRenderer rend : this.renderers) {
+			if (rend instanceof FileRenderer) {
+				((FileRenderer)rend).setSaveDirectory(saveDirectory);
+			}
 			rend.renderIndex(index);
 		}
 		
@@ -89,9 +92,6 @@ public class StrestDocParser {
 				r = "/index";
 
 			for (TemplateRenderer rend : this.renderers) {	
-				if (rend instanceof FileRenderer) {
-					((FileRenderer)rend).setSaveDirectory(saveDirectory);
-				}
 				rend.renderPage(r, route);
 			}
 		}
