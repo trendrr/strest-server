@@ -61,8 +61,7 @@ public class StrestServerBuilder {
 			log.warn("Unable to parse config file: " + filename);
 			return this;
 		}
-		this.config.extend(conf);
-		return this;
+		return this.addConfig(conf);
 	}
 	
 	/**
@@ -72,6 +71,15 @@ public class StrestServerBuilder {
 	 * @throws Exception
 	 */
 	public StrestServerBuilder addConfig(DynMap config) throws Exception {
+		//test for namespaces
+		for (String key: config.keySet()) {
+			DynMap mp = config.getMap(key); //this isn't very fast, but I don't think it needs to be.
+			if (mp == null)
+				continue;
+			if (mp.getList(String.class, "filters") != null) {
+				this.filterNamespaces.add(key);
+			}
+		}
 		this.config.extend(config);
 		return this;
 	}
