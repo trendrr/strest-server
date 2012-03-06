@@ -231,7 +231,7 @@ public class StrestRouter {
 	            for (Class f : controller.filters()) {
 	            	this.getFilter(f).before(controller);
 	            }
-	            for (StrestControllerFilter f : this.getFilters(controller.getFilterNamespace())) {
+	            for (StrestControllerFilter f : this.getFilters(controller.getControllerNamespace())) {
 	            	f.before(controller);
 	            }
 	            
@@ -287,7 +287,7 @@ public class StrestRouter {
 					if (f != null)
 						f.error(controller, response.getResponse(), e);
 	            }
-				for (StrestControllerFilter f : this.getFilters(controller.getFilterNamespace())) {
+				for (StrestControllerFilter f : this.getFilters(controller.getControllerNamespace())) {
 					f.error(controller, response.getResponse(), e);
 	            }
 			}
@@ -383,7 +383,7 @@ public class StrestRouter {
 				for (Class f : controller.filters()) {
 		        	this.getFilter(f).after(controller);
 		        }
-				for (StrestControllerFilter f : this.getFilters(controller.getFilterNamespace())) {
+				for (StrestControllerFilter f : this.getFilters(controller.getControllerNamespace())) {
 		        	f.after(controller);
 		        }
 				
@@ -409,7 +409,7 @@ public class StrestRouter {
 					if (f != null)
 						f.error(controller, response.getResponse(), e);
 	            }
-				for (StrestControllerFilter f : this.getFilters(controller.getFilterNamespace())) {
+				for (StrestControllerFilter f : this.getFilters(controller.getControllerNamespace())) {
 					f.error(controller, response.getResponse(), e);
 	            }
 			}

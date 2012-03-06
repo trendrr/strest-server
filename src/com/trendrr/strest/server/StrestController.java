@@ -214,9 +214,10 @@ public abstract class StrestController {
 	 * similar to connection storage or txn storage.
 	 * 
 	 * This is not threadsafe, and should not be used in STREST connections if avoidable.
-	 * 
+	 * @deprecated functionality moved to cheshire html controller.
 	 * @return
 	 */
+	@Deprecated
 	public Map<String,Object> getSessionStorage() {
 		Map<String, Object> session = (Map<String, Object>)this.getConnectionStorage().get("session");
 		if (session == null) {
@@ -229,6 +230,7 @@ public abstract class StrestController {
 	/**
 	 * deletes the session (if sessions are not enabled, does nothing)
 	 */
+	@Deprecated
 	public void destroySession() {
 		this.getConnectionStorage().put("session_destroy", true);
 	}
@@ -352,7 +354,7 @@ public abstract class StrestController {
 	 * gets the namespace for the filters in
 	 * @return
 	 */
-	public String getFilterNamespace() {
+	public String getControllerNamespace() {
 		return "default";
 	}
 	
