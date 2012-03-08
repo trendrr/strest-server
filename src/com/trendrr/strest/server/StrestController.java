@@ -336,6 +336,12 @@ public abstract class StrestController {
 		return null;
 	}
 
+	/**
+	 * gets any additional filters that should run for this controller.  
+	 * can be override by subclass, else takes the 'filters' value from the 
+	 * annotation.
+	 * @return
+	 */
 	public Class[] filters() {
 		if (this.isAnnotationPresent()) {
 			return this.getAnnotationVal(Class[].class, "filters");
