@@ -102,6 +102,28 @@ public class StrestRouter {
 	}
 	
 	/**
+	 * gets all the filters for this controller. Will return an empty list, never null.
+	 * @param controller
+	 * @return
+	 */
+	protected List<StrestControllerFilter> getFilters(StrestController controller) {
+		//TODO: implement a local cache of this? or overkill?
+		List<StrestControllerFilter> retList = new ArrayList<StrestControllerFilter>();
+		if (controller == null)
+			return retList;
+        Class[] filters = controller.filters();
+        if (filters != null) {
+            for (Class f : filters) {
+            	StrestControllerFilter filter = this.getFilter(f);
+            	retList.add(filter);
+            }
+        }
+        retList.addAll(this.getNamespaceFilters(controller.getControllerNamespace()));
+        return retList;
+	}
+	
+	
+	/**
 	 * sets the default filters that will be run on all controllers.
 	 * 
 	 * List should be full class names of the filters.
@@ -127,11 +149,11 @@ public class StrestRouter {
 		 this.defaultFilters.put(namespace, filters);
 	}
 	/**
-	 * returns the list of filters or empty list
+	 * returns the list of filters for the given namespace or empty list
 	 * @param namespace
 	 * @return
 	 */
-	protected List<StrestControllerFilter> getFilters(String namespace) {
+	protected List<StrestControllerFilter> getNamespaceFilters(String namespace) {
 		List<StrestControllerFilter> filters = this.defaultFilters.get(namespace);
 		if (filters == null)
 			filters = new ArrayList<StrestControllerFilter>();
@@ -228,10 +250,7 @@ public class StrestRouter {
 	            controller.setChannelConnection(con);
 	            
 	            //before filters
-	            for (Class f : controller.filters()) {
-	            	this.getFilter(f).before(controller);
-	            }
-	            for (StrestControllerFilter f : this.getFilters(controller.getControllerNamespace())) {
+	            for (StrestControllerFilter f : this.getFilters(controller)) {
 	            	f.before(controller);
 	            }
 	            
@@ -252,22 +271,7 @@ public class StrestRouter {
 		            	//user is responsable to complete the request.
 //		            	return; 
 					}
-	            }
-	            
-//	            
-//	            
-//	            for (Class f : controller.filters()) {
-//	            	this.getFilter(f).after(controller);
-//	            }
-//				for (StrestControllerFilter f : this.getFilters(controller.getFilterNamespace())) {
-//	            	f.after(controller);
-//	            }
-//				
-//				response.setResponse(controller.getResponse());
-//				if (!controller.isSendResponse()) {
-//					return;
-//				}
-				
+	            }			
 				
 	        } catch (StrestHttpException e) {
 	        	throw e;
@@ -282,12 +286,7 @@ public class StrestRouter {
 			response.txnStatus(StrestUtil.HEADERS.TXN_STATUS_VALUES.COMPLETE);
 			//run the error filters
 			if (controller != null) {
-				for (Class fcls : controller.filters()) {
-					StrestControllerFilter f = this.getFilter(fcls);
-					if (f != null)
-						f.error(controller, response.getResponse(), e);
-	            }
-				for (StrestControllerFilter f : this.getFilters(controller.getControllerNamespace())) {
+				for (StrestControllerFilter f : this.getFilters(controller)) {
 					f.error(controller, response.getResponse(), e);
 	            }
 			}
@@ -295,40 +294,6 @@ public class StrestRouter {
 			return;
 		}
 		this.finishResponse(controller, response);
-//		
-//        String txnStatus = response.getTxnStatus();
-//		if (txnStatus == null) {
-//			txnStatus = StrestUtil.HEADERS.TXN_STATUS_VALUES.COMPLETE;
-//		}
-//		
-//		//client only accepts single transactions.
-//		if (StrestUtil.HEADERS.TXN_ACCEPT_VALUES.SINGLE.equalsIgnoreCase(request.getHeader(StrestUtil.HEADERS.TXN_ACCEPT))) {
-//			txnStatus = StrestUtil.HEADERS.TXN_STATUS_VALUES.COMPLETE;
-//		}
-//		
-//		//now set the status
-//		response.txnStatus(txnStatus);
-//        
-//		
-//		
-//		
-//        // Write the response.
-////		System.out.println(response.getResponse());
-////		System.out.println("*****");
-////		System.out.println(response.getResponse().getContent().toString());
-//		ChannelFuture future = con.sendMessage(response);
-//		if (future == null) {
-//			this.removeChannel(channel);
-//			return;
-//		}
-//		
-//		 // Close the non-keep-alive connection after the write operation is done.
-//        if (!isStrest) {
-////	        	log.info("CLOSING NON STREST CONNECTION");
-//        	future.addListener(ChannelFutureListener.CLOSE_ON_FAILURE);
-//            future.addListener(ChannelFutureListener.CLOSE);
-//            this.removeChannel(channel);
-//        }
 	}
 	
 	/**
@@ -380,10 +345,8 @@ public class StrestRouter {
 	public void finishResponse(StrestController controller, ResponseBuilder response) {
 		try {
 			try {
-				for (Class f : controller.filters()) {
-		        	this.getFilter(f).after(controller);
-		        }
-				for (StrestControllerFilter f : this.getFilters(controller.getControllerNamespace())) {
+				//execute final filters
+				for (StrestControllerFilter f : this.getFilters(controller)) {
 		        	f.after(controller);
 		        }
 				
@@ -404,12 +367,7 @@ public class StrestRouter {
 			response.txnStatus(StrestUtil.HEADERS.TXN_STATUS_VALUES.COMPLETE);
 			//run the error filters
 			if (controller != null) {
-				for (Class fcls : controller.filters()) {
-					StrestControllerFilter f = this.getFilter(fcls);
-					if (f != null)
-						f.error(controller, response.getResponse(), e);
-	            }
-				for (StrestControllerFilter f : this.getFilters(controller.getControllerNamespace())) {
+				for (StrestControllerFilter f : this.getFilters(controller)) {
 					f.error(controller, response.getResponse(), e);
 	            }
 			}
