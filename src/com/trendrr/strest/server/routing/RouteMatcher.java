@@ -4,6 +4,7 @@
 package com.trendrr.strest.server.routing;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import org.apache.commons.logging.Log;
@@ -35,10 +36,10 @@ import com.trendrr.oss.StringHelper;
  */
 public class RouteMatcher {
 
-	protected Log log = LogFactory.getLog(RouteMatcher.class);
+	protected static Log log = LogFactory.getLog(RouteMatcher.class);
 	
-	TreeNode tree = new TreeNode();
-	
+	protected TreeNode tree = new TreeNode();
+	protected HashMap<String, UriMapping> nonWildcardRoutes = new HashMap<String, UriMapping>();
 	
 	public static void main(String ...strings) {
 		
@@ -71,44 +72,38 @@ public class RouteMatcher {
 	 * @return
 	 */
 	public MatchedRoute find(String uri) {
-		List<UriMapping> found = new ArrayList<UriMapping>();
-		
-		List<String> words = new ArrayList<String>();
-		
-		String word = null;
-		for (String w : StringHelper.trim(uri, "/").split("\\/")) {
-			if (word != null)
-				words.add(word);
-			word = w;
-		}
-		
-//		get the extension if it exists
-		String extension = null;
-		int index = word.indexOf('.');
-		if (index != -1) {
-			extension = word.substring(index+1);
-			word = word.substring(0, index);
-		}
-		words.add(word);
-		
-		
-		tree.find(found, words);
-		
-		if (found.isEmpty()) {
-			return null;
-		}
-		UriMapping route = found.get(found.size()-1);
-		
-//		if (found.size() > 1) {
-//			log.warn("More then one route matched: " + found);
-//			for (UriMapping mp : found) {
-//				log.warn("Got: " + mp.getRoute());
-//			}
-//		}
 		
 		MatchedRoute m = new MatchedRoute();
+		String u = StringHelper.trim(uri, "/");
+		String extension = null;
+		{
+			String tmp[] = u.split("\\.");
+			if (tmp.length == 2) {
+				u = tmp[0];
+				extension = tmp[1];
+			}
+		}
+		System.out.println(u);
+		UriMapping route = this.nonWildcardRoutes.get(u);
+		if (route == null) {
+			System.out.println("checking wildcards");
+			//check wildcard matches.
+			List<UriMapping> found = new ArrayList<UriMapping>();
+			List<String> words = new ArrayList<String>();
+			for (String w : u.split("\\/")) {
+				words.add(w);
+			}
+			
+			tree.find(found, words);
+			if (found.isEmpty()) {
+				return null;
+			}
+			route = found.get(found.size()-1);
+			m.setParams(route.getWildCardMatches(words));
+		}
+		
 		m.setMapping(route);
-		m.setParams(m.getMapping().getWildCardMatches(words));
+		
 		if (extension != null) {
 			m.getParams().put("return_type", extension);
 		}
@@ -124,7 +119,9 @@ public class RouteMatcher {
 	 * @param mapping
 	 */
 	public synchronized void addMapping(UriMapping mapping) {
-		if (mapping.getRoute().isEmpty()) {
+		if (!mapping.isWildCard()) {
+			this.nonWildcardRoutes.put(mapping.getRoute(), mapping);
+		}else if (mapping.getRoute().isEmpty()) {
 			tree.setMapping(mapping);
 		} else {
 			tree.addChildNode(mapping, mapping.getTokens());
