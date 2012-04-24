@@ -62,7 +62,7 @@
 			<attribute name="Class-Path" value="${classpath}"/>
 		</manifest>
 
-		<jar destfile="strest-core.jar"
+		<jar destfile="strest.jar"
 			basedir="build/jar"
 			manifest="build/jar/META-INF/MANIFEST.MF"
 			>
