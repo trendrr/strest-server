@@ -39,11 +39,12 @@ import com.trendrr.strest.server.StrestController;
  * 
  * @author Dustin Norlander
  * @created Apr 1, 2011
- * 
+ * @deprecated moved to cheshire
  */
 @Strest(
 		route = "/static/*filename"
 )
+@Deprecated
 public class StaticFileController extends StrestController {
 
 	protected Log log = LogFactory.getLog(StaticFileController.class);
