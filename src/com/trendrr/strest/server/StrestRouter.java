@@ -82,9 +82,10 @@ public class StrestRouter {
 				//do nothing.
 			}
 		}
-		
-		controllers.addAll(Reflection.instances(StrestController.class, packageName, true));
-		
+		List<StrestController> ctrls = Reflection.instances(StrestController.class, packageName, true);
+		if (ctrls != null) {
+			controllers.addAll(ctrls);
+		}
 		if (controllers.isEmpty()) {
 			log.warn("No controllers found in package: " + packageName);
 			return;
