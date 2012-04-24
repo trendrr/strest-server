@@ -52,7 +52,7 @@ public class StrestRequestHandler extends SimpleChannelUpstreamHandler {
 	
 	@Override
 	public void channelConnected(ChannelHandlerContext ctx, ChannelStateEvent e) throws Exception {
-		log.info("Connect! " + ctx);
+//		log.info("Connect! " + ctx);
 	}
 	
     @Override
@@ -73,7 +73,7 @@ public class StrestRequestHandler extends SimpleChannelUpstreamHandler {
 
     @Override
     public void channelDisconnected(ChannelHandlerContext ctx, ChannelStateEvent e) {
-    	log.info("Disconnect! " + ctx);
+//    	log.info("Disconnect! " + ctx);
     	router.removeChannel(e.getChannel());
     }
     
