@@ -4,6 +4,7 @@
 package com.trendrr.strest.server.v2.models.json;
 
 import java.io.UnsupportedEncodingException;
+import java.util.Collection;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -65,7 +66,7 @@ public abstract class StrestJsonBase implements StrestPacketBase {
 	public String getHeader(String header) {
 		return this.map.getString("strest." + header.toLowerCase());
 	}
-	
+		
 	/* (non-Javadoc)
 	 * @see com.trendrr.strest.server.v2.StrestRequest#setStrestProtocolVersion(java.lang.String)
 	 */
@@ -112,8 +113,9 @@ public abstract class StrestJsonBase implements StrestPacketBase {
 	 * @see com.trendrr.strest.server.v2.StrestRequest#setContent(java.lang.String, java.lang.String)
 	 */
 	@Override
-	public void setContent(String contentType, String content) {
-		this.map.put("content", content);
+	public void setContent(String contentType, byte[] content) {
+		log.warn("Setting byte content. no good, need a better way -Dustin");
+		this.map.put("content", content); //TODO: this ain't right
 		this.addHeader(Name.CONTENT_TYPE, contentType);
 	}
 
@@ -122,6 +124,7 @@ public abstract class StrestJsonBase implements StrestPacketBase {
 	 */
 	@Override
 	public Object getContent() {
+		
 		return this.map.get("content");
 	}
 

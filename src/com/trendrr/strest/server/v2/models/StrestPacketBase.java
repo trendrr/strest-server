@@ -3,6 +3,8 @@
  */
 package com.trendrr.strest.server.v2.models;
 
+import java.util.Collection;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -20,6 +22,8 @@ public interface StrestPacketBase {
 	public void addHeader(StrestHeader.Name header, String value);
 	public String getHeader(StrestHeader.Name header);
 	public String getHeader(String header);
+//	public Collection<String> getHeaderNames();
+	
 	
 	public void setStrestProtocolVersion(float version);
 	public float getStrestProtocolVersion();
@@ -28,7 +32,7 @@ public interface StrestPacketBase {
 	public String getTxnId();
 	
 	public void setContent(DynMap content);
-	public void setContent(String contentType, String content);
+	public void setContent(String contentType, byte[] bytes);
 	public Object getContent();
 	
 	/**

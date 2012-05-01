@@ -116,6 +116,6 @@ public class StrestJsonRequest extends StrestJsonBase implements StrestRequest {
 	@Override
 	public void cleanup() {
 		super.cleanup();
-		this.map = null;
+		this.channel = null;
 	}
 }
