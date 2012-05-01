@@ -17,8 +17,6 @@ import org.apache.commons.logging.LogFactory;
 import org.jboss.netty.channel.Channel;
 import org.jboss.netty.channel.ChannelFuture;
 import org.jboss.netty.channel.ChannelFutureListener;
-import org.jboss.netty.handler.codec.http.HttpMethod;
-import org.jboss.netty.handler.codec.http.HttpRequest;
 
 
 import com.trendrr.oss.DynMapFactory;
@@ -28,6 +26,8 @@ import com.trendrr.strest.StrestUtil;
 import com.trendrr.strest.annotations.AnnotationHelper;
 import com.trendrr.strest.annotations.Async;
 import com.trendrr.strest.server.connections.StrestConnectionChannel;
+import com.trendrr.strest.server.v2.models.StrestHeader;
+import com.trendrr.strest.server.v2.models.StrestRequest;
 
 
 /**
@@ -46,7 +46,7 @@ public class StrestRouter {
 	
 	protected RouteLookup routeLookup = new RouteLookup();
 
-	protected ConcurrentHashMap<Channel, StrestConnectionChannel> connections = new ConcurrentHashMap<Channel, StrestConnectionChannel>();
+//	protected ConcurrentHashMap<Channel, StrestConnectionChannel> connections = new ConcurrentHashMap<Channel, StrestConnectionChannel>();
 	
 	protected HashMap<String, List<StrestControllerFilter>> defaultFilters = new HashMap<String,List<StrestControllerFilter>> ();
 	protected ConcurrentHashMap<Class, StrestControllerFilter> filtersByClass = new ConcurrentHashMap<Class,StrestControllerFilter>();
@@ -198,20 +198,19 @@ public class StrestRouter {
 		return f;
 	}
 	
-	private boolean isAsync(StrestController controller, HttpMethod method) {
+	private boolean isAsync(StrestController controller, StrestHeader.Method method) {
 		return AnnotationHelper.hasMethodAnnotation(Async.class, controller, "handle" + method.toString());
 	}
 	
-	public void incoming(Channel channel, HttpRequest request) {
+	public void incoming(StrestRequest request) {
 		boolean isStrest = StrestUtil.isStrest(request);
 		// Build the response object.
         ResponseBuilder response = new ResponseBuilder(request);
         
-        this.connections.putIfAbsent(channel, new StrestConnectionChannel(channel));
-        StrestConnectionChannel con = this.connections.get(channel);
+        StrestConnectionChannel con = request.getConnectionChannel();
       
         
-        String txnId = request.getHeader(StrestUtil.HEADERS.TXN_ID);
+        String txnId = request.getTxnId();
         con.incoming(request);
         StrestController controller = null;
         try {
@@ -227,12 +226,17 @@ public class StrestRouter {
 	            }
 	            
 	            //parse the get string params
+	            //TODO: this should be handled by the request objects
+	            
 	            controller.setParamsGET(DynMapFactory.instanceFromURL(request.getUri()));
 	            
+	            controller.setParams(request.getParams());
+	            
 	            //parse any post params
+	            //TODO: don't think this is really correct.
 	            String contentType = request.getHeader(CONTENT_TYPE);
 	            if(contentType != null){
-	            	String pms = request.getContent().toString(Charset.forName("utf8"));
+	            	String pms = request.getContent().toString();
 	            	if(pms != null){
 	            		if (contentType.contains("form-urlencoded")) {
 	            			controller.setParamsPOST(DynMapFactory.instanceFromURLEncoded(pms));
@@ -257,13 +261,13 @@ public class StrestRouter {
 	            
 	            //now execution the appropriate action.
 	            if (!controller.isSkipExecution()) {
-		            if (request.getMethod() == HttpMethod.GET) {
+		            if (request.getMethod() == StrestHeader.Method.GET) {
 						controller.handleGET(controller.getParams());
-		            } else if (request.getMethod() == HttpMethod.POST) {
+		            } else if (request.getMethod() == StrestHeader.Method.POST) {
 		            	controller.handlePOST(controller.getParams());	
-		            } else if (request.getMethod() == HttpMethod.PUT) {
+		            } else if (request.getMethod() == StrestHeader.Method.PUT) {
 		            	controller.handlePUT(controller.getParams());	
-		            } else if (request.getMethod() == HttpMethod.DELETE) {
+		            } else if (request.getMethod() == StrestHeader.Method.DELETE) {
 		            	controller.handleDELETE(controller.getParams());	
 		            } else {
 		            	throw StrestHttpException.METHOD_NOT_ALLOWED();
@@ -302,7 +306,7 @@ public class StrestRouter {
 	 * @param controller
 	 * @param response
 	 */
-	protected void sendResponse(HttpRequest request, StrestConnectionChannel channel, ResponseBuilder response) {
+	protected void sendResponse(StrestRequest request, StrestConnectionChannel channel, ResponseBuilder response) {
 		String txnStatus = response.getTxnStatus();
 		if (txnStatus == null) {
 			txnStatus = StrestUtil.HEADERS.TXN_STATUS_VALUES.COMPLETE;
