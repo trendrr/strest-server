@@ -20,6 +20,7 @@ import com.trendrr.oss.DynMap;
 import com.trendrr.strest.StrestUtil;
 import com.trendrr.strest.server.ResponseBuilder;
 import com.trendrr.strest.server.callbacks.DisconnectCallback;
+import com.trendrr.strest.server.v2.models.StrestRequest;
 
 
 /**
@@ -103,8 +104,8 @@ public class StrestConnectionChannel implements Comparable<StrestConnectionChann
 		return channel.write(response);
 	}
 	
-	public void incoming(HttpRequest request) {
-		String txnId = request.getHeader(StrestUtil.HEADERS.TXN_ID);
+	public void incoming(StrestRequest request) {
+		String txnId = request.getTxnId();
 		if (txnId == null) {
 			//duh, what do we do now?
 			//guess this is a normal HTTP request.

@@ -24,6 +24,13 @@ import org.jboss.netty.handler.codec.http.HttpVersion;
 import com.trendrr.oss.DynMap;
 import com.trendrr.strest.ContentTypes;
 import com.trendrr.strest.StrestUtil;
+import com.trendrr.strest.server.v2.models.StrestHeader;
+import com.trendrr.strest.server.v2.models.StrestRequest;
+import com.trendrr.strest.server.v2.models.StrestResponse;
+import com.trendrr.strest.server.v2.models.http.StrestHttpRequest;
+import com.trendrr.strest.server.v2.models.http.StrestHttpResponse;
+import com.trendrr.strest.server.v2.models.json.StrestJsonRequest;
+import com.trendrr.strest.server.v2.models.json.StrestJsonResponse;
 
 
 /**
@@ -35,7 +42,7 @@ public class ResponseBuilder {
 
 	protected static Log log = LogFactory.getLog(ResponseBuilder.class);
 
-	HttpResponse response;
+	StrestResponse response;
 	
 	public static void main(String...strings) {
 		ResponseBuilder b = new ResponseBuilder();
@@ -45,22 +52,15 @@ public class ResponseBuilder {
 		return new ResponseBuilder();
 	}
 	
-	public static ResponseBuilder instance(HttpRequest request) {
+	public static ResponseBuilder instance(StrestRequest request) {
+		
+		
+		
 		return new ResponseBuilder(request);
 	}
 	
-	public static ResponseBuilder instance(HttpResponse response) {
+	public static ResponseBuilder instance(StrestResponse response) {
 		return new ResponseBuilder(response);
-	}
-	
-	/**
-	 * Creates a response builder 
-	 * txn-status is complete by default
-	 */
-	public ResponseBuilder() {
-		response = new DefaultHttpResponse(
-				new HttpVersion("STREST", 0, 1, true), HttpResponseStatus.OK);
-		this.txnStatus(StrestUtil.HEADERS.TXN_STATUS_VALUES.COMPLETE);
 	}
 	
 	
@@ -68,23 +68,18 @@ public class ResponseBuilder {
 	 * creates a new response builder based on the txn id of the request.
 	 * @param request
 	 */
-	public ResponseBuilder(HttpRequest request) {
-		response = new DefaultHttpResponse(
-				request.getProtocolVersion(), HttpResponseStatus.OK);
-		this.txnId(request.getHeader(StrestUtil.HEADERS.TXN_ID));
-		
-	}
-	
-	/**
-	 * creates a new response builder that acts on the given response.
-	 * @param response
-	 */
-	public ResponseBuilder(HttpResponse response) {
-		this.response = response;
+	public ResponseBuilder(StrestRequest request) {
+		if (request instanceof StrestJsonRequest) {
+			this.response = new StrestJsonResponse();
+		} else if (request instanceof StrestHttpRequest) {
+			this.response = new StrestHttpResponse();
+		}
+		response.setProtocol(request.getProtocolName(), request.getProtocolVersion());
+		response.setTxnId(request.getTxnId());
 	}
 	
 	public ResponseBuilder txnStatus(String status) {
-		response.setHeader(StrestUtil.HEADERS.TXN_STATUS, status);
+		response.setHeader(StrestHeader.TxnStatus, status);
 		return this;
 	}
 	

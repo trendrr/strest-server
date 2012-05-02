@@ -19,6 +19,9 @@ import com.trendrr.strest.server.ResponseBuilder;
 import com.trendrr.strest.server.StrestResponseEncoder;
 import com.trendrr.strest.server.callbacks.DisconnectCallback;
 import com.trendrr.strest.server.callbacks.TxnCompleteCallback;
+import com.trendrr.strest.server.v2.models.StrestRequest;
+import com.trendrr.strest.server.v2.models.StrestHeader.TxnAccept;
+import com.trendrr.strest.server.v2.models.StrestResponse;
 
 
 /**
@@ -37,44 +40,23 @@ public class StrestConnectionTxn implements Comparable<StrestConnectionTxn>{
 	protected Log log = LogFactory.getLog(StrestConnectionTxn.class);
 	
 	private ConcurrentHashMap<String,Object> storage = new ConcurrentHashMap<String,Object>();
-	private StrestConnectionChannel schannel = null;
 	private ConcurrentLinkedQueue<TxnCompleteCallback> txnCompleteCallbacks = new ConcurrentLinkedQueue<TxnCompleteCallback>();
 	
-	//hold a copy of the request (the headers only)
-	private HttpRequest request;
+	private StrestRequest request;
 	
 	
 	
-	public StrestConnectionTxn(StrestConnectionChannel connection, HttpRequest request) {
-		this.schannel = connection;
-		this.setRequest(request);
-	}
-	
-	private void setRequest(HttpRequest request) {
-		this.request = new DefaultHttpRequest(request.getProtocolVersion(), request.getMethod(), request.getUri());
-		for (String h : request.getHeaderNames()) {
-			this.request.addHeader(h, request.getHeader(h));
-		}
+	public StrestConnectionTxn(StrestRequest request) {
+		this.request = request;
 	}
 	
 	/**
-	 * returns a copy of the request that originated this txn.  Does NOT contain the 
-	 * content. Only the header information.
+	 * returns the request that originated this txn.
 	 * @return
 	 */
-	public HttpRequest getRequest() {
+	public StrestRequest getRequest() {
 		return this.request;
 	}
-	
-	/**
-	 * 
-	 * @param responseBuilder
-	 * @return
-	 */
-	public ChannelFuture sendMessage(ResponseBuilder responseBuilder) {
-		return this.sendMessage(responseBuilder.getResponse());
-	}
-	
 	
 	/**
 	 * returns a threadsafe map for use as txn storage.
@@ -89,7 +71,7 @@ public class StrestConnectionTxn implements Comparable<StrestConnectionTxn>{
 	 * @return
 	 */
 	public Map<String,Object> getChannelStorage() {
-		return this.schannel.getStorage();
+		return this.request.getConnectionChannel().getStorage();
 	}
 	
 	/**
@@ -97,6 +79,8 @@ public class StrestConnectionTxn implements Comparable<StrestConnectionTxn>{
 	 * @return
 	 */
 	public ChannelFuture close() {
+		
+		
 		ResponseBuilder response = new ResponseBuilder();
 		response.txnStatusComplete();
 		return this.sendMessage(response);
@@ -107,14 +91,10 @@ public class StrestConnectionTxn implements Comparable<StrestConnectionTxn>{
 	 * @param response
 	 * @return
 	 */
-	public ChannelFuture sendMessage(HttpResponse response) {
+	public ChannelFuture sendMessage(StrestResponse response) {
 		//set the txn id
-		response.setHeader(StrestUtil.HEADERS.TXN_ID, this.request.getHeader(StrestUtil.HEADERS.TXN_ID));
-		/**
-		 * do the content encoding here if neeeded.
-		 */
-		HttpResponse res = StrestResponseEncoder.encode(this.request, response);
-		return this.schannel.sendMessage(res);
+		response.setTxnId(this.request.getTxnId());
+		request.getConnectionChannel().sendMessage(response);	
 	}
 	
 	/**
@@ -122,11 +102,11 @@ public class StrestConnectionTxn implements Comparable<StrestConnectionTxn>{
 	 * @return
 	 */
 	public StrestConnectionChannel getStrestConnectionChannel() {
-		return this.schannel;
+		return this.request.getConnectionChannel();
 	}
 
 	public String getTxnId() {
-		return this.request.getHeader(StrestUtil.HEADERS.TXN_ID);
+		return this.request.getTxnId();
 	}
 	
 	/**
@@ -145,7 +125,6 @@ public class StrestConnectionTxn implements Comparable<StrestConnectionTxn>{
 			cb.txnComplete(this);
 		}
 		this.request = null;
-		this.schannel = null;
 		this.storage = null;
 	}
 	
