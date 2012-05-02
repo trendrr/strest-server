@@ -64,28 +64,40 @@ public class StrestHttpBase implements StrestPacketBase {
 	 * @see com.trendrr.strest.server.v2.models.StrestPacketBase#setStrestProtocolVersion(float)
 	 */
 	@Override
-	public void setStrestProtocolVersion(float version) {
+	public void setProtocol(String name, float version) {
 		String tmp[] = Float.toString(version).split("\\.");
 		int major = Integer.parseInt(tmp[0]);
 		int minor = 0;
 		if (tmp.length >0) {
 			minor = Integer.parseInt(tmp[1]);
 		}
-		this.message.setProtocolVersion(new HttpVersion("STREST", major, minor, true));
+		this.message.setProtocolVersion(new HttpVersion(name, major, minor, true));
 	}
 
 	/* (non-Javadoc)
 	 * @see com.trendrr.strest.server.v2.models.StrestPacketBase#getStrestProtocolVersion()
 	 */
 	@Override
-	public float getStrestProtocolVersion() {
+	public float getProtocolVersion() {
 		HttpVersion version= this.message.getProtocolVersion();
-		if (version == null || !version.getProtocolName().equalsIgnoreCase("strest")) {
+		if (version == null) {
 			return 0;
 		}
 		return Float.parseFloat(this.message.getProtocolVersion().getMajorVersion() + "." + this.message.getProtocolVersion().getMinorVersion());
 	}
 
+	/* (non-Javadoc)
+	 * @see com.trendrr.strest.server.v2.models.StrestPacketBase#getProtocolName()
+	 */
+	@Override
+	public String getProtocolName() {
+		HttpVersion version= this.message.getProtocolVersion();
+		if (version == null) {
+			return "STREST";
+		}
+		return version.getProtocolName();
+	}
+	
 	/* (non-Javadoc)
 	 * @see com.trendrr.strest.server.v2.models.StrestPacketBase#setTxnId(java.lang.String)
 	 */
@@ -149,4 +161,6 @@ public class StrestHttpBase implements StrestPacketBase {
 	public byte[] toByteArray() {
 		return null;
 	}
+
+
 }

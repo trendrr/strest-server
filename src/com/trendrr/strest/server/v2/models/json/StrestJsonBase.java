@@ -71,7 +71,7 @@ public abstract class StrestJsonBase implements StrestPacketBase {
 	 * @see com.trendrr.strest.server.v2.StrestRequest#setStrestProtocolVersion(java.lang.String)
 	 */
 	@Override
-	public void setStrestProtocolVersion(float version) {
+	public void setProtocol(String protocol, float version) {
 		this.map.putWithDot("strest.v", version);
 	}
 
@@ -79,10 +79,13 @@ public abstract class StrestJsonBase implements StrestPacketBase {
 	 * @see com.trendrr.strest.server.v2.StrestRequest#getStrestProtocolVersion()
 	 */
 	@Override
-	public float getStrestProtocolVersion() {
+	public float getProtocolVersion() {
 		return this.map.getDouble("strest.v").floatValue();
 	}
 
+	public String getProtocolName() {
+		return "strest";
+	}
 	/* (non-Javadoc)
 	 * @see com.trendrr.strest.server.v2.StrestRequest#setTxnId(java.lang.String)
 	 */

@@ -7,6 +7,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import com.trendrr.oss.DynMap;
+import com.trendrr.strest.server.v2.models.StrestHeader.TxnStatus;
+import com.trendrr.strest.server.v2.models.StrestHeader;
 import com.trendrr.strest.server.v2.models.StrestResponse;
 import com.trendrr.strest.server.v2.models.StrestHeader.Name;
 
@@ -44,6 +46,14 @@ public class StrestJsonResponse extends StrestJsonBase implements StrestResponse
 	@Override
 	public String getStatusMessage() {
 		return this.map.getString("status.message");
+	}
+
+	/* (non-Javadoc)
+	 * @see com.trendrr.strest.server.v2.models.StrestResponse#setTxnStatus(com.trendrr.strest.server.v2.models.StrestHeader.TxnStatus)
+	 */
+	@Override
+	public void setTxnStatus(TxnStatus status) {
+		this.addHeader(StrestHeader.Name.TXN_STATUS, status.getJson());
 	}
 	
 	

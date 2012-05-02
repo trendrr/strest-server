@@ -25,8 +25,9 @@ public interface StrestPacketBase {
 //	public Collection<String> getHeaderNames();
 	
 	
-	public void setStrestProtocolVersion(float version);
-	public float getStrestProtocolVersion();
+	public void setProtocol(String protocolName, float version);
+	public float getProtocolVersion();
+	public String getProtocolName();
 	
 	public void setTxnId(String id);
 	public String getTxnId();

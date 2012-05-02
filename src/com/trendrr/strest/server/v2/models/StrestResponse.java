@@ -16,6 +16,6 @@ public interface StrestResponse extends StrestPacketBase {
 	public void setStatus(int code, String message);
 	public int getStatusCode();
 	public String getStatusMessage();
-	
+	public void setTxnStatus(StrestHeader.TxnStatus status);
 	
 }
