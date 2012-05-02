@@ -58,6 +58,7 @@ public class RouteMatchingTests {
 		Assert.assertTrue(match(tree, "/test/idmatch/1", "test/idmatch/:id"));
 		Assert.assertTrue(match(tree, "/test/idmatch/namematch", "test/idmatch/namematch"));
 		
+		Assert.assertTrue(params(tree, "/test/dustin", "id", "dustin"));
 	}
 	
 	protected boolean match(RouteMatcher tree, String route, String expected) {
@@ -75,5 +76,14 @@ public class RouteMatchingTests {
 		log.warn("Route didn't match: " + route + " GOT: " + rt.getMapping().getRoute() + " EXPECTED: " + expected);
 		
 		return false;
+	}
+	
+	protected boolean params(RouteMatcher tree, String route, String paramKey, String paramVal) {
+		MatchedRoute rt = tree.find(route);
+		if (rt == null) {
+			log.warn("Route matched was null: " + route);
+			return false;
+		}
+		return rt.getParams().get(paramKey).equals(paramVal);
 	}
 }

@@ -231,9 +231,8 @@ public class StrestRouter {
 	            //parse the get string params
 	            //TODO: this should be handled by the request objects
 	            
-	            controller.setParamsGET(DynMapFactory.instanceFromURL(request.getUri()));
-	            
-	            controller.setParams(request.getParams());
+	            controller.setParamsGET(DynMapFactory.instanceFromURL(request.getUri())); 
+	            controller.getParams().putAll(request.getParams());
 	            
 	            //parse any post params
 	            //TODO: don't think this is really correct.

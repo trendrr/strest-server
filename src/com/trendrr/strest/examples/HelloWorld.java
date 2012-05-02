@@ -32,8 +32,8 @@ public class HelloWorld extends StrestController {
 	@Override
 	public void handleGET(DynMap params) throws Exception {
 		String val = params.getString("param", "world");
+		System.out.println(params.toJSONString());
 		this.setResponseUTF8(ContentTypes.TEXT, 
 				"Hello " + val.toUpperCase() + "!");
-		this.getSessionStorage().put("Key", "Test");
 	}
 }

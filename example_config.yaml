@@ -17,7 +17,7 @@ threads :
 controller_packages:
    - com.trendrr.strest.examples
    # this controller adds websocket support.  remove to not allow websocket connections.
-   - com.trendrr.strest.server.websocket
+   # - com.trendrr.strest.server.websocket
    # This controller serves files that are in the static directory
    - com.trendrr.strest.server.controllers.StaticFileController
    
@@ -25,9 +25,9 @@ controller_packages:
 # these must implement the StrestControllerFilter class
 filters:
    # enable sessions
-   - com.trendrr.strest.contrib.sessions.SessionFilter
+   # - com.trendrr.strest.contrib.sessions.SessionFilter
    # Leave this filter if you wish to use the "requiredParams" part of the annotation.
-   - com.trendrr.strest.contrib.filters.RequiredParamsFilter 
+   # - com.trendrr.strest.contrib.filters.RequiredParamsFilter 
    
    
    

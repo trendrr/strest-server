@@ -22,6 +22,7 @@ import com.trendrr.strest.server.ResponseBuilder;
 import com.trendrr.strest.server.callbacks.DisconnectCallback;
 import com.trendrr.strest.server.v2.models.*;
 import com.trendrr.strest.server.v2.models.StrestHeader.TxnStatus;
+import com.trendrr.strest.server.v2.models.http.StrestHttpResponse;
 
 
 /**
@@ -102,7 +103,13 @@ public class StrestConnectionChannel implements Comparable<StrestConnectionChann
 			//remove the txn
 			this.txnComplete(response.getTxnId());
 		}
-		return channel.write(response);
+		
+		if (response instanceof StrestHttpResponse) {
+			//TODO: we should probably just have an encoder in the pipeline..
+			return channel.write(((StrestHttpResponse)response).getResponse());
+		} else {
+			return channel.write(response);
+		}
 	}
 	
 	public void incoming(StrestRequest request) {

@@ -34,6 +34,8 @@ public class StrestHttpBase implements StrestPacketBase {
 	 */
 	@Override
 	public void addHeader(String header, String value) {
+		if (header == null || value == null)
+			return;
 		message.addHeader(header, value);
 	}
 
@@ -42,7 +44,7 @@ public class StrestHttpBase implements StrestPacketBase {
 	 */
 	@Override
 	public void addHeader(Name header, String value) {
-		message.addHeader(header.getHttpName(), value);
+		this.addHeader(header.getHttpName(), value);
 	}
 
 	/* (non-Javadoc)
