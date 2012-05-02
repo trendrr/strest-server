@@ -10,6 +10,7 @@ import org.jboss.netty.handler.codec.http.HttpResponse;
 import com.trendrr.strest.StrestException;
 import com.trendrr.strest.server.StrestController;
 import com.trendrr.strest.server.StrestControllerFilter;
+import com.trendrr.strest.server.v2.models.StrestResponse;
 
 
 /**
@@ -41,7 +42,7 @@ public class DummyFilter implements StrestControllerFilter {
 	 * @see com.trendrr.strest.server.StrestControllerFilter#error(com.trendrr.strest.server.StrestController, org.jboss.netty.handler.codec.http.HttpResponse, java.lang.Exception)
 	 */
 	@Override
-	public void error(StrestController controller, HttpResponse response,
+	public void error(StrestController controller, StrestResponse response,
 			Exception exception) {
 		// TODO Auto-generated method stub
 		

@@ -160,7 +160,7 @@ public class StrestClient {
 		this.init();
 		RequestHelper.addTxnId(request);
 		if (callback != null)
-			this.callbacks.put(request.getHeader(StrestUtil.HEADERS.TXN_ID), callback);
+			this.callbacks.put(request.getHeader("Strest-Txn-Id"), callback);
 		channel.write(request);
 	}
 	
@@ -176,15 +176,15 @@ public class StrestClient {
 	}
 	
 	public void responseReceived(HttpResponse response) {
-		String txnId = response.getHeader(StrestUtil.HEADERS.TXN_ID);
-		String txnStatus = response.getHeader(StrestUtil.HEADERS.TXN_STATUS);
+		String txnId = response.getHeader("Strest-Txn-Id");
+		String txnStatus = response.getHeader("Strest-Txn-Status");
 		StrestCallback cb = this.callbacks.get(txnId);
 		try {
 			cb.messageRecieved(response);
 		} catch (Exception x) {
 			log.error("Caught", x);
 		}
-		if (!StrestUtil.HEADERS.TXN_STATUS_VALUES.CONTINUE.equalsIgnoreCase(txnStatus)) {
+		if (!"continue".equalsIgnoreCase(txnStatus)) {
 			this.callbacks.remove(txnId);
 			cb.txnComplete();
 		}

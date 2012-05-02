@@ -19,6 +19,7 @@ import com.trendrr.strest.server.ResponseBuilder;
 import com.trendrr.strest.server.StrestResponseEncoder;
 import com.trendrr.strest.server.callbacks.DisconnectCallback;
 import com.trendrr.strest.server.callbacks.TxnCompleteCallback;
+import com.trendrr.strest.server.v2.models.StrestHeader.TxnStatus;
 import com.trendrr.strest.server.v2.models.StrestRequest;
 import com.trendrr.strest.server.v2.models.StrestHeader.TxnAccept;
 import com.trendrr.strest.server.v2.models.StrestResponse;
@@ -79,11 +80,13 @@ public class StrestConnectionTxn implements Comparable<StrestConnectionTxn>{
 	 * @return
 	 */
 	public ChannelFuture close() {
-		
-		
-		ResponseBuilder response = new ResponseBuilder();
-		response.txnStatusComplete();
+		ResponseBuilder response = new ResponseBuilder(this.request);
+		response.txnStatus(TxnStatus.COMPLETED);
 		return this.sendMessage(response);
+	}
+	
+	public ChannelFuture sendMessage(ResponseBuilder response) {
+		return this.sendMessage(response.getResponse());
 	}
 	
 	/**
@@ -94,7 +97,7 @@ public class StrestConnectionTxn implements Comparable<StrestConnectionTxn>{
 	public ChannelFuture sendMessage(StrestResponse response) {
 		//set the txn id
 		response.setTxnId(this.request.getTxnId());
-		request.getConnectionChannel().sendMessage(response);	
+		return request.getConnectionChannel().sendMessage(response);	
 	}
 	
 	/**

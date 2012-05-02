@@ -372,7 +372,7 @@ public class StrestRouter {
 	        }
 		} catch (StrestHttpException e) {
 			response.status(e.getCode(), e.getMessage());
-			response.txnStatus(StrestUtil.HEADERS.TXN_STATUS_VALUES.COMPLETE);
+			response.getResponse().setTxnStatus(TxnStatus.COMPLETED);
 			//run the error filters
 			if (controller != null) {
 				for (StrestControllerFilter f : this.getFilters(controller)) {

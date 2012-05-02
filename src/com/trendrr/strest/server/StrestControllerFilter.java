@@ -6,6 +6,7 @@ package com.trendrr.strest.server;
 import org.jboss.netty.handler.codec.http.HttpResponse;
 
 import com.trendrr.strest.StrestException;
+import com.trendrr.strest.server.v2.models.StrestResponse;
 
 
 /**
@@ -49,5 +50,5 @@ public interface StrestControllerFilter {
 	 * @param response The response packet to send to the end user.  Mutable
 	 * @param exception The exception
 	 */
-	public void error(StrestController controller, HttpResponse response, Exception exception);
+	public void error(StrestController controller, StrestResponse response, Exception exception);
 }

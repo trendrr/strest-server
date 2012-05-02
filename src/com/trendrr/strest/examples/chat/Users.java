@@ -16,6 +16,7 @@ import com.trendrr.strest.server.ResponseBuilder;
 import com.trendrr.strest.server.callbacks.TxnCompleteCallback;
 import com.trendrr.strest.server.connections.StrestConnectionGroup;
 import com.trendrr.strest.server.connections.StrestConnectionTxn;
+import com.trendrr.strest.server.v2.models.StrestHeader.TxnStatus;
 
 
 /**
@@ -90,7 +91,7 @@ public class Users implements TxnCompleteCallback {
 		mp.put("to", to);
 		mp.put("from", from);
 		mp.put("message", message);
-		con.sendMessage(new ResponseBuilder().txnStatusContinue().contentJSON(mp));
+		con.sendMessage(new ResponseBuilder(con.getRequest()).txnStatus(TxnStatus.CONTINUE).contentJSON(mp));
 	}
 	
 	/**
@@ -115,8 +116,8 @@ public class Users implements TxnCompleteCallback {
 		
 		//Now that I am registered to recieve connect message, then I
 		//tell everyone else that I am online.
-		ResponseBuilder response = new ResponseBuilder();
-		response.txnStatus(StrestUtil.HEADERS.TXN_STATUS_VALUES.CONTINUE);
+		ResponseBuilder response = new ResponseBuilder(con.getRequest());
+		response.txnStatus(TxnStatus.CONTINUE);
 		response.contentUTF8(self);
 		notifyConnect.sendMessage(response.getResponse());
 		
@@ -127,8 +128,8 @@ public class Users implements TxnCompleteCallback {
 			if (username.equals(self)) {
 				continue; //don't need to notify about self
 			}
-			response = new ResponseBuilder();
-			response.txnStatus(StrestUtil.HEADERS.TXN_STATUS_VALUES.CONTINUE);
+			response = new ResponseBuilder(con.getRequest());
+			response.txnStatus(TxnStatus.CONTINUE);
 			response.contentUTF8(username);
 			con.sendMessage(response);
 		}
@@ -146,8 +147,8 @@ public class Users implements TxnCompleteCallback {
 		this.onlineNow.remove(username);
 		this.notifyMessage.remove(username);
 		//now send the username to all who want connect notifications.
-		ResponseBuilder response = new ResponseBuilder();
-		response.txnStatus(StrestUtil.HEADERS.TXN_STATUS_VALUES.CONTINUE);
+		ResponseBuilder response = new ResponseBuilder(connection.getRequest());
+		response.txnStatus(TxnStatus.CONTINUE);
 		response.contentUTF8(username);
 		notifyDisconnect.sendMessage(response.getResponse());
 	}

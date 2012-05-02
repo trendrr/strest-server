@@ -42,7 +42,7 @@ public class RequestHelper {
 				new HttpVersion("STREST", 0, 1, true), method, uri.toASCIIString());
         
 //        request.setHeader(HttpHeaders.Names.ACCEPT_ENCODING, HttpHeaders.Values.GZIP);
-        request.setHeader(StrestUtil.HEADERS.TXN_ID, generateTxnId());
+        request.setHeader("Strest-Txn-Id", generateTxnId());
         request.setProtocolVersion(new HttpVersion("STREST", 0, 1, true));
         return request;
 	}
@@ -73,8 +73,8 @@ public class RequestHelper {
 	 * @return
 	 */
 	public static HttpRequest addTxnId(HttpRequest request) {
-		if (request.getHeader(StrestUtil.HEADERS.TXN_ID) == null) 
-			request.setHeader(StrestUtil.HEADERS.TXN_ID, generateTxnId());
+		if (request.getHeader("Strest-Txn-Id") == null) 
+			request.setHeader("Strest-Txn-Id", generateTxnId());
 		return request;
 	}
 	

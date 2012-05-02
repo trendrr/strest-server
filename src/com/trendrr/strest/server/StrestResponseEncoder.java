@@ -72,28 +72,6 @@ public class StrestResponseEncoder extends SimpleChannelHandler {
 	}
 	
 	/**
-	 * encodes the response adding correct STREST headers when needed
-	 * and gzipping when appropriate.
-	 * 
-	 *  
-	 * @param response
-	 * @return
-	 */
-	public static HttpResponse encode(HttpRequest request, HttpResponse response) {
-		String accept = request.getHeader(HttpHeaders.Names.ACCEPT_ENCODING);
-		long bytes = 0l;
-		if (response.getContent() != null) {
-			bytes = response.getContent().readableBytes();
-		}
-		compress(response, accept);
-		response.setHeader(HttpHeaders.Names.CONTENT_LENGTH, bytes);
-		if (!response.containsHeader(StrestUtil.HEADERS.TXN_ID)) {
-			response.setHeader(StrestUtil.HEADERS.TXN_ID, request.getHeader(StrestUtil.HEADERS.TXN_ID));
-		}
-		return response;
-	}
-	
-	/**
 	 * GZIPs the response content when accept is gzip.  only when content > GZIP_THRESHOLD
 	 * 
 	 * Will make no change if the content is already encoded, or if accept is not gzip

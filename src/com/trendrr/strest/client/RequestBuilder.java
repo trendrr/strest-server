@@ -47,12 +47,12 @@ public class RequestBuilder {
 		request = new DefaultHttpRequest(
 				new HttpVersion("STREST", 0, 1, true), HttpMethod.GET, "/");
 		this.txnId(StrestUtil.generateTxnId());
-		this.txnAccept(StrestUtil.HEADERS.TXN_ACCEPT_VALUES.MULTI);
+		this.txnAccept("multi");
 	}
 	
 	public RequestBuilder(HttpRequest request) {
 		this.request = request;
-		if (request.getHeader(StrestUtil.HEADERS.TXN_ID) == null) {
+		if (request.getHeader("Strest-Txn-Id") == null) {
 			this.txnId(StrestUtil.generateTxnId());
 		}
 		
@@ -113,7 +113,7 @@ public class RequestBuilder {
 	 * @return
 	 */
 	public RequestBuilder txnId(String id) {
-		request.setHeader(StrestUtil.HEADERS.TXN_ID, id);
+		request.setHeader("Strest-Txn-Id", id);
 		return this;
 	}
 	
@@ -126,7 +126,7 @@ public class RequestBuilder {
 	 * @return
 	 */
 	public RequestBuilder txnAccept(String val) {
-		request.setHeader(StrestUtil.HEADERS.TXN_ACCEPT, val);
+		request.setHeader("Strest-Txn-Accept", val);
 		return this;
 	}
 	

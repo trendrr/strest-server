@@ -16,6 +16,7 @@ import com.trendrr.strest.annotations.Strest;
 import com.trendrr.strest.server.StrestController;
 import com.trendrr.strest.server.callbacks.DisconnectCallback;
 import com.trendrr.strest.server.connections.StrestConnectionChannel;
+import com.trendrr.strest.server.v2.models.StrestHeader.TxnStatus;
 
 
 /**
@@ -37,7 +38,7 @@ public class Register extends StrestController {
 			throw new StrestHttpException(501, "username is mandatory!");
 		}
 		Users.instance().register(username, this.getTxnConnection());
-		this.response.setHeader(StrestUtil.HEADERS.TXN_STATUS, StrestUtil.HEADERS.TXN_STATUS_VALUES.CONTINUE);
+		this.response.setTxnStatus(TxnStatus.CONTINUE);
 	}
 
 

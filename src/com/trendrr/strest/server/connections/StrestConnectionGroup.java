@@ -26,6 +26,7 @@ import com.trendrr.strest.server.StrestResponseEncoder;
 import com.trendrr.strest.server.callbacks.ConnectionGroupEmptyCallback;
 import com.trendrr.strest.server.callbacks.DisconnectCallback;
 import com.trendrr.strest.server.callbacks.TxnCompleteCallback;
+import com.trendrr.strest.server.v2.models.StrestResponse;
 
 
 /**
@@ -118,16 +119,20 @@ public class StrestConnectionGroup implements TxnCompleteCallback {
 	 * @param response
 	 * @return
 	 */
-	public Collection<ChannelFuture> sendMessage(HttpResponse response) {
+	public Collection<ChannelFuture> sendMessage(StrestResponse response) {
 		Collection<ChannelFuture> futures = new ArrayList<ChannelFuture>();
 		for (StrestConnectionTxn con : this.connections) {
-			HttpResponse res = StrestResponseEncoder.copyHeaders(response);
 			
-			//We don't allow any content encoding.
-			//TODO: we should sort the gzip accept ones vs the ungzipped.
-			res.setHeader(HttpHeaders.Names.CONTENT_ENCODING, "identity");
-			res.setContent(response.getContent()); //all share the same content buffer.
-			futures.add(con.sendMessage(res));
+			//TODO: do this in an efficient way!
+			log.warn("connection group is disabled, TODO!");
+//			
+//			HttpResponse res = StrestResponseEncoder.copyHeaders(response);
+//			
+//			//We don't allow any content encoding.
+//			//TODO: we should sort the gzip accept ones vs the ungzipped.
+//			res.setHeader(HttpHeaders.Names.CONTENT_ENCODING, "identity");
+//			res.setContent(response.getContent()); //all share the same content buffer.
+//			futures.add(con.sendMessage(res));
 		}
 		return futures;
 	}

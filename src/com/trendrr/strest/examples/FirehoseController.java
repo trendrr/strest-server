@@ -18,6 +18,7 @@ import com.trendrr.strest.annotations.Strest;
 import com.trendrr.strest.server.ResponseBuilder;
 import com.trendrr.strest.server.StrestController;
 import com.trendrr.strest.server.connections.StrestConnectionGroup;
+import com.trendrr.strest.server.v2.models.StrestHeader.TxnStatus;
 
 
 /**
@@ -75,8 +76,8 @@ public class FirehoseController extends StrestController implements Runnable{
 		long num = 0;
 		while (true) {
 			//build the response.
-			ResponseBuilder res = new ResponseBuilder();
-			res.txnStatusContinue();//lets the client know to expect more messages.			
+			ResponseBuilder res = new ResponseBuilder(this.getRequest());
+			res.txnStatus(TxnStatus.CONTINUE);//lets the client know to expect more messages.			
 			//set the content message.
 			res.contentUTF8("this is message number: " + num++ + "\r\nThere are " + connections.size() + " concurrent connections");
 			//send it to all connections
