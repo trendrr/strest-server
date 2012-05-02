@@ -20,7 +20,8 @@ import com.trendrr.oss.DynMap;
 import com.trendrr.strest.StrestUtil;
 import com.trendrr.strest.server.ResponseBuilder;
 import com.trendrr.strest.server.callbacks.DisconnectCallback;
-import com.trendrr.strest.server.v2.models.StrestRequest;
+import com.trendrr.strest.server.v2.models.*;
+import com.trendrr.strest.server.v2.models.StrestHeader.TxnStatus;
 
 
 /**
@@ -90,16 +91,16 @@ public class StrestConnectionChannel implements Comparable<StrestConnectionChann
 		return this.sendMessage(responseBuilder.getResponse());
 	}
 	
-	public synchronized ChannelFuture sendMessage(HttpResponse response) {
+	public synchronized ChannelFuture sendMessage(StrestResponse response) {
 		if (channel == null || !channel.isOpen()) {
 			log.info("channel is closed, user has disconnected");
 			return null;
 		}
         
 		// Write the response.
-		if (StrestUtil.HEADERS.TXN_STATUS_VALUES.COMPLETE.equalsIgnoreCase(response.getHeader(StrestUtil.HEADERS.TXN_STATUS))) {
+		if (response.getTxnStatus() == TxnStatus.COMPLETED) {
 			//remove the txn
-			this.txnComplete(response.getHeader(StrestUtil.HEADERS.TXN_ID));
+			this.txnComplete(response.getTxnId());
 		}
 		return channel.write(response);
 	}
@@ -112,7 +113,7 @@ public class StrestConnectionChannel implements Comparable<StrestConnectionChann
 			return;
 		}
 		if (this.transactions.get(txnId) == null) {
-			this.transactions.putIfAbsent(txnId, new StrestConnectionTxn(this, request));
+			this.transactions.putIfAbsent(txnId, new StrestConnectionTxn(request));
 		}
 	}
 	

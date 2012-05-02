@@ -12,6 +12,12 @@ import org.jboss.netty.handler.codec.http.HttpRequest;
 import org.jboss.netty.handler.codec.http.HttpResponse;
 import org.jboss.netty.handler.codec.http.HttpVersion;
 
+import com.trendrr.strest.server.v2.models.StrestHeader.TxnAccept;
+import com.trendrr.strest.server.v2.models.StrestRequest;
+import com.trendrr.strest.server.v2.models.StrestResponse;
+import com.trendrr.strest.server.v2.models.http.StrestHttpResponse;
+import com.trendrr.strest.server.v2.models.json.StrestJsonResponse;
+
 
 /**
  * @author Dustin Norlander
@@ -26,63 +32,54 @@ public class StrestUtil {
 	public static String generateTxnId() {
 		return "str" + Long.toHexString(txn.incrementAndGet()) + "st";
 	}
-	public static final HttpVersion STREST_VERSION = new HttpVersion("STREST", 0, 1, true);
-	
-	public static final class HEADERS {
-		public static final String TXN_ID = "Strest-Txn-Id";
-		public static final String TXN_STATUS = "Strest-Txn-Status";
-		public static final String TXN_ACCEPT = "Strest-Txn-Accept";	
-		
-		public static final class TXN_STATUS_VALUES {
-			public static final String COMPLETE = "complete";
-			public static final String CONTINUE = "continue";
-		}
-		public static final class TXN_ACCEPT_VALUES {
-			public static final String SINGLE = "single";	
-			public static final String MULTI = "multi";	
-		}
-	}
 	
 	/**
 	 * easy check to make sure client can handle multiple returns.
 	 * @param request
 	 * @return
 	 */
-	public static boolean isTxnMulti(HttpRequest request) {
-		String val = request.getHeader(HEADERS.TXN_ACCEPT);
-		if (val == null || !val.equals(HEADERS.TXN_ACCEPT_VALUES.MULTI)) {
+	public static boolean isTxnMulti(StrestRequest request) {
+		TxnAccept val = request.getTxnAccept();
+		if (val == null || val == TxnAccept.SINGLE) {
 			return false;
 		}
 		return true;
 	}
 	
-	public static String txnId(HttpMessage message) {
-		return 	message.getHeader(StrestUtil.HEADERS.TXN_ID);
+//	public static String txnId(HttpMessage message) {
+//		return 	message.getHeader(StrestUtil.HEADERS.TXN_ID);
+//	}
+	
+	public static boolean isStrest(StrestRequest request) {
+		return "STREST".equalsIgnoreCase(request.getProtocolName());
 	}
 	
-	public static boolean isStrest(HttpRequest request) {
-		return "STREST".equalsIgnoreCase(request.getProtocolVersion().getProtocolName());
-	}
-	
-	public static String toString(HttpResponse response) {
-		StringBuilder str = new StringBuilder();
-		str.append(response.getProtocolVersion());
-		str.append(" ");
-		str.append(response.getStatus().getCode());
-		str.append(" ");
-		str.append(response.getStatus().getReasonPhrase());
+	public static String toString(StrestResponse response) {
 		
-		str.append("\n");
-		for (String hdr : response.getHeaderNames()) {
-			str.append(hdr);
-			str.append(" : ");
-			str.append(response.getHeader(hdr));
+		if (response instanceof StrestHttpResponse) {
+			
+			StringBuilder str = new StringBuilder();
+			str.append(response.getProtocolVersion());
+			str.append(" ");
+			str.append(response.getStatusCode());
+			str.append(" ");
+			str.append(response.getStatusMessage());
+			
 			str.append("\n");
+			for (String hdr : ((StrestHttpResponse)response).getResponse().getHeaderNames()) {
+				str.append(hdr);
+				str.append(" : ");
+				str.append(response.getHeader(hdr));
+				str.append("\n");
+			}
+			
+			str.append("\n\r\n\r");
+			str.append(response.getContent().toString());
+	
+			return str.toString();
+		} else if (response instanceof StrestJsonResponse) {
+			return ((StrestJsonResponse)response).getMap().toJSONString();
 		}
-		
-		str.append("\n\r\n\r");
-		str.append(response.getContent().toString());
-
-		return str.toString();
+		return response.toString();
 	}
 }

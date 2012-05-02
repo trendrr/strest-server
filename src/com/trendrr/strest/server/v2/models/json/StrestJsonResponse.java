@@ -55,6 +55,14 @@ public class StrestJsonResponse extends StrestJsonBase implements StrestResponse
 	public void setTxnStatus(TxnStatus status) {
 		this.addHeader(StrestHeader.Name.TXN_STATUS, status.getJson());
 	}
+
+	/* (non-Javadoc)
+	 * @see com.trendrr.strest.server.v2.models.StrestResponse#getTxnStatus()
+	 */
+	@Override
+	public TxnStatus getTxnStatus() {
+		return TxnStatus.instance(this.getHeader(StrestHeader.Name.TXN_STATUS));
+	}
 	
 	
 }

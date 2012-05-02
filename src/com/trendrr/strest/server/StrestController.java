@@ -25,6 +25,8 @@ import com.trendrr.strest.annotations.AnnotationHelper;
 import com.trendrr.strest.annotations.Strest;
 import com.trendrr.strest.server.connections.StrestConnectionChannel;
 import com.trendrr.strest.server.connections.StrestConnectionTxn;
+import com.trendrr.strest.server.v2.models.StrestRequest;
+import com.trendrr.strest.server.v2.models.StrestResponse;
 
 
 /**
@@ -41,8 +43,8 @@ public abstract class StrestController {
 
 	protected static Log log = LogFactory.getLog(StrestController.class);
 	
-	protected HttpRequest request;
-	protected HttpResponse response = null;
+	protected StrestRequest request;
+	protected StrestResponse response = null;
 	protected DynMap params = new DynMap();
 	protected DynMap paramsGET = new DynMap();
 	protected DynMap paramsPOST = new DynMap();
@@ -261,15 +263,15 @@ public abstract class StrestController {
 		throw StrestHttpException.METHOD_NOT_ALLOWED();
 	}
 	
-	public HttpRequest getRequest() {
+	public StrestRequest getRequest() {
 		return request;
 	}
 
-	public void setRequest(HttpRequest request) {
+	public void setRequest(StrestRequest request) {
 		this.request = request;
 	}
 
-	public HttpResponse getResponse() {
+	public StrestResponse getResponse() {
 		return response;
 	}
 	
@@ -277,7 +279,7 @@ public abstract class StrestController {
 		return ResponseBuilder.instance(this.getResponse());
 	}
 
-	public void setResponse(HttpResponse response) {
+	public void setResponse(StrestResponse response) {
 		this.response = response;
 	}
 
@@ -285,12 +287,8 @@ public abstract class StrestController {
 		return strest;
 	}
 	
-	public void setResponseStatus(HttpResponseStatus status_code){
-		this.response.setStatus(status_code);
-	}
-	
 	public void setResponseStatus(int code, String message){
-		this.response.setStatus(new HttpResponseStatus(code,message));
+		this.response.setStatus(code, message);
 	}
 	
 	public void setStrest(boolean strest) {
@@ -326,7 +324,7 @@ public abstract class StrestController {
 	 * @return
 	 */
 	public String getRequestContentUTF8() {
-		return request.getContent().toString(Charset.forName("utf8"));
+		return request.getContent().toString();
 	}
 	
 	public String[] routes() {

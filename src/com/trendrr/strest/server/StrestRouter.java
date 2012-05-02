@@ -26,8 +26,9 @@ import com.trendrr.strest.StrestUtil;
 import com.trendrr.strest.annotations.AnnotationHelper;
 import com.trendrr.strest.annotations.Async;
 import com.trendrr.strest.server.connections.StrestConnectionChannel;
-import com.trendrr.strest.server.v2.models.StrestHeader;
-import com.trendrr.strest.server.v2.models.StrestRequest;
+import com.trendrr.strest.server.v2.models.*;
+import com.trendrr.strest.server.v2.models.StrestHeader.TxnAccept;
+import com.trendrr.strest.server.v2.models.StrestHeader.TxnStatus;
 
 
 /**
@@ -46,7 +47,7 @@ public class StrestRouter {
 	
 	protected RouteLookup routeLookup = new RouteLookup();
 
-//	protected ConcurrentHashMap<Channel, StrestConnectionChannel> connections = new ConcurrentHashMap<Channel, StrestConnectionChannel>();
+	protected ConcurrentHashMap<Channel, StrestConnectionChannel> connections = new ConcurrentHashMap<Channel, StrestConnectionChannel>();
 	
 	protected HashMap<String, List<StrestControllerFilter>> defaultFilters = new HashMap<String,List<StrestControllerFilter>> ();
 	protected ConcurrentHashMap<Class, StrestControllerFilter> filtersByClass = new ConcurrentHashMap<Class,StrestControllerFilter>();
@@ -202,14 +203,16 @@ public class StrestRouter {
 		return AnnotationHelper.hasMethodAnnotation(Async.class, controller, "handle" + method.toString());
 	}
 	
-	public void incoming(StrestRequest request) {
+	
+	public void incoming(Channel channel, StrestRequest request) {
 		boolean isStrest = StrestUtil.isStrest(request);
 		// Build the response object.
         ResponseBuilder response = new ResponseBuilder(request);
         
-        StrestConnectionChannel con = request.getConnectionChannel();
-      
-        
+        this.connections.putIfAbsent(channel, new StrestConnectionChannel(channel));
+        StrestConnectionChannel con = this.connections.get(channel);
+        request.setConnectionChannel(con);
+  
         String txnId = request.getTxnId();
         con.incoming(request);
         StrestController controller = null;
@@ -288,7 +291,7 @@ public class StrestRouter {
 	        }
 		} catch (StrestHttpException e) {
 			response.status(e.getCode(), e.getMessage());
-			response.txnStatus(StrestUtil.HEADERS.TXN_STATUS_VALUES.COMPLETE);
+			response.txnStatus(TxnStatus.COMPLETED);
 			//run the error filters
 			if (controller != null) {
 				for (StrestControllerFilter f : this.getFilters(controller)) {
@@ -307,14 +310,14 @@ public class StrestRouter {
 	 * @param response
 	 */
 	protected void sendResponse(StrestRequest request, StrestConnectionChannel channel, ResponseBuilder response) {
-		String txnStatus = response.getTxnStatus();
+		StrestHeader.TxnStatus txnStatus = response.getResponse().getTxnStatus();
 		if (txnStatus == null) {
-			txnStatus = StrestUtil.HEADERS.TXN_STATUS_VALUES.COMPLETE;
+			txnStatus = StrestHeader.TxnStatus.COMPLETED;
 		}
 		
 		//client only accepts single transactions.
-		if (StrestUtil.HEADERS.TXN_ACCEPT_VALUES.SINGLE.equalsIgnoreCase(request.getHeader(StrestUtil.HEADERS.TXN_ACCEPT))) {
-			txnStatus = StrestUtil.HEADERS.TXN_STATUS_VALUES.COMPLETE;
+		if (request.getTxnAccept() == TxnAccept.SINGLE) {
+			txnStatus = StrestHeader.TxnStatus.COMPLETED;
 		}
 		
 		//now set the status

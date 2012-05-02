@@ -25,6 +25,7 @@ import com.trendrr.oss.DynMap;
 import com.trendrr.strest.ContentTypes;
 import com.trendrr.strest.StrestUtil;
 import com.trendrr.strest.server.v2.models.StrestHeader;
+import com.trendrr.strest.server.v2.models.StrestHeader.TxnStatus;
 import com.trendrr.strest.server.v2.models.StrestRequest;
 import com.trendrr.strest.server.v2.models.StrestResponse;
 import com.trendrr.strest.server.v2.models.http.StrestHttpRequest;
@@ -45,25 +46,20 @@ public class ResponseBuilder {
 	StrestResponse response;
 	
 	public static void main(String...strings) {
-		ResponseBuilder b = new ResponseBuilder();
+//		ResponseBuilder b = new ResponseBuilder();
 	}
 	
-	public static ResponseBuilder instance() {
-		return new ResponseBuilder();
-	}
 	
 	public static ResponseBuilder instance(StrestRequest request) {
-		
-		
-		
 		return new ResponseBuilder(request);
 	}
-	
 	public static ResponseBuilder instance(StrestResponse response) {
 		return new ResponseBuilder(response);
 	}
 	
-	
+	public ResponseBuilder(StrestResponse response) {
+		this.response = response;
+	}
 	/**
 	 * creates a new response builder based on the txn id of the request.
 	 * @param request
@@ -78,54 +74,36 @@ public class ResponseBuilder {
 		response.setTxnId(request.getTxnId());
 	}
 	
-	public ResponseBuilder txnStatus(String status) {
-		response.setHeader(StrestHeader.TxnStatus, status);
+	public ResponseBuilder txnStatus(TxnStatus status) {
+		response.setTxnStatus(status);
 		return this;
 	}
 	
-	/**
-	 * sets the txn status to complete
-	 * @return
-	 */
-	public ResponseBuilder txnStatusComplete() {
-		response.setHeader(StrestUtil.HEADERS.TXN_STATUS, StrestUtil.HEADERS.TXN_STATUS_VALUES.COMPLETE);
-		return this;
-	}
+//	/**
+//	 * Sets the status to 302, and the Location to the url.  This is a standard (sort of) redirect. 
+//	 * 
+//	 * This could be problematic for STREST clients, it is up to them to implement
+//	 * redirects (or not). 
+//	 * 
+//	 * @param url
+//	 * @return
+//	 */
+//	public ResponseBuilder redirect(String url) {
+//		this.response.setStatus(HttpResponseStatus.FOUND);
+//		this.response.setHeader("Location", url);
+//		return this;
+//	}
 	
-	/**
-	 * sets txn status to continue
-	 * @return
-	 */
-	public ResponseBuilder txnStatusContinue() {
-		response.setHeader(StrestUtil.HEADERS.TXN_STATUS, StrestUtil.HEADERS.TXN_STATUS_VALUES.CONTINUE);
-		return this;
-	}
-	
-	/**
-	 * Sets the status to 302, and the Location to the url.  This is a standard (sort of) redirect. 
-	 * 
-	 * This could be problematic for STREST clients, it is up to them to implement
-	 * redirects (or not). 
-	 * 
-	 * @param url
-	 * @return
-	 */
-	public ResponseBuilder redirect(String url) {
-		this.response.setStatus(HttpResponseStatus.FOUND);
-		this.response.setHeader("Location", url);
-		return this;
-	}
-	
-	/**
-	 * Sets the status of the header.
-	 * 
-	 * @param status
-	 * @return
-	 */
-	public ResponseBuilder status(HttpResponseStatus status) {
-		this.response.setStatus(status);
-		return this;
-	}
+//	/**
+//	 * Sets the status of the header.
+//	 * 
+//	 * @param status
+//	 * @return
+//	 */
+//	public ResponseBuilder status(HttpResponseStatus status) {
+//		this.response.setStatus(status);
+//		return this;
+//	}
 	
 	/**
 	 * Sets the status of the header.
@@ -134,7 +112,7 @@ public class ResponseBuilder {
 	 * @return
 	 */
 	public ResponseBuilder status(int code, String message) {
-		this.response.setStatus(new HttpResponseStatus(code, message));
+		this.response.setStatus(code, message);
 		return this;
 	}
 	
@@ -145,20 +123,18 @@ public class ResponseBuilder {
 	 */
 	public ResponseBuilder txnId(String id) {
 		if (id != null)
-			response.setHeader(StrestUtil.HEADERS.TXN_ID, id);
+			response.setTxnId(id);
 		return this;
 	}
 	
 	
-	public ResponseBuilder header(String header, Object value) {
-		response.setHeader(header, value);
+	public ResponseBuilder header(String header, String value) {
+		response.addHeader(header, value);
 		return this;
 	}
 	
 	public ResponseBuilder content(String mimeType, byte[] bytes) {
-		response.setContent(ChannelBuffers.wrappedBuffer(bytes));
-		response.setHeader("Content-Type", mimeType);
-		response.setHeader(HttpHeaders.Names.CONTENT_LENGTH, bytes.length);
+		response.setContent(mimeType, bytes);
 		return this;
 	}
 	
@@ -190,16 +166,11 @@ public class ResponseBuilder {
 		return this.contentUTF8(ContentTypes.JSON, mp.toJSONString());
 	}
 	
-	public HttpResponse getResponse() {
+	public StrestResponse getResponse() {
 		return this.response;
 	}
 	
-	public void setResponse(HttpResponse response) {
+	public void setResponse(StrestResponse response) {
 		this.response = response;
-	}
-	
-	public String getTxnStatus() {
-		return response.getHeader(StrestUtil.HEADERS.TXN_STATUS);
-	}
-	
+	}	
 }

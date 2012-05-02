@@ -8,6 +8,7 @@ import java.io.UnsupportedEncodingException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.jboss.netty.buffer.ChannelBuffers;
+import org.jboss.netty.handler.codec.http.HttpHeaders;
 import org.jboss.netty.handler.codec.http.HttpMessage;
 import org.jboss.netty.handler.codec.http.HttpVersion;
 
@@ -133,6 +134,7 @@ public class StrestHttpBase implements StrestPacketBase {
 	public void setContent(String contentType, byte[] bytes) {
 		this.message.setContent(ChannelBuffers.wrappedBuffer(bytes));
 		this.message.setHeader("Content-Type", contentType);
+		this.message.setHeader(HttpHeaders.Names.CONTENT_LENGTH, bytes.length);
 
 	}
 

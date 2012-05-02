@@ -33,6 +33,8 @@ import org.jboss.netty.handler.codec.http.DefaultHttpResponse;
 import org.jboss.netty.handler.codec.http.HttpRequest;
 import org.jboss.netty.handler.codec.http.HttpResponse;
 
+import com.trendrr.strest.server.v2.models.http.StrestHttpRequest;
+
 
 /**
  * @author <a href="http://www.jboss.org/netty/">The Netty Project</a>
@@ -67,8 +69,8 @@ public class StrestRequestHandler extends SimpleChannelUpstreamHandler {
         	//throw an exception here!
         	throw new Exception("Chunking not allowed!");
         } 
-        router.incoming(e.getChannel(), request);
-           
+        StrestHttpRequest req = new StrestHttpRequest(request);
+        router.incoming(e.getChannel(), req);
     }
 
     @Override
