@@ -28,6 +28,13 @@ public abstract class StrestJsonBase implements StrestPacketBase {
 
 	DynMap map = new DynMap();
 	
+	public StrestJsonBase(DynMap map) {
+		this.map = map;
+	}
+	
+	public StrestJsonBase() {
+		
+	}
 	/**
 	 * gets the DynMap this packet is based on.
 	 * @return

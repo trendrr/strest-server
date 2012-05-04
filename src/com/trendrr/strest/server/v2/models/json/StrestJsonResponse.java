@@ -20,6 +20,17 @@ import com.trendrr.strest.server.v2.models.StrestHeader.Name;
  */
 public class StrestJsonResponse extends StrestJsonBase implements StrestResponse {
 
+	/**
+	 * @param map
+	 */
+	public StrestJsonResponse(DynMap map) {
+		super(map);
+	}
+
+	public StrestJsonResponse() {
+		super();
+	}
+	
 	protected static Log log = LogFactory.getLog(StrestJsonResponse.class);
 
 	

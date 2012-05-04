@@ -24,6 +24,18 @@ import com.trendrr.strest.server.v2.models.StrestHeader.TxnAccept;
  */
 public class StrestJsonRequest extends StrestJsonBase implements StrestRequest {
 
+	/**
+	 * @param map
+	 */
+	public StrestJsonRequest(DynMap map) {
+		super(map);
+		// TODO Auto-generated constructor stub
+	}
+
+	public StrestJsonRequest() {
+		super();
+	}
+	
 	protected static Log log = LogFactory.getLog(StrestJsonRequest.class);
 
 	protected StrestConnectionChannel channel;
