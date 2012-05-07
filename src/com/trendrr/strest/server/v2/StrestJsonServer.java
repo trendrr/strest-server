@@ -24,10 +24,13 @@ public class StrestJsonServer {
 
 	protected static Log log = LogFactory.getLog(StrestJsonServer.class);
 	
-	private int port;
+	private int port = 8009;
 	
 	private DynMap config = new DynMap();
 	protected StrestRouter router = new StrestRouter();
+	
+	
+	
 	
 	public StrestJsonServer(StrestRouter router, DynMap config) {
 		this.config = config;

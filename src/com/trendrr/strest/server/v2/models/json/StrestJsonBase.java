@@ -87,7 +87,7 @@ public abstract class StrestJsonBase implements StrestPacketBase {
 	 */
 	@Override
 	public float getProtocolVersion() {
-		return this.map.getDouble("strest.v").floatValue();
+		return this.map.getDouble("strest.v", 0d).floatValue();
 	}
 
 	public String getProtocolName() {

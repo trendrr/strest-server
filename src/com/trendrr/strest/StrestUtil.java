@@ -13,6 +13,7 @@ import org.jboss.netty.handler.codec.http.HttpResponse;
 import org.jboss.netty.handler.codec.http.HttpVersion;
 
 import com.trendrr.strest.server.v2.models.StrestHeader.TxnAccept;
+import com.trendrr.strest.server.v2.models.StrestPacketBase;
 import com.trendrr.strest.server.v2.models.StrestRequest;
 import com.trendrr.strest.server.v2.models.StrestResponse;
 import com.trendrr.strest.server.v2.models.http.StrestHttpResponse;
@@ -31,6 +32,22 @@ public class StrestUtil {
 	private static AtomicLong txn = new AtomicLong(0l);
 	public static String generateTxnId() {
 		return "str" + Long.toHexString(txn.incrementAndGet()) + "st";
+	}
+	
+	public static void validateRequest(StrestRequest packet) throws StrestException {
+		if (packet.getProtocolName() == null) {
+			throw StrestHttpException.BAD_REQUEST("Invalid packet, protocol is required");
+		}
+		if (packet.getProtocolVersion() == 0) {
+			throw StrestHttpException.BAD_REQUEST("Invalid packet, bad protocol version");
+		}
+		if (packet.getMethod() == null) {
+			throw StrestHttpException.BAD_REQUEST("Invalid packet, method is required");
+		}
+		if (packet.getUri() == null) {
+			throw StrestHttpException.BAD_REQUEST("Invalid packet, uri is required");
+		}
+		
 	}
 	
 	/**

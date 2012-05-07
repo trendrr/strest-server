@@ -87,7 +87,10 @@ public class StrestJsonRequest extends StrestJsonBase implements StrestRequest {
 	 */
 	@Override
 	public TxnAccept getTxnAccept() {
-		return TxnAccept.instance(this.getHeader(Name.TXN_ACCEPT));
+		TxnAccept accept = TxnAccept.instance(this.getHeader(Name.TXN_ACCEPT));
+		if (accept == null)
+			return TxnAccept.SINGLE;
+		return accept;
 	}
 
 	/* (non-Javadoc)

@@ -46,14 +46,18 @@ public class JsonDecoder extends DelimiterBasedFrameDecoder {
 	@Override
 	protected Object decode(ChannelHandlerContext ctx, Channel channel,
 			ChannelBuffer buf) throws Exception {
+		
 		Object result = super.decode(ctx, channel, buf);
-		if (result != null) {
+		while(result != null) {
 			StringCharacterIterator iter = new StringCharacterIterator(((ChannelBuffer)result).toString(CharsetUtil.UTF_8));
 			for(char c = iter.first(); c != CharacterIterator.DONE; c = iter.next()) {
 		         DynMap val = parser.addChar(c);
-		         if (val != null)
+		         if (val != null) {
+		        	 log.info("GOT JSON PACKET: " + val.toJSONString());
 		        	 return val;
+		         }
 		    }
+			result = super.decode(ctx, channel, buf);
 		}
 		return null;
 	}

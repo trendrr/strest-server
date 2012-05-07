@@ -23,6 +23,7 @@ import com.trendrr.oss.DynMapFactory;
 import com.trendrr.oss.FileHelper;
 import com.trendrr.oss.SSLContextBuilder;
 import com.trendrr.strest.flash.FlashSocketPolicyServer;
+import com.trendrr.strest.server.v2.StrestJsonServer;
 
 
 /**
@@ -176,6 +177,9 @@ public class StrestServer {
 		}
 		server.config = config;
 		server.getRouter().setServer(server);
+		
+		
+		
 	}
 	
 	public StrestRouter getRouter() {
@@ -296,6 +300,8 @@ public class StrestServer {
 			this.bootstraps.add(f.getBootstrap());
 		}
 		
+		StrestJsonServer json = new StrestJsonServer(router, config);
+		json.start(bossExecutor, workerExecutor);
     }
 	
 	/**

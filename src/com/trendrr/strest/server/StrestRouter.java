@@ -21,6 +21,7 @@ import org.jboss.netty.channel.ChannelFutureListener;
 
 import com.trendrr.oss.DynMapFactory;
 import com.trendrr.oss.Reflection;
+import com.trendrr.strest.StrestException;
 import com.trendrr.strest.StrestHttpException;
 import com.trendrr.strest.StrestUtil;
 import com.trendrr.strest.annotations.AnnotationHelper;
@@ -207,6 +208,16 @@ public class StrestRouter {
 	public void incoming(Channel channel, StrestRequest request) {
 		boolean isStrest = StrestUtil.isStrest(request);
 		// Build the response object.
+		//throw an illegal exception here?
+		//TODO:throws a problem if the packet is invalid..
+		try {
+			StrestUtil.validateRequest(request);
+		} catch (StrestException x) {
+			//TODO: send exception response..
+			log.error("caught", x);
+			this.removeChannel(channel);
+			return;
+		}
         ResponseBuilder response = new ResponseBuilder(request);
         
         this.connections.putIfAbsent(channel, new StrestConnectionChannel(channel));
@@ -215,6 +226,7 @@ public class StrestRouter {
   
         String txnId = request.getTxnId();
         con.incoming(request);
+        log.info("HERE! " + request);
         StrestController controller = null;
         try {
         	try {
