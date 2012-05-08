@@ -17,22 +17,19 @@ import com.trendrr.strest.server.StrestRouter;
 
 /**
  * @author Dustin Norlander
- * @created May 4, 2012
+ * @created May 7, 2012
  * 
  */
-public class StrestJsonServer {
+public class StrestHttpServer {
 
-	protected static Log log = LogFactory.getLog(StrestJsonServer.class);
+	protected static Log log = LogFactory.getLog(StrestHttpServer.class);
 	
-	private int port = 8009;
+	private int port = 8000;
 	
 	private DynMap config = new DynMap();
 	protected StrestRouter router = new StrestRouter();
-	
-	
-	
-	
-	public StrestJsonServer(StrestRouter router, DynMap config) {
+		
+	public StrestHttpServer(StrestRouter router, DynMap config) {
 		this.config = config;
 		this.router = router;
 	}
@@ -52,6 +49,5 @@ public class StrestJsonServer {
 		  
 		 System.out.println("STREST server json started at port " + port + '.');
 	 }
-	
 	
 }

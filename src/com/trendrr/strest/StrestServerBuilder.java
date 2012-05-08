@@ -36,7 +36,7 @@ public class StrestServerBuilder {
 	 * @throws Exception
 	 */
 	public StrestServer build() throws Exception {
-		StrestServer.initialize(server, config);
+		server.initialize(config);
 		for (String nm : this.filterNamespaces) {
 			server.getRouter().setFilters(nm, config.getList(String.class, nm +".filters"));
 		}

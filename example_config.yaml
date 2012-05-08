@@ -30,23 +30,15 @@ filters:
    # - com.trendrr.strest.contrib.filters.RequiredParamsFilter 
    
    
+# Configuration of the listeners
+listeners:
+   http: 
+      port:8000
+   strest-json:
+#      classname: some.fully.qualified.classname #class that extends ServerListenerBase
+      port:8009
    
-# This section configures the ssl listener.
-# ssl:
-#    port: 8001
-#    keystore: /home/username/keystore.jks
-#    keystore_password: strest
-#    certificate_password: strest
 
-# Configuration of the default listener (i.e. regular http/strest)
-default:
-   port: 8000
-
-# Configuration for the optional Templating available from TemplateRenderer
-templating:
-   renderer : com.trendrr.strest.contrib.templating.STTemplateRenderer
-   base_dir : templates
-   cache_timeout : 5000 #5 seconds
 
    
 # Configuration for the Flash Socket Policy server.  this will serve the

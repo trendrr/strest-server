@@ -5,6 +5,7 @@ package com.trendrr.strest.server;
 
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Executor;
@@ -21,9 +22,12 @@ import org.yaml.snakeyaml.Yaml;
 import com.trendrr.oss.DynMap;
 import com.trendrr.oss.DynMapFactory;
 import com.trendrr.oss.FileHelper;
+import com.trendrr.oss.Reflection;
 import com.trendrr.oss.SSLContextBuilder;
 import com.trendrr.strest.flash.FlashSocketPolicyServer;
-import com.trendrr.strest.server.v2.StrestJsonServer;
+import com.trendrr.strest.server.v2.servers.ServerListenerBase;
+import com.trendrr.strest.server.v2.servers.StrestHttpServerListener;
+import com.trendrr.strest.server.v2.servers.StrestJsonServerListener;
 
 
 /**
@@ -44,7 +48,9 @@ public class StrestServer {
 	private Executor bossExecutor = Executors.newCachedThreadPool();
 	private Executor workerExecutor = Executors.newCachedThreadPool();
 	
-	private List<ServerBootstrap> bootstraps = new ArrayList<ServerBootstrap>();
+	protected HashMap<String, ServerListenerBase> listeners = new HashMap<String, ServerListenerBase>();
+	protected HashMap<String, Class> listenerClasses = new HashMap<String, Class>();
+	
 	private SSLContext sslContext = null;
 	
 	private DynMap config = new DynMap(); //private local config.
@@ -52,88 +58,14 @@ public class StrestServer {
 	
 
 	public StrestServer() {
-		
-		
+		//hard coded listener classes..
+		this.listenerClasses.put("http", StrestHttpServerListener.class);
+		this.listenerClasses.put("strest-json", StrestJsonServerListener.class);
 	}
-	
-	/**
-	 * creates a server based on a config file.  Config file is assumed to be either 
-	 * json or yaml.  See example_config.yaml for more.
-	 * 
-	 * if more then one filename is passed, the subsequent config files will override any fields in the previous ones.
-	 * this allows you to chain config files
-	 * 
-	 * @param filename
-	 * @return
-	 * @throws Exception
-	 * @deprecated Please use the StrestServerBuilder 
-	 */
-	@Deprecated
-	public static StrestServer instanceFromFile(String filename, String ...filenames) throws Exception {
-		StrestServer server = new StrestServer();
-		initFromFile(server, filename, filenames);
-		return server;
-	}
-	
-	/**
-	 * initializes the server with the passed in filenames.  
-	 * if more then one filename is passed, the subsequent config files will override any fields in the previous ones.
-	 * 
-	 * this allows you to chain config files
-	 * 
-	 * 
-	 * @param server
-	 * @param filename
-	 * @param filenames
-	 * @throws Exception
-	 * @deprecated Please use the StrestServerBuilder 
-	 */
-	@Deprecated
-	public static void initFromFile(StrestServer server, String filename, String ...filenames) throws Exception {
-		DynMap conf = dynMapFromFile(filename);
-		log.warn("Config with : " + conf.toJSONString());
-		for (String f : filenames) {
-			DynMap override = dynMapFromFile(f);
-			log.warn("Overriding config: " + override);
-			conf.extend(override);
-		}
-		log.warn("Initializing with config: " + conf.toJSONString());
-		initialize(server, conf);
-	}
-	
-	private static DynMap dynMapFromFile(String filename) throws Exception {
-		if (filename.endsWith("yaml")) {
-			Yaml yaml = new Yaml();
-		    String document = FileHelper.loadString(filename);
-		    Map map = (Map) yaml.load(document);
-		    return DynMapFactory.instance(map);
-		    
-		} else if (filename.endsWith("xml")) {
-			//TODO (or not..)
-			
-		}
 
-		//assume json
-		return DynMapFactory.instanceFromFile(filename);
-		
+	public void registerListenerClass(String name, Class cls) {
+		this.listenerClasses.put(name, cls);
 	}
-	/**
-	 * Initialize the server from a config DynMap. 
-	 *
-	 * See example_config.yaml for fields
-	 
-	 * @deprecated Please use the StrestServerBuilder 
-	 */
-	@Deprecated
-	public static StrestServer instance(DynMap config) throws Exception {
-		if (config == null) {
-			throw new Exception("Config is null! unable to create server ");
-		}
-		StrestServer server = new StrestServer();
-		initialize(server, config);
-		return server;
-	}
-	
 	/**
 	 * initializes the passed in server.  Use this if you need to override the 
 	 * StrestServer or set a new Router, ect.  
@@ -144,41 +76,50 @@ public class StrestServer {
 	 * @param config
 	 * @throws Exception
 	 */
-	public static void initialize(StrestServer server, DynMap config) throws Exception {
+	public void initialize(DynMap config) throws Exception {
 		if (config == null) {
 			throw new Exception("Config is null! unable to initialize server ");
 		}
 		
-		server.setPort(config.get(Integer.class, "default.port", 8008));
-		server.setMaxWorkerThreads(config.getInteger("threads.worker", 10));
-		server.setMaxWorkerThreads(config.getInteger("threads.io",8));
+		this.setMaxWorkerThreads(config.getInteger("threads.worker", 10));
+		this.setMaxIOThreads(config.getInteger("threads.io",8));
 		
 		List<String> controllerPackages = config.getList(String.class, "controller_packages");
 		if (controllerPackages != null) {
 			for (String c : controllerPackages) {
-				server.getRouter().addControllerPackage(c);
+				this.getRouter().addControllerPackage(c);
 			}
 		}
 		
 		List<String> filters = config.getList(String.class, "filters");
 		if (filters != null) {
-			server.getRouter().setFilters("default", filters);
+			this.getRouter().setFilters("default", filters);
 		}
+
+		this.getRouter().setServer(this);
 		
-		DynMap ssl = config.get(DynMap.class, "ssl");
-		
-		if (ssl != null) {
-			SSLContextBuilder builder = new SSLContextBuilder(false);
-			builder.keystoreFilename(ssl.get(String.class, "keystore"));
-			builder.keystorePassword(ssl.get(String.class, "keystore_password"));
-			builder.certificatePassword(ssl.get(String.class, "certificate_password"));
-			server.setSSLContext(builder.toSSLContext());
-			server.setSslPort(ssl.get(Integer.class, "port", server.getSslPort()));
+		//now initialize the listeners.
+		DynMap listeners = config.getMap("listeners", new DynMap());
+		for (String name : listeners.keySet()) {
+			DynMap listenerConfig = listeners.getMap(name, new DynMap());
+			ServerListenerBase listener = null;
+			if (listenerConfig.containsKey("classname")) {
+				listener = Reflection.instance(ServerListenerBase.class, listenerConfig.getString("classname"), this, listenerConfig);
+			} else {
+				Class cls = this.listenerClasses.get(name);
+				if (cls == null) {
+					log.warn("No listener class found for " + name + ", skipping");
+					continue;
+				}
+				listener = Reflection.instance(cls, this, listenerConfig);
+			}
+			if (listener == null) {
+				log.warn("No listener class found for " + name + ", skipping");
+				continue;
+			}
+			
+			this.listeners.put(name, listener);
 		}
-		server.config = config;
-		server.getRouter().setServer(server);
-		
-		
 		
 	}
 	
@@ -267,41 +208,17 @@ public class StrestServer {
 		}
 	}
 	
+	/**
+	 * starts all the listeners.
+	 */
 	public void start() {
-		 // Configure the server(s).
-		if (this.port != null) {
-			
-			ServerBootstrap  bootstrap = new ServerBootstrap(
-	                new NioServerSocketChannelFactory(
-	                        this.bossExecutor,
-	                        this.workerExecutor));
-	        // Set up the event pipeline factory.
-	        bootstrap.setPipelineFactory(new StrestServerPipelineFactory(router, null));
-			bootstrap.bind(new InetSocketAddress(this.port));
-			this.bootstraps.add(bootstrap);
-			log.warn("Listening on port: " + this.port);
+		if (this.listeners.isEmpty()) {
+			log.warn("No listeners configured.  Goodbye");
+			System.exit(1);
 		}
-		if (this.sslPort != null && this.sslContext != null) {
-			
-			ServerBootstrap  bootstrap = new ServerBootstrap(
-	                new NioServerSocketChannelFactory(
-	                        this.bossExecutor,
-	                        this.workerExecutor));
-	        // Set up the event pipeline factory.
-	        bootstrap.setPipelineFactory(new StrestServerPipelineFactory(router, sslContext));
-			bootstrap.bind(new InetSocketAddress(this.sslPort));
-			this.bootstraps.add(bootstrap);
-			log.warn("SSL listening on port: " + this.sslPort);
+		for (ServerListenerBase listener : this.listeners.values()) {
+			listener.start(bossExecutor, workerExecutor);
 		}
-		
-		//add the flashsocket policy server, if needed
-		if (this.config.containsKey("flashsocketpolicy")) {
-			FlashSocketPolicyServer f = FlashSocketPolicyServer.instance(config, bossExecutor, workerExecutor);
-			this.bootstraps.add(f.getBootstrap());
-		}
-		
-		StrestJsonServer json = new StrestJsonServer(router, config);
-		json.start(bossExecutor, workerExecutor);
     }
 	
 	/**
@@ -312,8 +229,8 @@ public class StrestServer {
 		return config;
 	}
 	public void shutdown() {
-		for (ServerBootstrap bootstrap: this.bootstraps) {
-			bootstrap.releaseExternalResources();
+		for (ServerListenerBase listener : this.listeners.values()) {
+			listener.stop();
 		}
 	}
 }
