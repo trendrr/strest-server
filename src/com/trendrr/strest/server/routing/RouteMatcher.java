@@ -83,10 +83,8 @@ public class RouteMatcher {
 				extension = tmp[1];
 			}
 		}
-		System.out.println(u);
 		UriMapping route = this.nonWildcardRoutes.get(u);
 		if (route == null) {
-			System.out.println("checking wildcards");
 			//check wildcard matches.
 			List<UriMapping> found = new ArrayList<UriMapping>();
 			List<String> words = new ArrayList<String>();
