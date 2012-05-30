@@ -37,8 +37,10 @@ listeners:
    strest-json:
 #      classname: some.fully.qualified.classname #class that extends ServerListenerBase
       port:8009
-   
-
+   zmq:
+      classname: com.trendrr.strest.contrib.zmq.StrestZMQServerListener
+      port:7233
+      
 
    
 # Configuration for the Flash Socket Policy server.  this will serve the
