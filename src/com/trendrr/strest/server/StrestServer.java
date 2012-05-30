@@ -49,7 +49,7 @@ public class StrestServer {
 	private Executor workerExecutor = Executors.newCachedThreadPool();
 	
 	protected HashMap<String, ServerListenerBase> listeners = new HashMap<String, ServerListenerBase>();
-	protected HashMap<String, Class> listenerClasses = new HashMap<String, Class>();
+	protected HashMap<String, Class<? extends ServerListenerBase>> listenerClasses = new HashMap<String, Class<? extends ServerListenerBase>>();
 	
 	private SSLContext sslContext = null;
 	
@@ -106,7 +106,7 @@ public class StrestServer {
 			if (listenerConfig.containsKey("classname")) {
 				listener = Reflection.instance(ServerListenerBase.class, listenerConfig.getString("classname"), this, listenerConfig);
 			} else {
-				Class cls = this.listenerClasses.get(name);
+				Class<? extends ServerListenerBase> cls = this.listenerClasses.get(name);
 				if (cls == null) {
 					log.warn("No listener class found for " + name + ", skipping");
 					continue;
