@@ -124,9 +124,22 @@ public abstract class StrestJsonBase implements StrestPacketBase {
 	 */
 	@Override
 	public void setContent(String contentType, byte[] content) {
-		log.warn("Setting byte content. no good, need a better way -Dustin");
-		this.map.put("content", content); //TODO: this ain't right
-		this.addHeader(Name.CONTENT_TYPE, contentType);
+		if (content == null || content.length == 0)
+			return;
+		try {
+			String str = new String(content, "utf8");
+			if (contentType.equals("application/json") || contentType == null) {
+				this.map.putAll(DynMap.instance(str));
+			} else {
+				this.map.put("content", str);
+			}
+			this.addHeader(Name.CONTENT_TYPE, contentType);
+			
+		} catch (UnsupportedEncodingException e) {
+			log.error("JSON COntent must be a UTF8 encoded string!", e);
+		}
+		
+		
 	}
 
 	/* (non-Javadoc)

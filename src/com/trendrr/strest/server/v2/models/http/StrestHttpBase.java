@@ -145,8 +145,7 @@ public class StrestHttpBase implements StrestPacketBase {
 	 */
 	@Override
 	public Object getContent() {
-		// TODO Auto-generated method stub
-		return null;
+		return this.message.getContent();
 	}
 
 	/* (non-Javadoc)

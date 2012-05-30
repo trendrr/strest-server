@@ -18,4 +18,9 @@ public interface StrestResponse extends StrestPacketBase {
 	public String getStatusMessage();
 	public void setTxnStatus(StrestHeader.TxnStatus status);
 	public StrestHeader.TxnStatus getTxnStatus();
+	/**
+	 * used for caching.. 
+	 * @return
+	 */
+	public byte[] getContentBytes();
 }

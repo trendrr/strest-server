@@ -3,6 +3,8 @@
  */
 package com.trendrr.strest.server.v2.models.json;
 
+import java.io.UnsupportedEncodingException;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -73,6 +75,24 @@ public class StrestJsonResponse extends StrestJsonBase implements StrestResponse
 	@Override
 	public TxnStatus getTxnStatus() {
 		return TxnStatus.instance(this.getHeader(StrestHeader.Name.TXN_STATUS));
+	}
+
+	/* (non-Javadoc)
+	 * @see com.trendrr.strest.server.v2.models.StrestResponse#getContentBytes()
+	 */
+	@Override
+	public byte[] getContentBytes() {
+		//gets the json packet minus the headers.
+		DynMap mp = new DynMap();
+		mp.putAll(this.getMap());
+		mp.remove("strest");
+		
+		try {
+			return mp.toJSONString().getBytes("utf8");
+		} catch (UnsupportedEncodingException e) {
+			log.error("Caught", e);
+		}
+		return null;
 	}
 	
 	

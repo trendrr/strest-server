@@ -83,4 +83,11 @@ public class StrestHttpResponse extends StrestHttpBase implements
 	public TxnStatus getTxnStatus() {
 		return TxnStatus.instance(this.getHeader(StrestHeader.Name.TXN_STATUS));
 	}
+	/* (non-Javadoc)
+	 * @see com.trendrr.strest.server.v2.models.StrestResponse#getContentBytes()
+	 */
+	@Override
+	public byte[] getContentBytes() {
+		return this.message.getContent().array();
+	}
 }
