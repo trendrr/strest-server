@@ -4,6 +4,8 @@
 package com.trendrr.strest.server.connections;
 
 
+import java.util.concurrent.ConcurrentHashMap;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.jboss.netty.channel.Channel;
@@ -20,6 +22,34 @@ import com.trendrr.strest.server.v2.models.http.StrestHttpResponse;
 public class StrestNettyConnectionChannel extends StrestConnectionChannel {
 
 	protected Log log = LogFactory.getLog(StrestNettyConnectionChannel.class);
+	
+	/**
+	 * Mapping from netty channel to the subsequent strest channel.  
+	 *
+	 */
+	protected static ConcurrentHashMap<Channel,StrestNettyConnectionChannel> channels = new ConcurrentHashMap<Channel,StrestNettyConnectionChannel>();
+	
+	/**
+	 * gets the StrestNettyConnectionChannel based on the channel, or creates a new association.
+	 * @param channel
+	 */
+	public static StrestNettyConnectionChannel get(Channel channel) {
+		StrestNettyConnectionChannel c= channels.get(channel);
+		if (c == null) {
+			channels.putIfAbsent(channel, new StrestNettyConnectionChannel(channel));
+			return channels.get(channel);
+		}
+		return c;
+	}
+	
+	public static void remove(Channel c) {
+		remove(get(c));
+	}
+	
+	public static void remove(StrestNettyConnectionChannel c) {
+		channels.remove(c.getChannel());
+		c.cleanup();
+	}
 	
 	Channel channel;
 	

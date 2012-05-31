@@ -69,7 +69,11 @@ public class Users implements TxnCompleteCallback {
 	 */
 	public void deregister(StrestConnectionTxn con) {
 		String username = (String)con.getChannelStorage().get("username");
-		this.onlineNow.get(username).close();
+		try {
+			this.onlineNow.get(username).close();
+		} catch (Exception e) {
+			log.error("Caught", e);
+		}
 	}
 
 	public void notifyMessage(StrestConnectionTxn con) throws StrestException {
@@ -91,7 +95,11 @@ public class Users implements TxnCompleteCallback {
 		mp.put("to", to);
 		mp.put("from", from);
 		mp.put("message", message);
-		con.sendMessage(new ResponseBuilder(con.getRequest()).txnStatus(TxnStatus.CONTINUE).contentJSON(mp));
+		try {
+			con.sendMessage(new ResponseBuilder(con.getRequest()).txnStatus(TxnStatus.CONTINUE).contentJSON(mp));
+		} catch (Exception e) {
+			log.error("Caught", e);
+		}
 	}
 	
 	/**
@@ -131,7 +139,11 @@ public class Users implements TxnCompleteCallback {
 			response = new ResponseBuilder(con.getRequest());
 			response.txnStatus(TxnStatus.CONTINUE);
 			response.contentUTF8(username);
-			con.sendMessage(response);
+			try {
+				con.sendMessage(response);
+			} catch (Exception e) {
+				log.error("caught", e);
+			}
 		}
 	}
 

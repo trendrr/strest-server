@@ -16,6 +16,7 @@ import org.jboss.netty.handler.codec.http.HttpRequest;
 
 import com.trendrr.oss.DynMap;
 import com.trendrr.strest.server.StrestRouter;
+import com.trendrr.strest.server.connections.StrestNettyConnectionChannel;
 import com.trendrr.strest.server.v2.models.http.StrestHttpRequest;
 import com.trendrr.strest.server.v2.models.json.StrestJsonRequest;
 
@@ -39,13 +40,14 @@ public class StrestJsonRequestHandler extends SimpleChannelUpstreamHandler {
     public void messageReceived(ChannelHandlerContext ctx, MessageEvent e) throws Exception {
     	DynMap request = (DynMap) e.getMessage(); 
         StrestJsonRequest req = new StrestJsonRequest(request);
-        router.incoming(e.getChannel(), req);
+        req.setConnectionChannel(StrestNettyConnectionChannel.get(e.getChannel()));
+        router.incoming(req);
     }
 
     @Override
     public void channelDisconnected(ChannelHandlerContext ctx, ChannelStateEvent e) {
-//    	log.info("Disconnect! " + ctx);
-    	router.removeChannel(e.getChannel());
+//    	log.info("Disconnect! " + ctx);    	
+    	StrestNettyConnectionChannel.remove(e.getChannel());
     }
     
     @Override
@@ -53,7 +55,7 @@ public class StrestJsonRequestHandler extends SimpleChannelUpstreamHandler {
             throws Exception {
     	log.warn("Caught", e.getCause());
         e.getChannel().close();
-        this.router.removeChannel(e.getChannel());
+        StrestNettyConnectionChannel.remove(e.getChannel());
     }
     
     

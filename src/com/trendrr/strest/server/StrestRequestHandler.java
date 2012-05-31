@@ -87,10 +87,7 @@ public class StrestRequestHandler extends SimpleChannelUpstreamHandler {
     @Override
     public void channelDisconnected(ChannelHandlerContext ctx, ChannelStateEvent e) {
 //    	log.info("Disconnect! " + ctx);
-    	StrestNettyConnectionChannel con = connections.remove(e.getChannel());
-    	if (con == null)
-			return;
-		con.cleanup();
+    	StrestNettyConnectionChannel.remove(e.getChannel());
     }
     
     
@@ -104,6 +101,6 @@ public class StrestRequestHandler extends SimpleChannelUpstreamHandler {
             throws Exception {
     	log.warn("Caught", e.getCause());
         e.getChannel().close();
-        this.router.removeChannel(e.getChannel());
+        StrestNettyConnectionChannel.remove(e.getChannel());
     }
 }
