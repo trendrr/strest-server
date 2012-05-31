@@ -115,8 +115,15 @@ public class StrestServerBuilder {
 		return this;
 	}
 	
-	public StrestServerBuilder port(int port) {
-		this.config.putWithDot("default.port", port);
+	public StrestServerBuilder addListenerHttp(int port) {
+		return this.addListener("http", port, null);
+	}
+	public StrestServerBuilder addListenerJson(int port) {
+		return this.addListener("json", port, null);
+	}
+	public StrestServerBuilder addListener(String name, int port, String className) {
+		this.config.putWithDot("listeners." + name + ".port", port);
+		this.config.putWithDot("listeners." + name + ".classname", className);
 		return this;
 	}
 	

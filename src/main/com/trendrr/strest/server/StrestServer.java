@@ -60,7 +60,7 @@ public class StrestServer {
 	public StrestServer() {
 		//hard coded listener classes..
 		this.listenerClasses.put("http", StrestHttpServerListener.class);
-		this.listenerClasses.put("strest-json", StrestJsonServerListener.class);
+		this.listenerClasses.put("json", StrestJsonServerListener.class);
 	}
 
 	public void registerListenerClass(String name, Class cls) {
@@ -103,7 +103,7 @@ public class StrestServer {
 		for (String name : listeners.keySet()) {
 			DynMap listenerConfig = listeners.getMap(name, new DynMap());
 			ServerListenerBase listener = null;
-			if (listenerConfig.containsKey("classname")) {
+			if (listenerConfig.getString("classname") != null) {
 				listener = Reflection.instance(ServerListenerBase.class, listenerConfig.getString("classname"), this, listenerConfig);
 			} else {
 				Class<? extends ServerListenerBase> cls = this.listenerClasses.get(name);
@@ -111,6 +111,7 @@ public class StrestServer {
 					log.warn("No listener class found for " + name + ", skipping");
 					continue;
 				}
+				log.warn("creating: " + cls);
 				listener = Reflection.instance(cls, this, listenerConfig);
 			}
 			if (listener == null) {
