@@ -20,8 +20,11 @@ import static org.jboss.netty.handler.codec.http.HttpHeaders.Names.*;
 import static org.jboss.netty.handler.codec.http.HttpResponseStatus.*;
 import static org.jboss.netty.handler.codec.http.HttpVersion.*;
 
+import java.util.concurrent.ConcurrentHashMap;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.jboss.netty.channel.Channel;
 import org.jboss.netty.channel.ChannelHandlerContext;
 import org.jboss.netty.channel.ChannelStateEvent;
 import org.jboss.netty.channel.ExceptionEvent;
@@ -33,6 +36,7 @@ import org.jboss.netty.handler.codec.http.DefaultHttpResponse;
 import org.jboss.netty.handler.codec.http.HttpRequest;
 import org.jboss.netty.handler.codec.http.HttpResponse;
 
+import com.trendrr.strest.server.connections.StrestNettyConnectionChannel;
 import com.trendrr.strest.server.v2.models.http.StrestHttpRequest;
 
 
@@ -45,8 +49,11 @@ import com.trendrr.strest.server.v2.models.http.StrestHttpRequest;
  */
 public class StrestRequestHandler extends SimpleChannelUpstreamHandler {
 
-	StrestRouter router;
-	protected Log log = LogFactory.getLog(StrestRequestHandler.class);
+	protected static Log log = LogFactory.getLog(StrestRequestHandler.class);
+	
+	protected StrestRouter router;
+	protected ConcurrentHashMap<Channel, StrestNettyConnectionChannel> connections = new ConcurrentHashMap<Channel, StrestNettyConnectionChannel>();
+	
 	
 	public StrestRequestHandler(StrestRouter r) {
 		this.router = r;
@@ -70,13 +77,20 @@ public class StrestRequestHandler extends SimpleChannelUpstreamHandler {
         	throw new Exception("Chunking not allowed!");
         } 
         StrestHttpRequest req = new StrestHttpRequest(request);
-        router.incoming(e.getChannel(), req);
+        Channel channel = e.getChannel();
+        connections.putIfAbsent(channel, new StrestNettyConnectionChannel(channel));
+        StrestNettyConnectionChannel con = this.connections.get(channel);
+        req.setConnectionChannel(con);
+        router.incoming(req);
     }
 
     @Override
     public void channelDisconnected(ChannelHandlerContext ctx, ChannelStateEvent e) {
 //    	log.info("Disconnect! " + ctx);
-    	router.removeChannel(e.getChannel());
+    	StrestNettyConnectionChannel con = connections.remove(e.getChannel());
+    	if (con == null)
+			return;
+		con.cleanup();
     }
     
     

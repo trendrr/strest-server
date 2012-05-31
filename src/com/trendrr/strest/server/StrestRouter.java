@@ -26,7 +26,7 @@ import com.trendrr.strest.StrestHttpException;
 import com.trendrr.strest.StrestUtil;
 import com.trendrr.strest.annotations.AnnotationHelper;
 import com.trendrr.strest.annotations.Async;
-import com.trendrr.strest.server.connections.StrestConnectionChannel;
+import com.trendrr.strest.server.connections.StrestNettyConnectionChannel;
 import com.trendrr.strest.server.v2.models.*;
 import com.trendrr.strest.server.v2.models.StrestHeader.TxnAccept;
 import com.trendrr.strest.server.v2.models.StrestHeader.TxnStatus;
@@ -48,7 +48,7 @@ public class StrestRouter {
 	
 	protected RouteLookup routeLookup = new RouteLookup();
 
-	protected ConcurrentHashMap<Channel, StrestConnectionChannel> connections = new ConcurrentHashMap<Channel, StrestConnectionChannel>();
+//	protected ConcurrentHashMap<Channel, StrestNettyConnectionChannel> connections = new ConcurrentHashMap<Channel, StrestNettyConnectionChannel>();
 	
 	protected HashMap<String, List<StrestControllerFilter>> defaultFilters = new HashMap<String,List<StrestControllerFilter>> ();
 	protected ConcurrentHashMap<Class, StrestControllerFilter> filtersByClass = new ConcurrentHashMap<Class,StrestControllerFilter>();
@@ -180,12 +180,12 @@ public class StrestRouter {
 	 * does not do anything to the channel itself. 
 	 * @param channel
 	 */
-	public void removeChannel(Channel channel) {
-		StrestConnectionChannel con = this.connections.remove(channel);
-		if (con == null)
-			return;
-		con.cleanup();
-	}
+//	public void removeChannel(Channel channel) {
+//		StrestNettyConnectionChannel con = this.connections.remove(channel);
+//		if (con == null)
+//			return;
+//		con.cleanup();
+//	}
 	
 	private StrestControllerFilter getFilter(Class cls) {
 		StrestControllerFilter f = this.filtersByClass.get(cls);
@@ -205,7 +205,7 @@ public class StrestRouter {
 	}
 	
 	
-	public void incoming(Channel channel, StrestRequest request) {
+	public void incoming(StrestRequest request) {
 		boolean isStrest = StrestUtil.isStrest(request);
 		// Build the response object.
 		//throw an illegal exception here?
@@ -215,17 +215,19 @@ public class StrestRouter {
 		} catch (StrestException x) {
 			//TODO: send exception response..
 			log.error("caught", x);
-			this.removeChannel(channel);
+			if (request.getConnectionChannel() != null) {
+				request.getConnectionChannel().cleanup();
+			}
 			return;
 		}
         ResponseBuilder response = new ResponseBuilder(request);
         
-        this.connections.putIfAbsent(channel, new StrestConnectionChannel(channel));
-        StrestConnectionChannel con = this.connections.get(channel);
-        request.setConnectionChannel(con);
+//        this.connections.putIfAbsent(channel, new StrestNettyConnectionChannel(channel));
+//        StrestNettyConnectionChannel con = this.connections.get(channel);
+//        request.setConnectionChannel(con);
   
         String txnId = request.getTxnId();
-        con.incoming(request);
+        request.getConnectionChannel().incoming(request);
         log.info("HERE! " + request);
         StrestController controller = null;
         try {
@@ -266,7 +268,6 @@ public class StrestRouter {
 	            
 	            controller.setRequest(request);
 	            controller.setResponse(response.getResponse());
-	            controller.setChannelConnection(con);
 	            
 	            //before filters
 	            for (StrestControllerFilter f : this.getFilters(controller)) {
@@ -309,7 +310,11 @@ public class StrestRouter {
 					f.error(controller, response.getResponse(), e);
 	            }
 			}
-			this.sendResponse(request, con, response);
+			try {
+				this.sendResponse(request, response);
+			} catch (Exception e1) {
+				log.error("Caught", e);
+			}
 			return;
 		}
 		this.finishResponse(controller, response);
@@ -320,7 +325,7 @@ public class StrestRouter {
 	 * @param controller
 	 * @param response
 	 */
-	protected void sendResponse(StrestRequest request, StrestConnectionChannel channel, ResponseBuilder response) {
+	protected void sendResponse(StrestRequest request, ResponseBuilder response) throws Exception{
 		StrestHeader.TxnStatus txnStatus = response.getResponse().getTxnStatus();
 		if (txnStatus == null) {
 			txnStatus = StrestHeader.TxnStatus.COMPLETED;
@@ -341,18 +346,13 @@ public class StrestRouter {
 //			System.out.println(response.getResponse());
 //			System.out.println("*****");
 //			System.out.println(response.getResponse().getContent().toString());
-		ChannelFuture future = channel.sendMessage(response);
-		if (future == null) {
-			this.removeChannel(channel.getChannel());
-			return;
-		}
+		Object future = request.getConnectionChannel().sendMessage(response);
 		
 		 // Close the non-keep-alive connection after the write operation is done.
-        if (!StrestUtil.isStrest(request)) {
+        if (!StrestUtil.isStrest(request) && future instanceof ChannelFuture) {
 //		        	log.info("CLOSING NON STREST CONNECTION");
-        	future.addListener(ChannelFutureListener.CLOSE_ON_FAILURE);
-            future.addListener(ChannelFutureListener.CLOSE);
-            this.removeChannel(channel.getChannel());
+        	((ChannelFuture)future).addListener(ChannelFutureListener.CLOSE_ON_FAILURE);
+        	((ChannelFuture)future).addListener(ChannelFutureListener.CLOSE);
         }
 		
 	}
@@ -391,6 +391,10 @@ public class StrestRouter {
 	            }
 			}
 		}
-        this.sendResponse(controller.getRequest(), controller.getChannelConnection(), response);
+        try {
+			this.sendResponse(controller.getRequest(), response);
+		} catch (Exception e) {
+			log.error("Caught", e);
+		}
 	}
 }

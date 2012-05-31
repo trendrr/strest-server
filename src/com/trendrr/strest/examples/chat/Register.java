@@ -15,7 +15,7 @@ import com.trendrr.strest.StrestUtil;
 import com.trendrr.strest.annotations.Strest;
 import com.trendrr.strest.server.StrestController;
 import com.trendrr.strest.server.callbacks.DisconnectCallback;
-import com.trendrr.strest.server.connections.StrestConnectionChannel;
+import com.trendrr.strest.server.connections.StrestNettyConnectionChannel;
 import com.trendrr.strest.server.v2.models.StrestHeader.TxnStatus;
 
 

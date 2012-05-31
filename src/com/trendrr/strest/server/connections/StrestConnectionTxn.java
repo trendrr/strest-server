@@ -79,13 +79,13 @@ public class StrestConnectionTxn implements Comparable<StrestConnectionTxn>{
 	 * Closes this transaction.
 	 * @return
 	 */
-	public ChannelFuture close() {
+	public Object close() throws Exception{
 		ResponseBuilder response = new ResponseBuilder(this.request);
 		response.txnStatus(TxnStatus.COMPLETED);
 		return this.sendMessage(response);
 	}
 	
-	public ChannelFuture sendMessage(ResponseBuilder response) {
+	public Object sendMessage(ResponseBuilder response) throws Exception{
 		return this.sendMessage(response.getResponse());
 	}
 	
@@ -94,7 +94,7 @@ public class StrestConnectionTxn implements Comparable<StrestConnectionTxn>{
 	 * @param response
 	 * @return
 	 */
-	public ChannelFuture sendMessage(StrestResponse response) {
+	public Object sendMessage(StrestResponse response) throws Exception{
 		//set the txn id
 		response.setTxnId(this.request.getTxnId());
 		return request.getConnectionChannel().sendMessage(response);	

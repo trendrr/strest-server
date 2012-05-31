@@ -24,6 +24,7 @@ import com.trendrr.strest.StrestHttpException;
 import com.trendrr.strest.annotations.AnnotationHelper;
 import com.trendrr.strest.annotations.Strest;
 import com.trendrr.strest.server.connections.StrestConnectionChannel;
+import com.trendrr.strest.server.connections.StrestNettyConnectionChannel;
 import com.trendrr.strest.server.connections.StrestConnectionTxn;
 import com.trendrr.strest.server.v2.models.StrestRequest;
 import com.trendrr.strest.server.v2.models.StrestResponse;
@@ -162,7 +163,7 @@ public abstract class StrestController {
 
 	protected boolean strest = false;
 	protected String strestTxnId = null;
-	protected StrestConnectionChannel connection = null;
+	protected StrestNettyConnectionChannel connection = null;
 	
 	/**
 	 * default constructor is manditory.  Other constructors will not be used.
@@ -173,15 +174,11 @@ public abstract class StrestController {
 	}
 	
 	public StrestConnectionChannel getChannelConnection() {
-		return this.connection;
+		return this.request.getConnectionChannel();
 	}
 
-	public void setChannelConnection(StrestConnectionChannel connection) {
-		this.connection = connection;
-	}
-	
 	public StrestConnectionTxn getTxnConnection() {
-		return this.connection.getTxnConnection(this.strestTxnId);
+		return  this.request.getConnectionChannel().getTxnConnection(this.strestTxnId);
 	}
 
 	/**

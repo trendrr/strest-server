@@ -149,18 +149,23 @@ public class StrestConnectionGroup implements TxnCompleteCallback {
 		return this.connections.isEmpty();
 	}
 	
-	public boolean contains(StrestConnectionChannel connection) {
+	public boolean contains(StrestNettyConnectionChannel connection) {
 		return this.connections.contains(connection);
 	}
 	
 	/**
 	 * closes this connection group and ends the transaction for *all* participants
+	 * @throws Exception 
 	 */
 	public void close() {
 		this.closed.set(true);
 		StrestConnectionTxn con = this.connections.pollFirst();
 		while (con != null) {
-			con.close();
+			try {
+				con.close();
+			} catch (Exception e) {
+				log.error("Caught", e);
+			}
 			con = this.connections.pollFirst();
 		}
 	}

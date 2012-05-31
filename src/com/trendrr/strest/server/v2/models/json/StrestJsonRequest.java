@@ -10,6 +10,7 @@ import org.apache.commons.logging.LogFactory;
 
 import com.trendrr.oss.DynMap;
 import com.trendrr.strest.server.connections.StrestConnectionChannel;
+import com.trendrr.strest.server.connections.StrestNettyConnectionChannel;
 import com.trendrr.strest.server.v2.models.StrestHeader;
 import com.trendrr.strest.server.v2.models.StrestRequest;
 import com.trendrr.strest.server.v2.models.StrestHeader.Method;
