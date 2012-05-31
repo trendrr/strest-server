@@ -19,7 +19,7 @@
 		description="Compile the Java source code">
 		<mkdir dir="build/classes"/>
 		<javac classpathref="build.classpath" destdir="build/classes" debug="true" debuglevel="lines,source">
-			<src path="src" />
+			<src path="src/main" />
 		</javac>
 	</target>
 	
@@ -79,7 +79,7 @@
         	classpathref="build.classpath"
         	access="public"
         	>
-            <fileset dir="src" includes="**/*.java" />
+            <fileset dir="src/main" includes="**/*.java" />
         </javadoc>
     </target>
 </project>
