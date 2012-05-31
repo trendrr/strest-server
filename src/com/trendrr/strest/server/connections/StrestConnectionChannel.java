@@ -39,6 +39,12 @@ public abstract class StrestConnectionChannel implements Comparable<StrestConnec
 	 */
 	protected abstract Object doSendMessage(StrestResponse response) throws Exception;
 	
+	/**
+	 * return the address of the connected client (or null if unavailable).
+	 * @return
+	 */
+	public abstract String getRemoteAddress();
+	
 	public Object sendMessage(ResponseBuilder responseBuilder) throws Exception{
 		return this.sendMessage(responseBuilder.getResponse());
 	}

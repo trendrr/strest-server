@@ -99,4 +99,17 @@ public class StrestNettyConnectionChannel extends StrestConnectionChannel {
 		return -1;
 	}
 
+	/* (non-Javadoc)
+	 * @see com.trendrr.strest.server.connections.StrestConnectionChannel#getRemoteAddress()
+	 */
+	@Override
+	public String getRemoteAddress() {
+		try {
+			return this.channel.getRemoteAddress().toString();
+		} catch (Exception x) {
+			log.error("Caught", x);
+		}
+		return null;
+	}
+
 }
