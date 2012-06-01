@@ -15,7 +15,7 @@ import com.trendrr.strest.server.StrestServer;
  * @created May 31, 2012
  * 
  */
-public class StrestEchoServer {
+public class StrestEchoServer implements Runnable {
 
 	protected static Log log = LogFactory.getLog(StrestEchoServer.class);
 	
@@ -23,20 +23,43 @@ public class StrestEchoServer {
 	StrestServer server;
 	
 	public static void main(String ...args) throws Exception {
-		new StrestEchoServer().start();
+		new StrestEchoServer().start(false);
 	}
 	
-	public void start() throws Exception {
+	/**
+	 * if threaded will return immediately and server starts in a separate thread.
+	 * @param threaded
+	 * @throws Exception
+	 */
+	public void start(boolean threaded) throws Exception {
+		
 		server = new StrestServerBuilder()
 			.addControllerPackage("com.trendrr.strest.tests.echoserver")
 			.addListenerHttp(8090)
 			.addListenerJson(8091)
 			.build();
-		server.start();
+		if (threaded) {
+			Thread t = new Thread(this);
+			t.setDaemon(true);
+			t.start();
+		} else {
+			this.run();
+		}
 	}
 	
 	public void stop() {
 		server.shutdown();
+	}
+
+	public StrestServer getServer() {
+		return this.server;
+	}
+	/* (non-Javadoc)
+	 * @see java.lang.Runnable#run()
+	 */
+	@Override
+	public void run() {
+		server.start();
 	}
 	
 }
