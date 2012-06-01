@@ -145,6 +145,8 @@ public class ResponseBuilder {
 	 * @return
 	 */
 	public ResponseBuilder contentUTF8(String mimeType, String content) {
+		if (content == null)
+			return this;
 		try {
 			this.content(mimeType, content.getBytes("utf8"));
 		} catch (UnsupportedEncodingException e) {
