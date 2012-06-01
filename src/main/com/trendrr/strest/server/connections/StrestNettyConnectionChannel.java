@@ -51,6 +51,10 @@ public class StrestNettyConnectionChannel extends StrestConnectionChannel {
 		c.cleanup();
 	}
 	
+	public static int size() {
+		return channels.size();
+	}
+	
 	Channel channel;
 	
 	public StrestNettyConnectionChannel(Channel channel) {

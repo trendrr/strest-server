@@ -167,6 +167,18 @@ public class StrestRouter {
 		this.getRouteLookup().addRoute(route, cls);
 	}
 	
+	/**
+	 * gets the # of connections.  
+	 * 
+	 * @return
+	 */
+	public int getNumConnections() {
+		//TODO: this is a hacky 
+		//need to support other connection types
+		return StrestNettyConnectionChannel.size();
+		
+	}
+	
 	public RouteLookup getRouteLookup() {
 		return routeLookup;
 	}

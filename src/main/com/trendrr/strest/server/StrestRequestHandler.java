@@ -52,7 +52,6 @@ public class StrestRequestHandler extends SimpleChannelUpstreamHandler {
 	protected static Log log = LogFactory.getLog(StrestRequestHandler.class);
 	
 	protected StrestRouter router;
-	protected ConcurrentHashMap<Channel, StrestNettyConnectionChannel> connections = new ConcurrentHashMap<Channel, StrestNettyConnectionChannel>();
 	
 	
 	public StrestRequestHandler(StrestRouter r) {
@@ -78,8 +77,7 @@ public class StrestRequestHandler extends SimpleChannelUpstreamHandler {
         } 
         StrestHttpRequest req = new StrestHttpRequest(request);
         Channel channel = e.getChannel();
-        connections.putIfAbsent(channel, new StrestNettyConnectionChannel(channel));
-        StrestNettyConnectionChannel con = this.connections.get(channel);
+        StrestNettyConnectionChannel con = StrestNettyConnectionChannel.get(channel);
         req.setConnectionChannel(con);
         router.incoming(req);
     }
