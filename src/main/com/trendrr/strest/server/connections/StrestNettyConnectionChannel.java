@@ -92,16 +92,16 @@ public class StrestNettyConnectionChannel extends StrestConnectionChannel {
 	}
 	
 
-	/* (non-Javadoc)
-	 * @see java.lang.Comparable#compareTo(java.lang.Object)
-	 */
-	@Override
-	public int compareTo(StrestConnectionChannel o) {
-		if (o instanceof StrestNettyConnectionChannel) {
-			return this.channel.compareTo(((StrestNettyConnectionChannel)o).getChannel());
-		}
-		return -1;
-	}
+//	/* (non-Javadoc)
+//	 * @see java.lang.Comparable#compareTo(java.lang.Object)
+//	 */
+//	@Override
+//	public int compareTo(StrestConnectionChannel o) {
+//		if (o instanceof StrestNettyConnectionChannel) {
+//			return this.channel.compareTo(((StrestNettyConnectionChannel)o).getChannel());
+//		}
+//		return -1;
+//	}
 
 	/* (non-Javadoc)
 	 * @see com.trendrr.strest.server.connections.StrestConnectionChannel#getRemoteAddress()

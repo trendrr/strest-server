@@ -37,6 +37,7 @@ public class StrestEchoServer implements Runnable {
 			.addControllerPackage("com.trendrr.strest.tests.echoserver")
 			.addListenerHttp(8090)
 			.addListenerJson(8091)
+			.addListenerZmq(8092)
 			.build();
 		if (threaded) {
 			Thread t = new Thread(this);

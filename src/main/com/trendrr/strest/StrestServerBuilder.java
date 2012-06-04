@@ -121,6 +121,11 @@ public class StrestServerBuilder {
 	public StrestServerBuilder addListenerJson(int port) {
 		return this.addListener("json", port, null);
 	}
+	
+	public StrestServerBuilder addListenerZmq(int port) {
+		return this.addListener("zmq", port, "com.trendrr.strest.contrib.zmq.StrestZMQServerListener");
+	}
+	
 	public StrestServerBuilder addListener(String name, int port, String className) {
 		this.config.putWithDot("listeners." + name + ".port", port);
 		this.config.putWithDot("listeners." + name + ".classname", className);

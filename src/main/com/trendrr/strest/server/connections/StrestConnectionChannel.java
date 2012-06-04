@@ -22,7 +22,7 @@ import com.trendrr.strest.server.v2.models.StrestHeader.TxnStatus;
  * @created May 31, 2012
  * 
  */
-public abstract class StrestConnectionChannel implements Comparable<StrestConnectionChannel>{
+public abstract class StrestConnectionChannel {
 
 	public abstract boolean isConnected();
 	

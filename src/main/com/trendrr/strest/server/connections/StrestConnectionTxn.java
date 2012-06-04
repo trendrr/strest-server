@@ -36,7 +36,7 @@ import com.trendrr.strest.server.v2.models.StrestResponse;
  * @created Mar 24, 2011
  * 
  */
-public class StrestConnectionTxn implements Comparable<StrestConnectionTxn>{
+public class StrestConnectionTxn /* implements Comparable<StrestConnectionTxn> */{
 
 	protected Log log = LogFactory.getLog(StrestConnectionTxn.class);
 	
@@ -131,17 +131,17 @@ public class StrestConnectionTxn implements Comparable<StrestConnectionTxn>{
 		this.storage = null;
 	}
 	
-	/* (non-Javadoc)
-	 * @see java.lang.Comparable#compareTo(java.lang.Object)
-	 */
-	@Override
-	public int compareTo(StrestConnectionTxn o) {
-		//first check if the parent connections are equal.
-		int val = this.getStrestConnectionChannel().compareTo(o.getStrestConnectionChannel());
-		if ( val != 0) {
-			return val;
-		}
-		//then compare txn Ids.
-		return this.getTxnId().compareTo(o.getTxnId());
-	}
+//	/* (non-Javadoc)
+//	 * @see java.lang.Comparable#compareTo(java.lang.Object)
+//	 */
+//	@Override
+//	public int compareTo(StrestConnectionTxn o) {
+//		//first check if the parent connections are equal.
+//		int val = this.getStrestConnectionChannel().compareTo(o.getStrestConnectionChannel());
+//		if ( val != 0) {
+//			return val;
+//		}
+//		//then compare txn Ids.
+//		return this.getTxnId().compareTo(o.getTxnId());
+//	}
 }

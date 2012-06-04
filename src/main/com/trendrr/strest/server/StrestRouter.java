@@ -240,7 +240,6 @@ public class StrestRouter {
   
         String txnId = request.getTxnId();
         request.getConnectionChannel().incoming(request);
-        log.info("HERE! " + request);
         StrestController controller = null;
         try {
         	try {
