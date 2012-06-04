@@ -48,14 +48,9 @@ public class StrestZMQChannel extends StrestConnectionChannel{
 	 * @param channel
 	 */
 	public static StrestZMQChannel get(ZMQChannel channel) {
-		ByteBuffer id = ByteBuffer.wrap(channel.getId());
+		ByteBuffer id = ByteBuffer.wrap(channel.getId()); //we wrap in a byte buffer because hashcode in byte[] doesn't work by val (works by address)
 		StrestZMQChannel c= channels.get(id);
 		if (c == null) {
-			try {
-				System.out.println("couldn't find key: "  + new String(channel.getId(), "utf8"));
-			} catch (Exception x) {
-				x.printStackTrace();
-			}
 			channels.putIfAbsent(id, new StrestZMQChannel(channel));
 			return channels.get(id);
 		}
