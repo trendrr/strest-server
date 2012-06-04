@@ -33,13 +33,12 @@ filters:
 # Configuration of the listeners
 listeners:
    http: 
-      port:8000
-   strest-json:
-#      classname: some.fully.qualified.classname #class that extends ServerListenerBase
-      port:8009
-   zmq:
-      classname: com.trendrr.strest.contrib.zmq.StrestZMQServerListener
-      port:7233
+      port: 8000
+   json:
+      port: 8009
+#   zmq:
+#      classname: com.trendrr.strest.contrib.zmq.StrestZMQServerListener
+#      port: 7233
       
 
    
