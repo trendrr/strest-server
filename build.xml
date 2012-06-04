@@ -3,7 +3,7 @@
 <project name="STREST" default="jar" basedir=".">
 
 	<fileset id="lib" dir="lib">
-		<include name="*.jar" />
+		<include name="**/*.jar" />
 	</fileset>
 	
 	<path id="build.classpath">
