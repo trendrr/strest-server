@@ -65,10 +65,18 @@ public class EchoTests {
 	public void strestTest() throws Exception {
 		
 		EchoClient client = new EchoClient();
-		for (int i=0; i < 10; i++) {
+		client.send("warmup message");
+		
+		Date start = new Date();
+		int num = 100000;
+		for (int i=0; i < num; i++) {
 			client.send("message" + i);
 		}
-		Sleep.seconds(5);
+		
+		while(client.size() > 0) {
+			Sleep.millis(10); //busy waiting, baaad
+		}
+		System.out.println("Completed " + num + " in " + (new Date().getTime()-start.getTime()) + " millis");
 		client.close();
 	}
 
@@ -89,7 +97,7 @@ public class EchoTests {
 			try {String response = Http.get("http://localhost:8090/random404"+ i); }
 			catch (Exception x) {/*swallow 404 exception*/}
 		}
-		
+		Sleep.seconds(2);
 		Assert.assertEquals(0, server.getServer().getRouter().getNumConnections());
 	}
 

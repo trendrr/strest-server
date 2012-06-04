@@ -43,7 +43,7 @@ public class EchoClient {
 		
 		@Override
 		public void response(StrestResponse response) {
-			log.info("GOT RESPONSE: " + response);
+//			log.info("GOT RESPONSE: " + response);
 			if (response.getContent() != null) {
 				sent.remove(response.getContent().toString());
 			}
@@ -55,11 +55,17 @@ public class EchoClient {
 		}
 	};
 	public EchoClient() throws IOException {
+		client.setMaxQueuedWrites(10000);
+		client.setWaitOnMaxQueuedWrites(true);
 		client.connect();
+		
 	}
 	
 	public void close() {
 		client.close();
+	}
+	public int size() {
+		return this.sent.size();
 	}
 	
 	public void send(String message) {
