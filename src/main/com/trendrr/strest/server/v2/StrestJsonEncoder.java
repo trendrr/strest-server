@@ -29,13 +29,13 @@ public class StrestJsonEncoder extends SimpleChannelHandler {
 	 @Override
 	 public void writeRequested(ChannelHandlerContext ctx, MessageEvent e) throws Exception {
 		 Object msg = e.getMessage();
-		 log.info("writing: " + msg);
+//		 log.info("writing: " + msg);
 		 if (msg instanceof StrestJsonResponse) {
 			 StrestJsonResponse res = (StrestJsonResponse)msg;
 			Channels.write(ctx, e.getFuture(), 
 					ChannelBuffers.wrappedBuffer(res.getMap().toJSONString().getBytes(CharsetUtil.UTF_8))
 			);
-			log.info("Writing Response: " + res.getMap().toJSONString());
+//			log.info("Writing Response: " + res.getMap().toJSONString());
 		 } else if (msg instanceof DynMap) {
 			Channels.write(ctx, e.getFuture(), 
 					ChannelBuffers.wrappedBuffer(((DynMap)msg).toJSONString().getBytes(CharsetUtil.UTF_8))

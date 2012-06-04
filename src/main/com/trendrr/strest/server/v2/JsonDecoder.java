@@ -53,7 +53,7 @@ public class JsonDecoder extends DelimiterBasedFrameDecoder {
 			for(char c = iter.first(); c != CharacterIterator.DONE; c = iter.next()) {
 		         DynMap val = parser.addChar(c);
 		         if (val != null) {
-		        	 log.info("GOT JSON PACKET: " + val.toJSONString());
+//		        	 log.info("GOT JSON PACKET: " + val.toJSONString());
 		        	 return val;
 		         }
 		    }
