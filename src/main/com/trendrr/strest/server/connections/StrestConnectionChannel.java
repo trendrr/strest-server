@@ -75,15 +75,12 @@ public abstract class StrestConnectionChannel {
 	}
 	
 	public synchronized void cleanup() {		
-		if (this.transactions == null) {
-			//already cleaned.
-			return;
-		}
 		//first cleanup all the txns
 		for (String txnId : this.transactions.keySet()) {
 			this.transactions.get(txnId).cleanup();
 		}
-		this.transactions = null;
+		
+		this.transactions.clear();
 		
 		//call all the disconnectCallbacks
 		while(!this.disconnectCallbacks.isEmpty()) {
