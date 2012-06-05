@@ -139,6 +139,20 @@ public class StrestHttpBase implements StrestPacketBase {
 		this.message.setHeader(HttpHeaders.Names.CONTENT_LENGTH, bytes.length);
 
 	}
+	
+	/* (non-Javadoc)
+	 * @see com.trendrr.strest.server.v2.models.StrestPacketBase#setContent(java.lang.String, java.lang.String)
+	 */
+	@Override
+	public void setContent(String contentType, String utf8Str) {
+		try {
+			this.setContent(contentType, utf8Str.getBytes("utf8"));
+		} catch (UnsupportedEncodingException e) {
+			log.error("Caught", e);
+		}
+		
+	}
+	
 
 	/* (non-Javadoc)
 	 * @see com.trendrr.strest.server.v2.models.StrestPacketBase#getContent()
@@ -164,6 +178,8 @@ public class StrestHttpBase implements StrestPacketBase {
 	public byte[] toByteArray() {
 		return null;
 	}
+
+
 
 
 }

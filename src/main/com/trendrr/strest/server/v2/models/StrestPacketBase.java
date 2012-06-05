@@ -34,6 +34,9 @@ public interface StrestPacketBase {
 	
 	public void setContent(DynMap content);
 	public void setContent(String contentType, byte[] bytes);
+	public void setContent(String contentType, String utf8Str);
+	
+	
 	public Object getContent();
 	
 	/**

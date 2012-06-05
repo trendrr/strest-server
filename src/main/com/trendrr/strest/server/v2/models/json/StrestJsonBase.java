@@ -120,6 +120,15 @@ public abstract class StrestJsonBase implements StrestPacketBase {
 	}
 
 	/* (non-Javadoc)
+	 * @see com.trendrr.strest.server.v2.models.StrestPacketBase#setContent(java.lang.String, java.lang.String)
+	 */
+	@Override
+	public void setContent(String contentType, String utf8Str) {
+		this.map.put("content", utf8Str);
+		this.addHeader(Name.CONTENT_TYPE, contentType);
+	}
+	
+	/* (non-Javadoc)
 	 * @see com.trendrr.strest.server.v2.StrestRequest#setContent(java.lang.String, java.lang.String)
 	 */
 	@Override

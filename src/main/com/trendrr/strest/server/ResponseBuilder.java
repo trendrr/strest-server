@@ -147,11 +147,7 @@ public class ResponseBuilder {
 	public ResponseBuilder contentUTF8(String mimeType, String content) {
 		if (content == null)
 			return this;
-		try {
-			this.content(mimeType, content.getBytes("utf8"));
-		} catch (UnsupportedEncodingException e) {
-			log.warn("Swallowed", e);
-		}
+		this.response.setContent(mimeType, content);
 		return this;
 	}
 	/**
