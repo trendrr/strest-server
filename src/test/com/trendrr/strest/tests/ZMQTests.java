@@ -46,6 +46,9 @@ public class ZMQTests {
 		int num = 1000000;
 		for (int i=0; i < num; i++) {
 			client.send("message" + i);
+			if (i % 10000 == 0) {
+				System.out.println("Completed " + i + " in " + (new Date().getTime()-start.getTime()) + " millis");
+			}
 		}
 		
 		while(client.size() > 0) {

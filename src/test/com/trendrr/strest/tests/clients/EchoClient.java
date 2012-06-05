@@ -55,7 +55,7 @@ public class EchoClient {
 		}
 	};
 	public EchoClient() throws IOException {
-		client.setMaxQueuedWrites(10000);
+		client.setMaxQueuedWrites(500);
 		client.setWaitOnMaxQueuedWrites(true);
 		client.connect();
 		
