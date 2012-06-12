@@ -121,7 +121,7 @@ public class StrestServer {
 			
 			this.listeners.put(name, listener);
 		}
-		
+		this.config = config;
 	}
 	
 	public StrestRouter getRouter() {
