@@ -161,7 +161,8 @@ public class ResponseBuilder {
 	}
 	
 	public ResponseBuilder contentJSON(DynMap mp) {
-		return this.contentUTF8(ContentTypes.JSON, mp.toJSONString());
+		this.response.setContent(mp);
+		return this;
 	}
 	
 	public StrestResponse getResponse() {
