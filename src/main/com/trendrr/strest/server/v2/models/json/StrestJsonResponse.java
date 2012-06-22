@@ -50,7 +50,7 @@ public class StrestJsonResponse extends StrestJsonBase implements StrestResponse
 	 */
 	@Override
 	public int getStatusCode() {
-		return this.map.getInteger("status.code");
+		return this.map.getInteger("status.code", 200);
 	}
 
 	/* (non-Javadoc)
@@ -58,7 +58,7 @@ public class StrestJsonResponse extends StrestJsonBase implements StrestResponse
 	 */
 	@Override
 	public String getStatusMessage() {
-		return this.map.getString("status.message");
+		return this.map.getString("status.message", "OK");
 	}
 
 	/* (non-Javadoc)
