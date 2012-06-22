@@ -30,6 +30,7 @@ import com.trendrr.strest.server.connections.StrestNettyConnectionChannel;
 import com.trendrr.strest.server.v2.models.*;
 import com.trendrr.strest.server.v2.models.StrestHeader.TxnAccept;
 import com.trendrr.strest.server.v2.models.StrestHeader.TxnStatus;
+import com.trendrr.strest.server.v2.models.json.StrestJsonResponse;
 
 
 /**
@@ -227,6 +228,16 @@ public class StrestRouter {
 		} catch (StrestException x) {
 			//TODO: send exception response..
 			log.error("caught", x);
+			
+			try {
+				//SEND ERROR REsponse
+				StrestJsonResponse error = new StrestJsonResponse();
+				error.setStatus(StrestHttpException.BAD_REQUEST().getCode(), x.getMessage());
+				request.getConnectionChannel().sendMessage(error);
+			} catch (Exception x2) {
+				log.error("caught", x2);
+			}
+			
 			if (request.getConnectionChannel() != null) {
 				request.getConnectionChannel().cleanup();
 			}
