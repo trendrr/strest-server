@@ -30,7 +30,7 @@ public class StrestZMQServerListener extends ServerListenerBase implements ZMQSe
 	
 	ZMQServer server;
 	Timer connectionReaper = new Timer(true);
-	
+	Executor workerExecutor;
 	/**
 	 * @param master
 	 * @param config
@@ -54,6 +54,7 @@ public class StrestZMQServerListener extends ServerListenerBase implements ZMQSe
 	 */
 	@Override
 	public void start(Executor bossExecutor, Executor workerExecutor) {
+		this.workerExecutor = workerExecutor;
 		this.server = new ZMQServer();
 		int port= this.config.getInteger("port");
 		server.listen(port, this, true);
@@ -94,15 +95,8 @@ public class StrestZMQServerListener extends ServerListenerBase implements ZMQSe
 	public void incoming(ZMQChannel channel, byte[] bytes) {
 		//create the StrestJsonRequest.
 		StrestZMQChannel c = StrestZMQChannel.get(channel);
-		try {
-			String json = new String(bytes, "utf8");
-			StrestJsonRequest request = new StrestJsonRequest(DynMap.instance(json));
-			c.setLastIncoming();
-			request.setConnectionChannel(c);
-			this.master.getRouter().incoming(request);
-		} catch (UnsupportedEncodingException e) {
-			this.error(e);
-			c.cleanup();//bad message
-		}
+		workerExecutor.execute(
+					new StrestZMQIncomingRunnable(this.master, c, bytes)		
+				);
 	}
 }
