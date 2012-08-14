@@ -2,6 +2,8 @@
 
 
 # Controlling thread pools
+# deprecated for the moment.
+# IO is handled in a cached threadpool, and execution in a memory aware threadpool.
 threads :
    #threads that handle the io, usually set this to the 2 * # of cores	
    io : 8 
