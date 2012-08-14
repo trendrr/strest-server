@@ -68,6 +68,7 @@ public class EchoTests {
 	
 	@Test
 	public void strestSpeedTest() throws Exception {
+//		Completed 1000000 in 128114 millis
 		
 		EchoClient client = new EchoClient();
 		client.send("warmup message");

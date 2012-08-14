@@ -12,9 +12,9 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import com.trendrr.oss.DynMap;
-import com.trendrr.oss.networking.strest.v2.models.StrestRequest;
-import com.trendrr.oss.networking.strest.v2.models.StrestHeader.Method;
-import com.trendrr.oss.networking.strest.v2.models.json.StrestJsonRequest;
+import com.trendrr.oss.strest.models.StrestRequest;
+import com.trendrr.oss.strest.models.StrestHeader.Method;
+import com.trendrr.oss.strest.models.json.StrestJsonRequest;
 import com.trendrr.zmq.client.ZMQClient;
 import com.trendrr.zmq.client.ZMQClientMessageHandler;
 

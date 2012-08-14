@@ -7,7 +7,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import com.trendrr.oss.DynMap;
-import com.trendrr.oss.networking.cheshire.Verb;
+import com.trendrr.oss.strest.cheshire.Verb;
 import com.trendrr.strest.server.connections.StrestConnectionChannel;
 import com.trendrr.strest.server.connections.StrestNettyConnectionChannel;
 
