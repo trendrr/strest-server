@@ -55,8 +55,10 @@ public class StrestJsonServerPipelineFactory extends StrestServerPipelineFactory
         pipeline.addLast("encoder", new StrestJsonEncoder());
         // Remove the following line if you don't want automatic content compression.
         
-//        pipeline.addLast("executionHandler", handler);
+        pipeline.addLast("executionHandler", this.handler);
+        
         pipeline.addLast("handler", new StrestJsonRequestHandler(router));
+        
         return pipeline;
 	}
 	

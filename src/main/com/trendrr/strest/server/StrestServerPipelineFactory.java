@@ -62,10 +62,10 @@ public class StrestServerPipelineFactory implements ChannelPipelineFactory {
 	public StrestServerPipelineFactory(StrestRouter router, SSLContext sslContext) {
 		this.router = router;
 		this.sslContext = sslContext;
-		this.handler = new ExecutionHandler(
-	             new MemoryAwareThreadPoolExecutor(
-	            		 router.getServer().getConfig().getInteger("threads.worker", 16), 1048576, 1048576)
-	    );
+		this.handler = new ExecutionHandler(router.getServer().getWorkerExecutor());
+//	             new MemoryAwareThreadPoolExecutor(
+//	            		 router.getServer().getConfig().getInteger("threads.worker", 16), 1048576, 1048576)
+//	    );
 	}
 	
     public ChannelPipeline getPipeline() throws Exception {

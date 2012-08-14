@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 import javax.net.ssl.SSLContext;
 
@@ -17,6 +18,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.jboss.netty.bootstrap.ServerBootstrap;
 import org.jboss.netty.channel.socket.nio.NioServerSocketChannelFactory;
+import org.jboss.netty.handler.execution.ExecutionHandler;
+import org.jboss.netty.handler.execution.MemoryAwareThreadPoolExecutor;
 import org.yaml.snakeyaml.Yaml;
 
 import com.trendrr.oss.DynMap;
@@ -46,7 +49,8 @@ public class StrestServer {
 
 
 	private Executor bossExecutor = Executors.newCachedThreadPool();
-	private Executor workerExecutor = Executors.newCachedThreadPool();
+	private Executor workerExecutor = new MemoryAwareThreadPoolExecutor(
+	   		 16, 1048576, 1048576);
 	
 	protected HashMap<String, ServerListenerBase> listeners = new HashMap<String, ServerListenerBase>();
 	protected HashMap<String, Class<? extends ServerListenerBase>> listenerClasses = new HashMap<String, Class<? extends ServerListenerBase>>();
@@ -81,8 +85,8 @@ public class StrestServer {
 			throw new Exception("Config is null! unable to initialize server ");
 		}
 		
-		this.setMaxWorkerThreads(config.getInteger("threads.worker", 10));
-		this.setMaxIOThreads(config.getInteger("threads.io",8));
+//		this.setMaxWorkerThreads(config.getInteger("threads.worker", 10));
+//		this.setMaxIOThreads(config.getInteger("threads.io",8));
 		
 		List<String> controllerPackages = config.getList(String.class, "controller_packages");
 		if (controllerPackages != null) {
@@ -177,37 +181,37 @@ public class StrestServer {
 		this.workerExecutor = workerExecutor;
 	}
 
-	/**
-	 * will set the workerExecutor to a fixed pool with maxThreads number of threads.
-	 * 
-	 * -1 or null will set to unlimited.
-	 * 
-	 * @param maxThreads
-	 */
-	public void setMaxWorkerThreads(Integer maxThreads) {
-		if (maxThreads == null || maxThreads < 1) {
-			this.workerExecutor = Executors.newCachedThreadPool();
-		} else {
-			log.info("Setting max worker threads: " + maxThreads);
-			this.workerExecutor = Executors.newFixedThreadPool(maxThreads);
-		}
-	}
-	
-	/**
-	 * will set the bossExecutor to a fixed pool with maxThreads number of threads.
-	 * 
-	 * -1 or null will set to unlimited.
-	 * 
-	 * @param maxThreads
-	 */
-	public void setMaxIOThreads(Integer maxThreads) {
-		if (maxThreads == null || maxThreads < 1) {
-			this.bossExecutor = Executors.newCachedThreadPool();
-		} else {
-			log.info("Setting max IO threads: " + maxThreads);
-			this.bossExecutor = Executors.newFixedThreadPool(maxThreads);
-		}
-	}
+//	/**
+//	 * will set the workerExecutor to a fixed pool with maxThreads number of threads.
+//	 * 
+//	 * -1 or null will set to unlimited.
+//	 * 
+//	 * @param maxThreads
+//	 */
+//	public void setMaxWorkerThreads(Integer maxThreads) {
+//		if (maxThreads == null || maxThreads < 1) {
+//			this.workerExecutor = Executors.newCachedThreadPool();
+//		} else {
+//			log.info("Setting max worker threads: " + maxThreads);
+//			this.workerExecutor = Executors.newFixedThreadPool(maxThreads);
+//		}
+//	}
+//	
+//	/**
+//	 * will set the bossExecutor to a fixed pool with maxThreads number of threads.
+//	 * 
+//	 * -1 or null will set to unlimited.
+//	 * 
+//	 * @param maxThreads
+//	 */
+//	public void setMaxIOThreads(Integer maxThreads) {
+//		if (maxThreads == null || maxThreads < 1) {
+//			this.bossExecutor = Executors.newCachedThreadPool();
+//		} else {
+//			log.info("Setting max IO threads: " + maxThreads);
+//			this.bossExecutor = Executors.newFixedThreadPool(maxThreads);
+//		}
+//	}
 	
 	/**
 	 * starts all the listeners.

@@ -44,7 +44,7 @@ public class StrestJsonServerListener extends ServerListenerBase{
 		 this.bootstrap = new ServerBootstrap(
 	                new NioServerSocketChannelFactory(
 	                		bossExecutor,
-	                		workerExecutor));
+	                		bossExecutor));
 		   
 		 // Set up the event pipeline factory.
 		 bootstrap.setPipelineFactory(new StrestJsonServerPipelineFactory(this.master.getRouter(), null));

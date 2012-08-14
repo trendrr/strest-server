@@ -52,7 +52,7 @@ public class StrestHttpServerListener extends ServerListenerBase {
 		this.bootstrap = new ServerBootstrap(
                 new NioServerSocketChannelFactory(
                         bossExecutor,
-                        workerExecutor));
+                        bossExecutor));
         // Set up the event pipeline factory.
 		 int port = this.config.getInteger("port", 8010);
 		 
