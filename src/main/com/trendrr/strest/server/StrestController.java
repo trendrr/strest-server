@@ -163,7 +163,6 @@ public abstract class StrestController {
 
 	protected boolean strest = false;
 	protected String strestTxnId = null;
-	protected StrestNettyConnectionChannel connection = null;
 	
 	/**
 	 * default constructor is manditory.  Other constructors will not be used.
@@ -192,8 +191,7 @@ public abstract class StrestController {
 	public Map<String,Object> getTxnStorage() {
 		if (!this.isStrest())
 			return this.nonstrestTxnStorage;
-		
-		return this.connection.getTxnConnection(this.strestTxnId).getStorage();
+		return this.getChannelConnection().getTxnConnection(this.strestTxnId).getStorage();
 	}
 	
 	/**
@@ -203,7 +201,7 @@ public abstract class StrestController {
 	 * @return
 	 */
 	public Map<String,Object> getConnectionStorage() {
-		return this.connection.getStorage();
+		return this.getChannelConnection().getStorage();
 	}
 	
 	
