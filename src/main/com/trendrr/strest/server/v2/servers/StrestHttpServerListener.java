@@ -54,7 +54,7 @@ public class StrestHttpServerListener extends ServerListenerBase {
                         bossExecutor,
                         bossExecutor));
         // Set up the event pipeline factory.
-		 int port = this.config.getInteger("port", 8010);
+		int port = this.config.getInteger("port", 8010);
 		 
         bootstrap.setPipelineFactory(new StrestServerPipelineFactory(this.master.getRouter(), null));
 		bootstrap.bind(new InetSocketAddress(port));
