@@ -119,14 +119,53 @@ public class StrestHttpRequest extends StrestHttpBase implements StrestRequest {
 		this.setUri(uri + encodedParams);
 	}
 
+	protected DynMap params = null;
+	protected DynMap paramsPOST = null;
+	protected DynMap paramsGET = null;
+	
 	/* (non-Javadoc)
 	 * @see com.trendrr.strest.server.v2.models.StrestRequest#getParams()
 	 */
 	@Override
 	public DynMap getParams() {
-		return DynMapFactory.instanceFromURL(this.getUri());
+		if (params == null) {
+			params = new DynMap();
+			params.putAll(this.getParamsGET());
+			params.putAll(this.getParamsPOST());
+		}
+		return params;
 	}
 	
+	
+	public DynMap getParamsPOST() {
+		if (paramsPOST != null) {
+			return this.paramsPOST;
+		}
+		
+		 //parse any post params
+        String contentType = this.getHeader(Name.CONTENT_TYPE);
+        if(contentType != null){
+        	String pms = this.getContentAsString();
+        	if(pms != null){
+        		if (contentType.contains("form-urlencoded")) {
+        			this.paramsPOST = DynMapFactory.instanceFromURLEncoded(pms);
+        		}else if (contentType.contains("json")){
+        			this.paramsPOST = DynMapFactory.instanceFromJSON(pms);
+        		}
+        	}
+        }
+		if (this.paramsPOST == null)
+			this.paramsPOST = new DynMap();
+		return this.paramsPOST;
+        
+	}
+	
+	public DynMap getParamsGET() {
+		if (this.paramsGET == null) {
+			this.paramsGET = DynMapFactory.instanceFromURL(this.getUri());
+		}
+		return this.paramsGET;
+	}
 	/* (non-Javadoc)
 	 * @see com.trendrr.strest.server.v2.models.StrestPacketBase#cleanup()
 	 */

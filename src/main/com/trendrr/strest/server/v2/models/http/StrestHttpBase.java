@@ -4,6 +4,7 @@
 package com.trendrr.strest.server.v2.models.http;
 
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.Charset;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -154,12 +155,21 @@ public class StrestHttpBase implements StrestPacketBase {
 	}
 	
 
-	/* (non-Javadoc)
-	 * @see com.trendrr.strest.server.v2.models.StrestPacketBase#getContent()
+	
+	/**
+	 * Returns the content as a byte array.
 	 */
 	@Override
 	public Object getContent() {
-		return this.message.getContent();
+		return this.message.getContent().array();
+	}
+	
+	public String getContentAsString() {
+		try {
+			return this.message.getContent().toString(Charset.forName("utf8"));
+		} catch (Exception x) {
+			return null;
+		}
 	}
 
 	/* (non-Javadoc)
