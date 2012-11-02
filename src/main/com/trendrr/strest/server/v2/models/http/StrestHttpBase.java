@@ -161,12 +161,15 @@ public class StrestHttpBase implements StrestPacketBase {
 	 */
 	@Override
 	public Object getContent() {
-		return this.message.getContent().array();
+		int length = this.message.getContent().readableBytes();
+		byte[] bytes = new byte[length];
+		this.message.getContent().getBytes(0, bytes);
+		return bytes;
 	}
 	
 	public String getContentAsString() {
 		try {
-			return this.message.getContent().toString(Charset.forName("utf8"));
+			return new String((byte[])this.getContent(), "utf8");
 		} catch (Exception x) {
 			return null;
 		}
