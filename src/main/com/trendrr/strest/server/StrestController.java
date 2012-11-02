@@ -191,7 +191,12 @@ public abstract class StrestController {
 	public Map<String,Object> getTxnStorage() {
 		if (!this.isStrest())
 			return this.nonstrestTxnStorage;
-		return this.getChannelConnection().getTxnConnection(this.strestTxnId).getStorage();
+		try {
+			return this.getChannelConnection().getTxnConnection(this.strestTxnId).getStorage();
+		} catch (NullPointerException x) {
+			log.warn("Unable to get txn storage.  The connection was likely broken, returning dummy");
+			return new HashMap<String,Object>();
+		}
 	}
 	
 	/**
