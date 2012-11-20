@@ -24,21 +24,20 @@ import com.trendrr.strest.server.v2.models.json.StrestJsonResponse;
 public class StrestWebSocketEncoder extends OneToOneEncoder {
 
 	protected static Log log = LogFactory.getLog(StrestWebSocketEncoder.class);
-	
-	
+
+
 	@Override
-    protected Object encode(ChannelHandlerContext ctx, Channel channel, Object msg) throws Exception {
-		
+	protected Object encode(ChannelHandlerContext ctx, Channel channel, Object msg) throws Exception {
+
 		String json = null;
 		if (msg instanceof StrestJsonResponse) {
-			 StrestJsonResponse res = (StrestJsonResponse)msg;
-			 json = res.getMap().toJSONString();
-		 } else if (msg instanceof DynMap) {
+			StrestJsonResponse res = (StrestJsonResponse)msg;
+			json = res.getMap().toJSONString();
+		} else if (msg instanceof DynMap) {
 			json = ((DynMap)msg).toJSONString();
-		 } else {
-			 return msg; //do nothing.
-		 }
-		System.out.println(json);
+		} else {
+			return msg; //do nothing.
+		}
 		return new TextWebSocketFrame(json);
 	}
 }
