@@ -47,6 +47,7 @@ import com.trendrr.strest.server.v2.models.http.StrestHttpRequest;
  *
  * @version $Rev: 2368 $, $Date: 2010-10-18 17:19:03 +0900 (Mon, 18 Oct 2010) $
  */
+@Deprecated
 public class StrestRequestHandler extends SimpleChannelUpstreamHandler {
 
 	protected static Log log = LogFactory.getLog(StrestRequestHandler.class);

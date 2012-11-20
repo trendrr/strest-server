@@ -13,6 +13,7 @@ import org.jboss.netty.handler.codec.http.HttpChunkAggregator;
  * @created Jun 13, 2011
  * 
  */
+@Deprecated
 public class StrestChunkAggregator extends HttpChunkAggregator {
 
 	/**

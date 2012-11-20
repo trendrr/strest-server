@@ -30,6 +30,7 @@ import com.trendrr.strest.StrestUtil;
  * @created Mar 17, 2011
  * 
  */
+@Deprecated
 public class StrestResponseEncoder extends SimpleChannelHandler {
 
 	protected Log log = LogFactory.getLog(StrestResponseEncoder.class);
