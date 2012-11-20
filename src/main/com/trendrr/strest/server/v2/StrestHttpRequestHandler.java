@@ -12,6 +12,7 @@ import org.apache.commons.logging.LogFactory;
 import org.jboss.netty.channel.Channel;
 import org.jboss.netty.channel.ChannelHandlerContext;
 import org.jboss.netty.channel.ChannelStateEvent;
+import org.jboss.netty.channel.Channels;
 import org.jboss.netty.channel.ExceptionEvent;
 import org.jboss.netty.channel.MessageEvent;
 import org.jboss.netty.channel.SimpleChannelUpstreamHandler;
@@ -37,6 +38,7 @@ import org.jboss.netty.handler.codec.http.DefaultHttpResponse;
 import org.jboss.netty.handler.codec.http.HttpHeaders;
 import org.jboss.netty.handler.codec.http.HttpRequest;
 import org.jboss.netty.handler.codec.http.HttpResponse;
+import org.jboss.netty.handler.codec.http.HttpResponseEncoder;
 import org.jboss.netty.handler.codec.http.websocketx.CloseWebSocketFrame;
 import org.jboss.netty.handler.codec.http.websocketx.PingWebSocketFrame;
 import org.jboss.netty.handler.codec.http.websocketx.PongWebSocketFrame;
@@ -48,9 +50,11 @@ import org.jboss.netty.logging.InternalLogger;
 import org.jboss.netty.logging.InternalLoggerFactory;
 import org.jboss.netty.util.CharsetUtil;
 
+import com.trendrr.oss.DynMap;
 import com.trendrr.strest.server.StrestRouter;
 import com.trendrr.strest.server.connections.StrestNettyConnectionChannel;
 import com.trendrr.strest.server.v2.models.http.StrestHttpRequest;
+import com.trendrr.strest.server.v2.models.json.StrestJsonRequest;
 
 
 /**
@@ -94,7 +98,7 @@ public class StrestHttpRequestHandler  extends SimpleChannelUpstreamHandler {
     	
     }
     
-    protected void handleWebSocketFrame(ChannelHandlerContext ctx, MessageEvent e) {
+    protected void handleWebSocketFrame(ChannelHandlerContext ctx, MessageEvent e) throws Exception{
     	WebSocketFrame frame = (WebSocketFrame)e.getMessage();
         // Check for closing frame
         if (frame instanceof CloseWebSocketFrame) {
@@ -109,13 +113,19 @@ public class StrestHttpRequestHandler  extends SimpleChannelUpstreamHandler {
         }
 
         // Send the uppercase string back.
-        String request = ((TextWebSocketFrame) frame).getText();
-//        if (logger.isDebugEnabled()) {
-//            logger.debug(String.format("Channel %s received %s", ctx.getChannel().getId(), request));
-//        }
+        String json = ((TextWebSocketFrame) frame).getText();
+        
+        DynMap map = DynMap.instance(json);
+        if (map.isEmpty()) {
+        	throw new Exception("Invalid json");
+        }
+        
+        StrestJsonRequest req = new StrestJsonRequest(map);
+        req.setConnectionChannel(StrestNettyConnectionChannel.get(e.getChannel()));
+        router.incoming(req);
         
         //TODO: this sure isn't right.
-        ctx.getChannel().write(new TextWebSocketFrame(request.toUpperCase()));
+//        ctx.getChannel().write(new TextWebSocketFrame(json.toUpperCase()));
     }
     protected boolean isWebSocketUpgrade(HttpRequest request) {
     	String upgrade = request.getHeader("Upgrade");
@@ -138,22 +148,26 @@ public class StrestHttpRequestHandler  extends SimpleChannelUpstreamHandler {
             if (handshaker == null) {
                 wsFactory.sendUnsupportedWebSocketVersionResponse(ctx.getChannel());
             } else {
-                handshaker.handshake(ctx.getChannel(), request).addListener(WebSocketServerHandshaker.HANDSHAKE_LISTENER);
+                handshaker.handshake(ctx.getChannel(), request).addListener(
+                		new ChannelFutureListener() {
+                	        public void operationComplete(ChannelFuture future) throws Exception {
+                	            if (!future.isSuccess()) {
+                	                Channels.fireExceptionCaught(future.getChannel(), future.getCause());
+                	                return;
+                	            }
+                	            future.getChannel().getPipeline().addLast("jsonencoder", new StrestWebSocketEncoder());
+
+                	            System.out.println(future.getChannel().getPipeline().get("wsencoder"));
+                	            System.out.println(future.getChannel().getPipeline().getNames());
+                	        }
+                	    }
+                );
+                
             }
             return;
     	}
     	
     	//Now handle regular http requests.
-    	
-        if (is100ContinueExpected(request)) {
-            send100Continue(e);
-        }
-        
-        if (request.isChunked()) {
-        	//we don't need no chunked POST's here!
-        	//throw an exception here!
-        	throw new Exception("Chunking not allowed!");
-        } 
         StrestHttpRequest req = new StrestHttpRequest(request);
         Channel channel = e.getChannel();
         StrestNettyConnectionChannel con = StrestNettyConnectionChannel.get(channel);

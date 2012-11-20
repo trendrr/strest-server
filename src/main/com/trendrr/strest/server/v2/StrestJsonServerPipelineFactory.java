@@ -47,10 +47,7 @@ public class StrestJsonServerPipelineFactory extends StrestHttpServerPipelineFac
         ChannelPipeline pipeline = pipeline();
         
 		pipeline.addLast("decoder", new JsonDecoder());
-        // Uncomment the following line if you don't want to handle HttpChunks.
         pipeline.addLast("encoder", new StrestJsonEncoder());
-        // Remove the following line if you don't want automatic content compression.
-        
         pipeline.addLast("executionHandler", this.handler);
         
         pipeline.addLast("handler", new StrestJsonRequestHandler(router));
