@@ -177,7 +177,7 @@ public class StrestHttpRequestHandler  extends SimpleChannelUpstreamHandler {
 
     @Override
     public void channelDisconnected(ChannelHandlerContext ctx, ChannelStateEvent e) {
-//    	log.info("Disconnect! " + ctx);
+    	log.info("Disconnect! " + ctx);
     	StrestNettyConnectionChannel.remove(e.getChannel());
     }
     

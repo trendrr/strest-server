@@ -7,8 +7,6 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-import org.jboss.netty.channel.ChannelFuture;
-
 import com.trendrr.strest.server.ResponseBuilder;
 import com.trendrr.strest.server.callbacks.DisconnectCallback;
 import com.trendrr.strest.server.v2.models.StrestRequest;

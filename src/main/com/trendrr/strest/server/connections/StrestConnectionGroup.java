@@ -5,9 +5,6 @@ package com.trendrr.strest.server.connections;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -15,16 +12,9 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.jboss.netty.channel.ChannelFuture;
-import org.jboss.netty.handler.codec.http.DefaultHttpRequest;
-import org.jboss.netty.handler.codec.http.HttpHeaders;
-import org.jboss.netty.handler.codec.http.HttpRequest;
-import org.jboss.netty.handler.codec.http.HttpResponse;
 
-import com.trendrr.strest.StrestUtil;
 import com.trendrr.strest.server.ResponseBuilder;
-import com.trendrr.strest.server.StrestResponseEncoder;
 import com.trendrr.strest.server.callbacks.ConnectionGroupEmptyCallback;
-import com.trendrr.strest.server.callbacks.DisconnectCallback;
 import com.trendrr.strest.server.callbacks.TxnCompleteCallback;
 import com.trendrr.strest.server.v2.models.StrestResponse;
 

@@ -9,19 +9,10 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.jboss.netty.channel.ChannelFuture;
-import org.jboss.netty.handler.codec.http.DefaultHttpRequest;
-import org.jboss.netty.handler.codec.http.HttpRequest;
-import org.jboss.netty.handler.codec.http.HttpResponse;
-
-import com.trendrr.strest.StrestUtil;
 import com.trendrr.strest.server.ResponseBuilder;
-import com.trendrr.strest.server.StrestResponseEncoder;
-import com.trendrr.strest.server.callbacks.DisconnectCallback;
 import com.trendrr.strest.server.callbacks.TxnCompleteCallback;
 import com.trendrr.strest.server.v2.models.StrestHeader.TxnStatus;
 import com.trendrr.strest.server.v2.models.StrestRequest;
-import com.trendrr.strest.server.v2.models.StrestHeader.TxnAccept;
 import com.trendrr.strest.server.v2.models.StrestResponse;
 
 
