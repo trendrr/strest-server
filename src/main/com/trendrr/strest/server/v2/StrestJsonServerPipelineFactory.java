@@ -14,11 +14,7 @@ import org.jboss.netty.channel.ChannelPipelineFactory;
 import org.jboss.netty.handler.codec.http.HttpRequestDecoder;
 import org.jboss.netty.handler.codec.http.HttpResponseEncoder;
 
-import com.trendrr.strest.server.StrestChunkAggregator;
-import com.trendrr.strest.server.StrestRequestHandler;
-import com.trendrr.strest.server.StrestResponseEncoder;
 import com.trendrr.strest.server.StrestRouter;
-import com.trendrr.strest.server.StrestServerPipelineFactory;
 
 
 /**

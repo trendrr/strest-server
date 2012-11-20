@@ -19,9 +19,6 @@ import org.jboss.netty.handler.codec.http.HttpResponseEncoder;
 import org.jboss.netty.handler.execution.ExecutionHandler;
 import org.jboss.netty.handler.ssl.SslHandler;
 
-import com.trendrr.strest.server.StrestChunkAggregator;
-import com.trendrr.strest.server.StrestRequestHandler;
-import com.trendrr.strest.server.StrestResponseEncoder;
 import com.trendrr.strest.server.StrestRouter;
 
 

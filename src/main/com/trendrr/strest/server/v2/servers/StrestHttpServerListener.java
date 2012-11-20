@@ -13,7 +13,6 @@ import org.jboss.netty.channel.socket.nio.NioServerSocketChannelFactory;
 
 import com.trendrr.oss.DynMap;
 import com.trendrr.strest.server.StrestServer;
-import com.trendrr.strest.server.StrestServerPipelineFactory;
 import com.trendrr.strest.server.v2.StrestHttpServerPipelineFactory;
 
 

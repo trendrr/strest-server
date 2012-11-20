@@ -44,12 +44,7 @@ listeners:
       
 
    
-# Configuration for the Flash Socket Policy server.  this will serve the
-# the flash socket policy so you can use the flash websocket bridge(allows
-# websocket connections for browsers that don't support websockets
-flashsocketpolicy:
-   port : 843 # ONly change if you are doing some internal port routing, flash looks on port 843 by default
-   
+
 
 # session config.
 sessions:
