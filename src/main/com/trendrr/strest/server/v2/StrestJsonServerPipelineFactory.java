@@ -26,7 +26,7 @@ import com.trendrr.strest.server.StrestServerPipelineFactory;
  * @created May 4, 2012
  * 
  */
-public class StrestJsonServerPipelineFactory extends StrestServerPipelineFactory {
+public class StrestJsonServerPipelineFactory extends StrestHttpServerPipelineFactory {
 
 	
 	/**

@@ -14,6 +14,7 @@ import org.jboss.netty.channel.socket.nio.NioServerSocketChannelFactory;
 import com.trendrr.oss.DynMap;
 import com.trendrr.strest.server.StrestServer;
 import com.trendrr.strest.server.StrestServerPipelineFactory;
+import com.trendrr.strest.server.v2.StrestHttpServerPipelineFactory;
 
 
 /**
@@ -56,7 +57,7 @@ public class StrestHttpServerListener extends ServerListenerBase {
         // Set up the event pipeline factory.
 		int port = this.config.getInteger("port", 8010);
 		 
-        bootstrap.setPipelineFactory(new StrestServerPipelineFactory(this.master.getRouter(), null));
+        bootstrap.setPipelineFactory(new StrestHttpServerPipelineFactory(this.master.getRouter(), null));
 		bootstrap.bind(new InetSocketAddress(port));
 		System.out.println("HTTP server started at port " + port + '.');
 
