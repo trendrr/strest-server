@@ -155,10 +155,11 @@ public class StrestHttpRequestHandler  extends SimpleChannelUpstreamHandler {
                 	                Channels.fireExceptionCaught(future.getChannel(), future.getCause());
                 	                return;
                 	            }
+                	            //add the strest object encoder
                 	            future.getChannel().getPipeline().addLast("jsonencoder", new StrestWebSocketEncoder());
 
-                	            System.out.println(future.getChannel().getPipeline().get("wsencoder"));
-                	            System.out.println(future.getChannel().getPipeline().getNames());
+//                	            System.out.println(future.getChannel().getPipeline().get("wsencoder"));
+//                	            System.out.println(future.getChannel().getPipeline().getNames());
                 	        }
                 	    }
                 );
@@ -177,16 +178,9 @@ public class StrestHttpRequestHandler  extends SimpleChannelUpstreamHandler {
 
     @Override
     public void channelDisconnected(ChannelHandlerContext ctx, ChannelStateEvent e) {
-    	log.info("Disconnect! " + ctx);
     	StrestNettyConnectionChannel.remove(e.getChannel());
     }
     
-    
-    private void send100Continue(MessageEvent e) {
-        HttpResponse response = new DefaultHttpResponse(HTTP_1_1, CONTINUE);
-        e.getChannel().write(response);
-    }
-
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, ExceptionEvent e)
             throws Exception {
