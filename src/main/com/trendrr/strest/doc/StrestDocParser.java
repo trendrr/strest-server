@@ -110,55 +110,75 @@ public class StrestDocParser {
 	
 	
 	/**
-	 * creates an index map.
-	 * index is keyed by categories
+	 * creates a list of indexes
 	 * 
+	 * where each entry looks like:
 	 * {
-	 * 	 "default" : [
-	 * 					{"route" : "/" , "abstract" : "blah blah"}
-	 * 				],
-	 * 	 "admin" : [ ... ] 
+	 * 	"name" : "default", //the default index
+	 * 	"categories" : [
+	 * 		{
+	 * 			"category" : "admin", //name of the category
+	 * 			"routes" : [
+	 * 				{"route" : "/" , "abstract" : "blah blah"}
+	 * 			]
+	 * 		}
+	 *  ]
 	 * }
+	 * 
+	 * 
+	 * 
 	 * 
 	 * individual entries are created by the createIndexEntry method.
 	 * 
 	 * @param routes
 	 * @return
 	 */
-	public DynMap createIndex(List<DynMap> routes) {
+	public DynMap createIndexes(List<DynMap> routes) {
+		
+		DynMap indexes = new DynMap();
 		
 		
-		DynMap categories = new DynMap();
+		
 		
 		for (DynMap route : routes) {
-			String category = route.get(String.class, "category", "default");
-			categories.putIfAbsent(category, new ArrayList<DynMap>());
+			String indexName = route.getString("index", "default");
+			indexes.putIfAbsent(indexName, new DynMap("name", indexName));
+			DynMap index = indexes.getMap(indexName);
+			
+			
+			
+			String category = route.getString("category", "default");
+			
 			DynMap mp = this.createIndexEntry(route);
 			if (mp == null)
 				continue;
-			categories.get(List.class, category).add(mp);
-		}
-
-		
-		List<DynMap> catList = new ArrayList<DynMap>();
-		//now sort the lists.
-		for (String cat : categories.keySet()) {
-			List<DynMap> rt = categories.getList(DynMap.class, cat);
-			DynMap ct = this.createIndexCategory(cat, rt);
-			if (ct != null) {
-				catList.add(ct);
-			}
+			
+			index.addToListWithDot("categories." + category, mp);
 		}
 		
-		Collections.sort(catList, new Comparator<DynMap>() {
-			@Override
-			public int compare(DynMap o1, DynMap o2) {
-				return o1.getString("category").compareTo(o2.getString("category"));
+		//TODO: now need to sort the categories
+		for(String ind : indexes.keySet()) {
+			DynMap cats = indexes.getMap(ind + ".categories");
+			List<DynMap> catList = new ArrayList<DynMap>();
+			
+			for (String c : cats.keySet()) {
+				DynMap ct = this.createIndexCategory(c, cats.getList(DynMap.class, "routes"));
+				if (ct != null) {
+					catList.add(ct);
+				}
 			}
-		});
-		DynMap index = new DynMap();
-		index.put("categories", catList);
-		return index;
+			//sort the categories
+			Collections.sort(catList, new Comparator<DynMap>() {
+				@Override
+				public int compare(DynMap o1, DynMap o2) {
+					return o1.getString("category").compareTo(o2.getString("category"));
+				}
+			});
+			
+			//add back to the index.
+			indexes.getMap(ind).put("categories", catList);
+		}
+		return indexes;
 	}
 	
 	public DynMap createIndexCategory(String category, List<DynMap> routes) {
