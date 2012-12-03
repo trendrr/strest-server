@@ -110,7 +110,7 @@ public class StrestDocParser {
 	
 	
 	/**
-	 * creates a list of indexes
+	 * creates a indexes
 	 * 
 	 * where each entry looks like:
 	 * {
@@ -141,19 +141,21 @@ public class StrestDocParser {
 		
 		
 		for (DynMap route : routes) {
-			String indexName = route.getString("index", "default");
-			indexes.putIfAbsent(indexName, new DynMap("name", indexName));
-			DynMap index = indexes.getMap(indexName);
-			
-			
-			
-			String category = route.getString("category", "default");
-			
-			DynMap mp = this.createIndexEntry(route);
-			if (mp == null)
-				continue;
-			
-			index.addToListWithDot("categories." + category, mp);
+			route.putIfAbsent("index", "default");
+			for (String indexName : route.getList(String.class, "index", ",")) {
+				indexes.putIfAbsent(indexName, new DynMap("name", indexName));
+				DynMap index = indexes.getMap(indexName);
+				
+				
+				
+				String category = route.getString("category", "default");
+				
+				DynMap mp = this.createIndexEntry(route);
+				if (mp == null)
+					continue;
+				
+				index.addToListWithDot("categories." + category, mp);
+			}
 		}
 		
 		//TODO: now need to sort the categories
