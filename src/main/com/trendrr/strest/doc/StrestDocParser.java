@@ -77,13 +77,15 @@ public class StrestDocParser {
 		for (String dir : srcDirectories) {
 			routes.addAll(this.parseDirectory(dir));
 		}
-		DynMap index = this.createIndex(routes);
+		List<DynMap> indexes = this.createIndexes(routes);
 		//save the index.
-		for (TemplateRenderer rend : this.renderers) {
-			if (rend instanceof FileRenderer) {
-				((FileRenderer)rend).setSaveDirectory(saveDirectory);
+		for (DynMap index : indexes) {
+			for (TemplateRenderer rend : this.renderers) {
+				if (rend instanceof FileRenderer) {
+					((FileRenderer)rend).setSaveDirectory(saveDirectory);
+				}
+				rend.renderIndex(index);
 			}
-			rend.renderIndex(index);
 		}
 		
 		for (DynMap route : routes) {
@@ -133,7 +135,7 @@ public class StrestDocParser {
 	 * @param routes
 	 * @return
 	 */
-	public DynMap createIndexes(List<DynMap> routes) {
+	public List<DynMap> createIndexes(List<DynMap> routes) {
 		
 		DynMap indexes = new DynMap();
 		
@@ -157,8 +159,9 @@ public class StrestDocParser {
 				index.addToListWithDot("categories." + category, mp);
 			}
 		}
-		
-		//TODO: now need to sort the categories
+		List<DynMap> inds = new ArrayList<DynMap>();
+				
+		//	now need to sort the categories
 		for(String ind : indexes.keySet()) {
 			DynMap cats = indexes.getMap(ind + ".categories");
 			List<DynMap> catList = new ArrayList<DynMap>();
@@ -179,8 +182,9 @@ public class StrestDocParser {
 			
 			//add back to the index.
 			indexes.getMap(ind).put("categories", catList);
+			inds.add(indexes.getMap(ind));
 		}
-		return indexes;
+		return inds;
 	}
 	
 	public DynMap createIndexCategory(String category, List<DynMap> routes) {

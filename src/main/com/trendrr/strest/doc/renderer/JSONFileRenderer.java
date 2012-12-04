@@ -27,7 +27,7 @@ public class JSONFileRenderer extends FileRenderer {
 	 */
 	@Override
 	public void renderIndex(DynMap index) {
-		this.save("strestdoc_index.json", index.toJSONString());
+		this.save("strestdoc_index_" + index.getString("name") + ".json", index.toJSONString());
 	}
 
 	/* (non-Javadoc)
