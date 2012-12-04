@@ -139,9 +139,6 @@ public class StrestDocParser {
 		
 		DynMap indexes = new DynMap();
 		
-		
-		
-		
 		for (DynMap route : routes) {
 			route.putIfAbsent("index", "default");
 			for (String indexName : route.getList(String.class, "index", ",")) {
@@ -160,14 +157,13 @@ public class StrestDocParser {
 			}
 		}
 		List<DynMap> inds = new ArrayList<DynMap>();
-				
 		//	now need to sort the categories
 		for(String ind : indexes.keySet()) {
 			DynMap cats = indexes.getMap(ind + ".categories");
 			List<DynMap> catList = new ArrayList<DynMap>();
 			
 			for (String c : cats.keySet()) {
-				DynMap ct = this.createIndexCategory(c, cats.getList(DynMap.class, "routes"));
+				DynMap ct = this.createIndexCategory(c, cats.getList(DynMap.class, c));
 				if (ct != null) {
 					catList.add(ct);
 				}
