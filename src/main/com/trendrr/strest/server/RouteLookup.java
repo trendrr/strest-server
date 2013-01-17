@@ -3,6 +3,10 @@
  */
 package com.trendrr.strest.server;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -27,6 +31,30 @@ public class RouteLookup {
 	
 	public void addRoute(String route, Class<StrestController> cls) {
 		matcher.addMapping(new UriMapping(route, cls));
+	}
+	
+	/**
+	 * Returns all the controllers registered controllers.
+	 * 
+	 * This copies and instantiates all registered controllers into a new list
+	 * so if there are many this could be a heavy operation.
+	 * 
+	 */
+	public List<StrestController> getAllControllers() {
+		Collection<UriMapping> mps = this.matcher.getAll();
+		ArrayList<StrestController> controllers = new ArrayList<StrestController>();
+		for (UriMapping m : mps) {
+			Class cls = m.getCls();
+			if (cls == null)
+				continue;
+			try {
+				StrestController controller = (StrestController)Reflection.defaultInstance(cls);
+				controllers.add(controller);
+			} catch (Exception e) {
+				log.error("Caught" ,e);
+			}
+		}
+		return controllers;
 	}
 	
 	/**

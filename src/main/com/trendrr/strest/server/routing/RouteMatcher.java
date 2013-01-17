@@ -4,7 +4,9 @@
 package com.trendrr.strest.server.routing;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 
 import org.apache.commons.logging.Log;
@@ -40,6 +42,8 @@ public class RouteMatcher {
 	
 	protected TreeNode tree = new TreeNode();
 	protected HashMap<String, UriMapping> nonWildcardRoutes = new HashMap<String, UriMapping>();
+	
+	protected HashSet<UriMapping> all = new HashSet<UriMapping>();
 	
 	public static void main(String ...strings) {
 		
@@ -124,6 +128,14 @@ public class RouteMatcher {
 		} else {
 			tree.addChildNode(mapping, mapping.getTokens());
 		}
+		this.all.add(mapping);
 	}
-	
+
+	/**
+	 * returns a list of all the mapped uris
+	 * @return
+	 */
+	public Collection<UriMapping> getAll() {
+		return this.all;
+	}
 }

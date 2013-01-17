@@ -8,6 +8,7 @@ import static org.jboss.netty.handler.codec.http.HttpHeaders.Names.CONTENT_TYPE;
 import java.nio.channels.ClosedChannelException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
@@ -27,6 +28,7 @@ import com.trendrr.strest.StrestUtil;
 import com.trendrr.strest.annotations.AnnotationHelper;
 import com.trendrr.strest.annotations.Async;
 import com.trendrr.strest.server.connections.StrestNettyConnectionChannel;
+import com.trendrr.strest.server.routing.UriMapping;
 import com.trendrr.strest.server.v2.models.*;
 import com.trendrr.strest.server.v2.models.StrestHeader.TxnAccept;
 import com.trendrr.strest.server.v2.models.StrestHeader.TxnStatus;
@@ -378,6 +380,18 @@ public class StrestRouter {
         }
 		
 	}
+	
+	/**
+	 * Returns all the controllers registered controllers.
+	 * 
+	 * This copies and instantiates all registered controllers into a new list
+	 * so if there are many this could be a heavy operation.
+	 * 
+	 */
+	public List<StrestController> getAllControllers() {
+		return this.routeLookup.getAllControllers();
+	}
+	
 	/**
 	 * completes a response.  
 	 * @param controller
